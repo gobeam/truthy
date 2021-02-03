@@ -1,0 +1,11 @@
+db:
+  host: 'localhost'
+  type: 'postgres'
+  port: 5432
+  database: 'nest'
+  username: 'postgres'
+  password: 'root'
+  synchronize: true
+
+jwt:
+  secret: 'example@123'

@@ -1,0 +1,4 @@
+server:
+  origin: http://localhost:3001
+db:
+  synchronize: false
