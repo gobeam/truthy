@@ -1,28 +1,48 @@
-FROM node:12.13-alpine As development
+FROM node:12-alpine AS BUILD_IMAGE
+
+# couchbase sdk requirements
+RUN apk update && apk add yarn curl bash python g++ make && rm -rf /var/cache/apk/*
+
+# install node-prune (https://github.com/tj/node-prune)
+RUN curl -sfL https://install.goreleaser.com/github.com/tj/node-prune.sh | bash -s -- -b /usr/local/bin
 
 WORKDIR /usr/src/app
 
-COPY package*.json ./
+COPY package.json yarn.lock ./
 
-RUN npm i
+# install dependencies
+RUN yarn --frozen-lockfile
 
 COPY . .
 
-RUN npm run build
+# lint & test
+#RUN yarn test
 
-FROM node:12.13-alpine as production
+# build application
+RUN yarn build
 
-ARG NODE_ENV=production
-ENV NODE_ENV=${NODE_ENV}
+# remove development dependencies
+RUN npm prune --production
+
+# run node prune
+RUN /usr/local/bin/node-prune
+
+# remove unused dependencies
+RUN rm -rf node_modules/rxjs/src/
+RUN rm -rf node_modules/rxjs/bundles/
+RUN rm -rf node_modules/rxjs/_esm5/
+RUN rm -rf node_modules/rxjs/_esm2015/
+RUN rm -rf node_modules/swagger-ui-dist/*.map
+RUN rm -rf node_modules/couchbase/src/
+
+FROM node:12-alpine
 
 WORKDIR /usr/src/app
 
-COPY package*.json ./
+# copy from build image
+COPY --from=BUILD_IMAGE /usr/src/app/dist ./dist
+COPY --from=BUILD_IMAGE /usr/src/app/node_modules ./node_modules
 
-RUN npm i
+EXPOSE 3030
 
-COPY . .
-
-COPY --from=development /usr/src/app/dist ./dist
-
-CMD ["node", "dist/main"]
+CMD [ "node", "./dist/Main.js" ]
