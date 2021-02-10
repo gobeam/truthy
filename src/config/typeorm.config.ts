@@ -3,7 +3,7 @@ import * as config from 'config';
 
 const dbConfig = config.get('db');
 export const TypeOrmConfig: TypeOrmModuleOptions = {
-  type: dbConfig.type,
+  type: process.env.DB_TYPE || dbConfig.type,
   host: process.env.DB_HOST || dbConfig.host,
   port: process.env.DB_PORT || dbConfig.port,
   username: process.env.DB_USERNAME || dbConfig.username,
@@ -12,8 +12,8 @@ export const TypeOrmConfig: TypeOrmModuleOptions = {
   entities: [__dirname + '/../**/*.entity.js'],
   synchronize: process.env.TYPE_ORM_SYNC || dbConfig.synchronize,
   migrationsTableName: 'migrations',
-  migrations: ['migration/*.js'],
+  migrations: ['./migration/*.js', 'migration/*.ts'],
   cli: {
-    migrationsDir: 'migration',
+    migrationsDir: './migration',
   },
 };
