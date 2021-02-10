@@ -5,7 +5,7 @@ db:
   host: 'localhost'
   type: 'postgres'
   port: 5432
-  database: 'nest'
+  database: 'truthy'
 
 jwt:
   expiresIn: 3600

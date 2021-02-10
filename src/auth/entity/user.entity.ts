@@ -1,30 +1,32 @@
-import {
-  BaseEntity,
-  Column,
-  Entity,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
+import { Column, Entity, Index } from 'typeorm';
 import { UserStatusEnum } from '../user-status.enum';
 import * as bcrypt from 'bcrypt';
 import { Exclude } from 'class-transformer';
+import { CustomBaseEntity } from '../../custom-base.entity';
 
 @Entity()
-export class User extends BaseEntity {
-  @PrimaryGeneratedColumn()
-  id: number;
-
+export class User extends CustomBaseEntity {
+  @Index({ unique: true })
   @Column()
   username: string;
+
+  @Index({ unique: true })
+  @Column()
+  email: string;
 
   @Column()
   @Exclude({ toPlainOnly: true })
   password: string;
 
+  @Index()
   @Column()
   name: string;
 
   @Column()
   status: UserStatusEnum;
+
+  @Column()
+  token: string;
 
   @Column()
   @Exclude({ toPlainOnly: true })
