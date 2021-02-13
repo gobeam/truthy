@@ -1,7 +1,6 @@
 import { Column, Entity, Index } from 'typeorm';
 import { UserStatusEnum } from '../user-status.enum';
 import * as bcrypt from 'bcrypt';
-import { Exclude } from 'class-transformer';
 import { CustomBaseEntity } from '../../custom-base.entity';
 
 @Entity({ name: 'users' })
@@ -15,7 +14,6 @@ export class User extends CustomBaseEntity {
   email: string;
 
   @Column()
-  @Exclude({ toPlainOnly: true })
   password: string;
 
   @Index()
@@ -29,7 +27,6 @@ export class User extends CustomBaseEntity {
   token: string;
 
   @Column()
-  @Exclude({ toPlainOnly: true })
   salt: string;
 
   async validatePassword(password: string): Promise<boolean> {
