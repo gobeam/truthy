@@ -1,4 +1,5 @@
 import { MigrationInterface, QueryRunner, Table, TableIndex } from 'typeorm';
+import { UserStatusEnum } from '../auth/user-status.enum';
 
 export class UserTable1612960824811 implements MigrationInterface {
   indexFields = ['name', 'email', 'username'];
@@ -49,6 +50,11 @@ export class UserTable1612960824811 implements MigrationInterface {
             name: 'token',
             type: 'varchar',
             isNullable: true
+          },
+          {
+            name: 'status',
+            type: 'varchar',
+            default: `'active'`
           },
           {
             name: 'createdAt',

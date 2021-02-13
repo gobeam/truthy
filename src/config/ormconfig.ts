@@ -9,9 +9,9 @@ const ormConfig: ConnectionOptions = {
   username: process.env.DB_USERNAME || dbConfig.username,
   password: process.env.DB_PASSWORD || dbConfig.password,
   database: process.env.DB_DATABASE_NAME || dbConfig.database,
-  entities: [__dirname + '/**/*.entity{.ts,.js}'],
+  entities: [__dirname + '/../**/*.entity.{js,ts}'],
   synchronize: process.env.TYPE_ORM_SYNC || dbConfig.synchronize,
-  migrations: [__dirname + '/migrations/**/*{.ts,.js}'],
+  migrations: [__dirname + '/../migrations/**/*{.ts,.js}'],
   cli: {
     migrationsDir: 'src/migrations'
   }

@@ -4,7 +4,7 @@ import * as bcrypt from 'bcrypt';
 import { Exclude } from 'class-transformer';
 import { CustomBaseEntity } from '../../custom-base.entity';
 
-@Entity()
+@Entity({ name: 'users' })
 export class User extends CustomBaseEntity {
   @Index({ unique: true })
   @Column()
