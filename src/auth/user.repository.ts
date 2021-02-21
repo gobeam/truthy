@@ -14,7 +14,7 @@ export class UserRepository extends Repository<User> {
     user.username = username;
     user.email = email;
     user.salt = await bcrypt.genSalt();
-    user.password = await this.hashPassword(password, user.salt);
+    user.password = password;
     await user.save();
   }
 
@@ -27,7 +27,7 @@ export class UserRepository extends Repository<User> {
     throw new UnauthorizedException();
   }
 
-  private async hashPassword(password: string, salt: string): Promise<string> {
-    return bcrypt.hash(password, salt);
-  }
+  // private async hashPassword(password: string, salt: string): Promise<string> {
+  //   return bcrypt.hash(password, salt);
+  // }
 }

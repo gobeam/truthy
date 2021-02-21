@@ -1,9 +1,9 @@
-import { Column, Entity, Index } from 'typeorm';
+import { BeforeInsert, BeforeUpdate, Column, Entity, Index } from 'typeorm';
 import { UserStatusEnum } from '../user-status.enum';
 import * as bcrypt from 'bcrypt';
 import { CustomBaseEntity } from '../../custom-base.entity';
 
-@Entity({ name: 'users' })
+@Entity({ name: 'user' })
 export class User extends CustomBaseEntity {
   @Index({ unique: true })
   @Column()
@@ -28,9 +28,28 @@ export class User extends CustomBaseEntity {
 
   @Column()
   salt: string;
+  skipHashPassword = false;
+
+  @BeforeInsert()
+  async hashPasswordBeforeInsert() {
+    if (this.password && !this.skipHashPassword) {
+      await this.hashPassword();
+    }
+  }
+
+  @BeforeUpdate()
+  async hashPasswordBeforeUpdate() {
+    if (this.password && !this.skipHashPassword) {
+      await this.hashPassword();
+    }
+  }
 
   async validatePassword(password: string): Promise<boolean> {
     const hash = await bcrypt.hash(password, this.salt);
     return hash === this.password;
+  }
+
+  async hashPassword() {
+    this.password = await bcrypt.hash(this.password, this.salt);
   }
 }

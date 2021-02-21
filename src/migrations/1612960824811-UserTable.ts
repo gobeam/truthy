@@ -1,13 +1,12 @@
 import { MigrationInterface, QueryRunner, Table, TableIndex } from 'typeorm';
-import { UserStatusEnum } from '../auth/user-status.enum';
 
 export class UserTable1612960824811 implements MigrationInterface {
   indexFields = ['name', 'email', 'username'];
-
+  tableName = 'user';
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.createTable(
       new Table({
-        name: 'users',
+        name: this.tableName,
         columns: [
           {
             name: 'id',
@@ -73,7 +72,7 @@ export class UserTable1612960824811 implements MigrationInterface {
 
     for (const field of this.indexFields) {
       await queryRunner.createIndex(
-        'users',
+        this.tableName,
         new TableIndex({
           name: `IDX_USER_${field.toUpperCase()}`,
           columnNames: [field]
@@ -83,9 +82,12 @@ export class UserTable1612960824811 implements MigrationInterface {
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.query(`DROP TABLE users`);
     for (const field of this.indexFields) {
-      await queryRunner.dropIndex('users', `IDX_USER_${field.toUpperCase()}`);
+      await queryRunner.dropIndex(
+        this.tableName,
+        `IDX_USER_${field.toUpperCase()}`
+      );
     }
+    await queryRunner.query(`DROP TABLE ${this.tableName}`);
   }
 }

@@ -9,8 +9,10 @@ import { JwtPayloadDto } from './dto/jwt-payload.dto';
 
 @Injectable()
 export class AuthService {
-  constructor(@InjectRepository(UserRepository) private userRepository: UserRepository, private jwtService: JwtService) {
-  }
+  constructor(
+    @InjectRepository(UserRepository) private userRepository: UserRepository,
+    private jwtService: JwtService
+  ) {}
 
   async addUser(createUserDto: CreateUserDto): Promise<void> {
     return this.userRepository.store(createUserDto);
