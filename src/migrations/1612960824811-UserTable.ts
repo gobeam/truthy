@@ -3,6 +3,7 @@ import { MigrationInterface, QueryRunner, Table, TableIndex } from 'typeorm';
 export class UserTable1612960824811 implements MigrationInterface {
   indexFields = ['name', 'email', 'username'];
   tableName = 'user';
+
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.createTable(
       new Table({
@@ -82,11 +83,13 @@ export class UserTable1612960824811 implements MigrationInterface {
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
+    const table = await queryRunner.getTable(this.tableName);
     for (const field of this.indexFields) {
-      await queryRunner.dropIndex(
-        this.tableName,
-        `IDX_USER_${field.toUpperCase()}`
+      const index = `IDX_USER_${field.toUpperCase()}`;
+      const keyIndex = table.indices.find(
+        (fk) => fk.name.indexOf(index) !== -1
       );
+      await queryRunner.dropIndex(this.tableName, keyIndex);
     }
     await queryRunner.query(`DROP TABLE ${this.tableName}`);
   }

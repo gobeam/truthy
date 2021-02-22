@@ -3,16 +3,19 @@ import { Column, Entity, JoinColumn, OneToMany, Unique } from 'typeorm';
 import { PermissionRoleEntity } from './permission-role.entity';
 
 @Entity({ name: 'permission' })
-@Unique(['key'])
+@Unique(['path'])
 export class PermissionEntity extends CustomBaseEntity {
-  @Column('varchar', { length: 200 })
-  key: string;
+  @Column('varchar', { length: 100 })
+  resource: string;
 
   @Column()
   description: string;
 
-  @Column('varchar', { default: 'Custom', length: 100 })
-  group: string;
+  @Column()
+  path: string;
+
+  @Column('varchar', { default: 'get', length: 20 })
+  method: string;
 
   @OneToMany(
     (type) => PermissionRoleEntity,

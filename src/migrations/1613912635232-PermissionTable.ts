@@ -2,6 +2,7 @@ import { MigrationInterface, QueryRunner, Table, TableIndex } from 'typeorm';
 
 export class PermissionTable1613912635232 implements MigrationInterface {
   tableName = 'permission';
+  indexFields = ['resource', 'path'];
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.createTable(
@@ -16,11 +17,15 @@ export class PermissionTable1613912635232 implements MigrationInterface {
             generationStrategy: 'increment'
           },
           {
-            name: 'key',
+            name: 'resource',
+            type: 'varchar',
+            length: '100'
+          },
+          {
+            name: 'path',
             type: 'varchar',
             isNullable: false,
-            isUnique: true,
-            length: '200'
+            isUnique: true
           },
           {
             name: 'description',
@@ -28,9 +33,10 @@ export class PermissionTable1613912635232 implements MigrationInterface {
             isNullable: true
           },
           {
-            name: 'group',
+            name: 'method',
             type: 'varchar',
-            default: `'Custom'`
+            default: `'get'`,
+            length: '20'
           },
           {
             name: 'createdAt',
@@ -47,20 +53,26 @@ export class PermissionTable1613912635232 implements MigrationInterface {
       false
     );
 
-    await queryRunner.createIndex(
-      this.tableName,
-      new TableIndex({
-        name: `IDX_PERMISSION_KEY`,
-        columnNames: ['key']
-      })
-    );
+    for (const field of this.indexFields) {
+      await queryRunner.createIndex(
+        this.tableName,
+        new TableIndex({
+          name: `IDX_PERMISSION_${field.toUpperCase()}`,
+          columnNames: [field]
+        })
+      );
+    }
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
     const table = await queryRunner.getTable(this.tableName);
-    const index = `IDX_PERMISSION_KEY`;
-    const keyIndex = table.indices.find((fk) => fk.name.indexOf(index) !== -1);
-    await queryRunner.dropIndex(this.tableName, keyIndex);
+    for (const field of this.indexFields) {
+      const index = `IDX_PERMISSION_${field.toUpperCase()}`;
+      const keyIndex = table.indices.find(
+        (fk) => fk.name.indexOf(index) !== -1
+      );
+      await queryRunner.dropIndex(this.tableName, keyIndex);
+    }
     await queryRunner.query(`DROP TABLE ${this.tableName}`);
   }
 }

@@ -11,12 +11,6 @@ export class RoleEntity extends CustomBaseEntity {
   @Column('text')
   description: string;
 
-  @Column('varchar', { length: 100, default: 'Custom' })
-  group: string;
-
-  @Column('boolean', { default: false })
-  isDefault: boolean;
-
   @OneToMany(
     (type) => PermissionRoleEntity,
     (permissionRole) => permissionRole.role

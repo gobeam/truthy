@@ -15,12 +15,6 @@ export class PermissionRoleEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column('boolean', { default: false })
-  isEnabled: boolean;
-
-  @Column('boolean', { default: false })
-  isDefault: boolean;
-
   @ManyToOne(
     (type) => PermissionEntity,
     (permission) => permission.permissionRoles,

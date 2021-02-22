@@ -26,8 +26,4 @@ export class UserRepository extends Repository<User> {
     }
     throw new UnauthorizedException();
   }
-
-  // private async hashPassword(password: string, salt: string): Promise<string> {
-  //   return bcrypt.hash(password, salt);
-  // }
 }

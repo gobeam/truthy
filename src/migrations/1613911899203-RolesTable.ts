@@ -28,21 +28,6 @@ export class RolesTable1613911899203 implements MigrationInterface {
             isNullable: true
           },
           {
-            name: 'group',
-            type: 'varchar',
-            default: `'Custom'`
-          },
-          {
-            name: 'isDefault',
-            type: 'boolean',
-            default: false
-          },
-          {
-            name: 'isSystem',
-            type: 'boolean',
-            default: false
-          },
-          {
             name: 'createdAt',
             type: 'timestamp',
             default: 'now()'
