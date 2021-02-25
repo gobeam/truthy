@@ -1,6 +1,6 @@
 import { MigrationInterface, QueryRunner, Table, TableIndex } from 'typeorm';
 
-export class RolesTable1613911899203 implements MigrationInterface {
+export class RoleTable1614275766942 implements MigrationInterface {
   tableName = 'role';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
@@ -56,6 +56,6 @@ export class RolesTable1613911899203 implements MigrationInterface {
     const index = `IDX_ROLE_NAME`;
     const nameIndex = table.indices.find((fk) => fk.name.indexOf(index) !== -1);
     await queryRunner.dropIndex(this.tableName, nameIndex);
-    await queryRunner.query(`DROP TABLE ${this.tableName}`);
+    await queryRunner.dropTable(this.tableName);
   }
 }

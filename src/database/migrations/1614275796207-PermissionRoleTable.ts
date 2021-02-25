@@ -1,12 +1,6 @@
-import {
-  MigrationInterface,
-  QueryRunner,
-  Table,
-  TableColumn,
-  TableForeignKey
-} from 'typeorm';
+import { MigrationInterface, QueryRunner, Table, TableColumn, TableForeignKey } from 'typeorm';
 
-export class PermissionRoleTable1613922953252 implements MigrationInterface {
+export class PermissionRoleTable1614275796207 implements MigrationInterface {
   foreignKeysArray = [
     { table: 'permission', field: 'permissionId', reference: 'id' },
     { table: 'role', field: 'roleId', reference: 'id' }
@@ -24,16 +18,6 @@ export class PermissionRoleTable1613922953252 implements MigrationInterface {
             isPrimary: true,
             isGenerated: true,
             generationStrategy: 'increment'
-          },
-          {
-            name: 'isEnabled',
-            type: 'boolean',
-            default: false
-          },
-          {
-            name: 'isDefault',
-            type: 'boolean',
-            default: false
           }
         ]
       }),

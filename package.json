@@ -23,7 +23,8 @@
     "generate": "npm run typeorm migration:generate -- -n",
     "orm-create": "npm run typeorm migration:create -- -n",
     "migrate": "npm run typeorm migration:run",
-    "revert": "npm run typeorm migration:revert"
+    "migration:rollback": "npm run typeorm migration:revert",
+    "seed:run": "ts-node ./node_modules/typeorm-seeding/dist/cli.js seed -n ./src/config/ormconfig.ts"
   },
   "dependencies": {
     "@nestjs/common": "^7.5.1",
@@ -43,7 +44,8 @@
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",
     "rxjs": "^6.6.3",
-    "typeorm": "^0.2.30"
+    "typeorm": "^0.2.30",
+    "typeorm-seeding": "^1.6.1"
   },
   "devDependencies": {
     "@nestjs/cli": "^7.5.1",

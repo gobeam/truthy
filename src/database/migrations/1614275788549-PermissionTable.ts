@@ -1,6 +1,6 @@
 import { MigrationInterface, QueryRunner, Table, TableIndex } from 'typeorm';
 
-export class PermissionTable1613912635232 implements MigrationInterface {
+export class PermissionTable1614275788549 implements MigrationInterface {
   tableName = 'permission';
   indexFields = ['resource', 'path'];
 
@@ -73,6 +73,6 @@ export class PermissionTable1613912635232 implements MigrationInterface {
       );
       await queryRunner.dropIndex(this.tableName, keyIndex);
     }
-    await queryRunner.query(`DROP TABLE ${this.tableName}`);
+    await queryRunner.dropTable(this.tableName);
   }
 }

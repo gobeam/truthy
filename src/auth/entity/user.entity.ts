@@ -1,7 +1,16 @@
-import { BeforeInsert, BeforeUpdate, Column, Entity, Index } from 'typeorm';
+import {
+  BeforeInsert,
+  BeforeUpdate,
+  Column,
+  Entity,
+  Index,
+  JoinColumn,
+  OneToOne
+} from 'typeorm';
 import { UserStatusEnum } from '../user-status.enum';
 import * as bcrypt from 'bcrypt';
 import { CustomBaseEntity } from '../../custom-base.entity';
+import { RoleEntity } from '../../roles/entities/role.entity';
 
 @Entity({ name: 'user' })
 export class User extends CustomBaseEntity {
@@ -28,7 +37,15 @@ export class User extends CustomBaseEntity {
 
   @Column()
   salt: string;
+
   skipHashPassword = false;
+
+  @OneToOne(() => RoleEntity)
+  @JoinColumn()
+  role: RoleEntity;
+
+  @Column()
+  roleId: number;
 
   @BeforeInsert()
   async hashPasswordBeforeInsert() {

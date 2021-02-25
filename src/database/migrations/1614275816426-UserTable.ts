@@ -1,6 +1,13 @@
-import { MigrationInterface, QueryRunner, Table, TableIndex } from 'typeorm';
+import {
+  MigrationInterface,
+  QueryRunner,
+  Table,
+  TableColumn,
+  TableForeignKey,
+  TableIndex
+} from 'typeorm';
 
-export class UserTable1612960824811 implements MigrationInterface {
+export class UserTable1614275816426 implements MigrationInterface {
   indexFields = ['name', 'email', 'username'];
   tableName = 'user';
 
@@ -80,17 +87,42 @@ export class UserTable1612960824811 implements MigrationInterface {
         })
       );
     }
+
+    await queryRunner.addColumn(
+      this.tableName,
+      new TableColumn({
+        name: 'roleId',
+        type: 'int'
+      })
+    );
+
+    await queryRunner.createForeignKey(
+      this.tableName,
+      new TableForeignKey({
+        columnNames: ['roleId'],
+        referencedColumnNames: ['id'],
+        referencedTableName: 'role',
+        onDelete: 'CASCADE'
+      })
+    );
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
     const table = await queryRunner.getTable(this.tableName);
+
+    const foreignKey = await table.foreignKeys.find(
+      (fk) => fk.columnNames.indexOf('roleId') !== -1
+    );
+    await queryRunner.dropForeignKey(this.tableName, foreignKey);
+    await queryRunner.dropColumn(this.tableName, 'roleId');
+
     for (const field of this.indexFields) {
       const index = `IDX_USER_${field.toUpperCase()}`;
-      const keyIndex = table.indices.find(
+      const keyIndex = await table.indices.find(
         (fk) => fk.name.indexOf(index) !== -1
       );
       await queryRunner.dropIndex(this.tableName, keyIndex);
     }
-    await queryRunner.query(`DROP TABLE ${this.tableName}`);
+    await queryRunner.dropTable(this.tableName);
   }
 }
