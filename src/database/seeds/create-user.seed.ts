@@ -16,12 +16,6 @@ export default class CreateUserSeed {
     if (!role) {
       return;
     }
-    // let user = new User();
-    // user.username = 'admin';
-    // user.email = 'admin@truthy.com';
-    // user.password = 'truthy@123';
-    // user.name = 'truthy';
-    // user.status = UserStatusEnum.ACTIVE;
     await connection
       .createQueryBuilder()
       .insert()
