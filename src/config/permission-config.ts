@@ -1,8 +1,8 @@
 interface PermissionConfigInterface {
   superRole: superRole;
-  defaultPermissionGrantedRoutes?: Array<RoutePayload>;
-  permissionDeniedToSuperUserRoutes?: Array<RoutePayload>;
-  modules: Array<ModulesPayload>;
+  defaultPermissionGrantedRoutes?: Array<RoutePayloadInterface>;
+  permissionDeniedToSuperUserRoutes?: Array<RoutePayloadInterface>;
+  modules: Array<ModulesPayloadInterface>;
 }
 
 interface superRole {
@@ -10,7 +10,7 @@ interface superRole {
   description: string;
 }
 
-enum MethodList {
+export enum MethodList {
   GET = 'get',
   POST = 'post',
   PUT = 'put',
@@ -19,23 +19,26 @@ enum MethodList {
   OPTIONS = 'options'
 }
 
-interface RoutePayload {
-  url: string;
+export interface RoutePayloadInterface {
+  path: string;
   method: MethodList;
+  description?: string;
+  resource?: string;
 }
 
-interface ModulesPayload {
+interface ModulesPayloadInterface {
   name: string;
   resource: string;
   icon: string;
   hasSubmodules: boolean;
   route?: string;
-  submodules?: Array<SubModulePayload>;
+  submodules?: Array<SubModulePayloadInterface>;
   permissions?: Array<PermissionPayload>;
 }
 
-interface SubModulePayload {
+interface SubModulePayloadInterface {
   name: string;
+  resource?: string;
   icon: string;
   route?: string;
   permissions?: Array<PermissionPayload>;
@@ -43,7 +46,7 @@ interface SubModulePayload {
 
 interface PermissionPayload {
   name: string;
-  route: Array<RoutePayload>;
+  route: Array<RoutePayloadInterface>;
 }
 
 export const PermissionConfiguration: PermissionConfigInterface = {
@@ -61,6 +64,7 @@ export const PermissionConfiguration: PermissionConfigInterface = {
       hasSubmodules: true,
       submodules: [
         {
+          resource: 'user',
           name: 'Users',
           icon: `user-icon`,
           route: '/users',
@@ -69,7 +73,8 @@ export const PermissionConfiguration: PermissionConfigInterface = {
               name: 'View user',
               route: [
                 {
-                  url: '/users',
+                  description: 'View all user',
+                  path: '/users',
                   method: MethodList.GET
                 }
               ]
@@ -78,7 +83,8 @@ export const PermissionConfiguration: PermissionConfigInterface = {
               name: 'Store user',
               route: [
                 {
-                  url: '/users',
+                  description: 'Store new user',
+                  path: '/users',
                   method: MethodList.POST
                 }
               ]
@@ -87,7 +93,8 @@ export const PermissionConfiguration: PermissionConfigInterface = {
               name: 'Update user',
               route: [
                 {
-                  url: '/users/:id',
+                  description: 'Update existing user',
+                  path: '/users/:id',
                   method: MethodList.PUT
                 }
               ]
@@ -96,7 +103,8 @@ export const PermissionConfiguration: PermissionConfigInterface = {
               name: 'Delete user',
               route: [
                 {
-                  url: '/users/:id',
+                  description: 'Delete user',
+                  path: '/users/:id',
                   method: MethodList.DELETE
                 }
               ]
@@ -105,6 +113,7 @@ export const PermissionConfiguration: PermissionConfigInterface = {
         },
         {
           name: 'Roles',
+          resource: 'role',
           icon: `role-icon`,
           route: '/roles',
           permissions: [
@@ -112,7 +121,8 @@ export const PermissionConfiguration: PermissionConfigInterface = {
               name: 'View role',
               route: [
                 {
-                  url: '/roles',
+                  description: 'View all role',
+                  path: '/roles',
                   method: MethodList.GET
                 }
               ]
@@ -121,7 +131,8 @@ export const PermissionConfiguration: PermissionConfigInterface = {
               name: 'Store role',
               route: [
                 {
-                  url: '/roles',
+                  description: 'Store new role',
+                  path: '/roles',
                   method: MethodList.POST
                 }
               ]
@@ -130,7 +141,8 @@ export const PermissionConfiguration: PermissionConfigInterface = {
               name: 'Update role',
               route: [
                 {
-                  url: '/roles/:id',
+                  description: 'update existing role',
+                  path: '/roles/:id',
                   method: MethodList.PUT
                 }
               ]
@@ -139,7 +151,8 @@ export const PermissionConfiguration: PermissionConfigInterface = {
               name: 'Delete role',
               route: [
                 {
-                  url: '/roles/:id',
+                  description: 'Delete existing role',
+                  path: '/roles/:id',
                   method: MethodList.DELETE
                 }
               ]

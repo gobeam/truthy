@@ -2,7 +2,7 @@ import { MigrationInterface, QueryRunner, Table, TableIndex } from 'typeorm';
 
 export class PermissionTable1614275788549 implements MigrationInterface {
   tableName = 'permission';
-  indexFields = ['resource', 'path'];
+  indexFields = ['resource', 'description'];
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.createTable(
@@ -24,13 +24,13 @@ export class PermissionTable1614275788549 implements MigrationInterface {
           {
             name: 'path',
             type: 'varchar',
-            isNullable: false,
-            isUnique: true
+            isNullable: false
           },
           {
             name: 'description',
             type: 'text',
-            isNullable: true
+            isNullable: true,
+            isUnique: true
           },
           {
             name: 'method',
