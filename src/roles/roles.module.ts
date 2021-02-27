@@ -9,5 +9,4 @@ import { RoleRepository } from './role.repository';
   controllers: [RolesController],
   providers: [RolesService]
 })
-export class RolesModule {
-}
+export class RolesModule {}
