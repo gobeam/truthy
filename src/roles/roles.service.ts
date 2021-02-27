@@ -12,7 +12,7 @@ export class RolesService {
     @InjectRepository(RoleRepository) private repository: RoleRepository
   ) {}
 
-  create(createRoleDto: CreateRoleDto): Promise<void> {
+  create(createRoleDto: CreateRoleDto): Promise<RoleEntity> {
     return this.repository.store(createRoleDto);
   }
 
@@ -21,13 +21,13 @@ export class RolesService {
   }
 
   async findOne(id: number): Promise<RoleEntity> {
-    const task = await this.repository.findOne({
+    const role = await this.repository.findOne({
       where: { id }
     });
-    if (!task) {
+    if (!role) {
       throw new NotFoundException();
     }
-    return task;
+    return role;
   }
 
   async update(id: number, updateRoleDto: UpdateRoleDto): Promise<RoleEntity> {

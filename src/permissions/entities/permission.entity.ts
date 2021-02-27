@@ -7,20 +7,23 @@ import { PermissionRoleEntity } from './permission-role.entity';
 export class PermissionEntity extends CustomBaseEntity {
   @Column('varchar', { length: 100 })
   resource: string;
-
   @Column()
   description: string;
-
   @Column()
   path: string;
-
   @Column('varchar', { default: 'get', length: 20 })
   method: string;
-
   @OneToMany(
     (type) => PermissionRoleEntity,
     (permissionRole) => permissionRole.permission
   )
   @JoinColumn()
   permissionRoles: PermissionRoleEntity[];
+
+  constructor(data?: Partial<PermissionEntity>) {
+    super();
+    if (data) {
+      Object.assign(this, data);
+    }
+  }
 }

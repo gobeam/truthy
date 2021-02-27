@@ -9,16 +9,17 @@ export class RoleRepository extends Repository<RoleEntity> {
     const { name } = roleFilterDto;
     const query = this.createQueryBuilder('role');
     if (name) {
-      query.andWhere('role.name LIKE :name', { name: `%${name}%` });
+      query.where('role.name LIKE :name', { name: `%${name}%` });
     }
     return query.getMany();
   }
 
-  async store(createRoleDto: CreateRoleDto): Promise<void> {
+  async store(createRoleDto: CreateRoleDto): Promise<RoleEntity> {
     const { name, description } = createRoleDto;
     const role = this.create();
     role.name = name;
     role.description = description;
     await role.save();
+    return role;
   }
 }
