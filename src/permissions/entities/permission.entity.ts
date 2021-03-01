@@ -13,6 +13,8 @@ export class PermissionEntity extends CustomBaseEntity {
   path: string;
   @Column('varchar', { default: 'get', length: 20 })
   method: string;
+  @Column()
+  isDefault: boolean;
   @OneToMany(
     (type) => PermissionRoleEntity,
     (permissionRole) => permissionRole.permission

@@ -9,7 +9,8 @@ import { UpdateRoleDto } from './dto/update-role.dto';
 const roleRepositoryMock = () => ({
   findAll: jest.fn(),
   findOne: jest.fn(),
-  store: jest.fn()
+  store: jest.fn(),
+  updateItem: jest.fn()
 });
 const mockRole = {
   id: 1,
@@ -53,7 +54,7 @@ describe('RolesService', () => {
   });
 
   describe('findOne', () => {
-    it('find success', async () => {
+    it('role find success', async () => {
       roleRepository.findOne.mockResolvedValue(mockRole);
       const result = await service.findOne(1);
       expect(roleRepository.findOne).toHaveBeenCalledWith({
@@ -70,25 +71,24 @@ describe('RolesService', () => {
 
   describe('update', () => {
     it('update item that exists in database', async () => {
+      roleRepository.updateItem.mockResolvedValue(mockRole);
       const updateRoleDto: UpdateRoleDto = mockRole;
-      service.findOne = jest.fn().mockResolvedValue(mockRole);
-      await service.update(1, updateRoleDto);
-      expect(service.findOne).toHaveBeenCalledWith(1);
-      expect(mockRole.save).toHaveBeenCalledTimes(1);
+      const role = await service.update(1, updateRoleDto);
+      expect(roleRepository.updateItem).toHaveBeenCalledWith(1, updateRoleDto);
+      expect(role).toEqual(mockRole);
     });
 
     it('trying to update item that does not exists in database', async () => {
+      roleRepository.updateItem.mockRejectedValue(new NotFoundException());
       const updateRoleDto: UpdateRoleDto = mockRole;
-      service.findOne = jest.fn().mockImplementation(() => {
-        throw NotFoundException;
-      });
-      await expect(service.update(1, updateRoleDto)).rejects.toThrow();
-      expect(service.findOne).toHaveBeenCalledTimes(1);
+      await expect(service.update(1, updateRoleDto)).rejects.toThrowError(
+        NotFoundException
+      );
     });
   });
 
   describe('remove', () => {
-    it('trying to delete existing item', async () => {
+    it('trying to delete existing role', async () => {
       service.findOne = jest.fn().mockResolvedValue(mockRole);
       const result = await service.remove(1);
       expect(service.findOne).toHaveBeenCalledTimes(1);
@@ -98,7 +98,7 @@ describe('RolesService', () => {
       expect(result).toEqual(undefined);
     });
 
-    it('trying to delete no existing item', async () => {
+    it('trying to delete no existing role', async () => {
       service.findOne = jest.fn().mockImplementation(() => {
         throw NotFoundException;
       });

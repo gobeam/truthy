@@ -17,4 +17,11 @@ export class RoleEntity extends CustomBaseEntity {
   )
   @JoinColumn()
   permissionRoles: PermissionRoleEntity[];
+
+  constructor(data?: Partial<RoleEntity>) {
+    super();
+    if (data) {
+      Object.assign(this, data);
+    }
+  }
 }

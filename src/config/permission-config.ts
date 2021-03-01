@@ -1,7 +1,6 @@
 interface PermissionConfigInterface {
   superRole: superRole;
-  defaultPermissionGrantedRoutes?: Array<RoutePayloadInterface>;
-  permissionDeniedToSuperUserRoutes?: Array<RoutePayloadInterface>;
+  defaultRoutes?: Array<PermissionPayload>;
   modules: Array<ModulesPayloadInterface>;
 }
 
@@ -22,11 +21,12 @@ export enum MethodList {
 export interface RoutePayloadInterface {
   path: string;
   method: MethodList;
-  description?: string;
   resource?: string;
+  description?: string;
+  isDefault?: boolean;
 }
 
-interface ModulesPayloadInterface {
+export interface ModulesPayloadInterface {
   name: string;
   resource: string;
   icon: string;
@@ -36,7 +36,7 @@ interface ModulesPayloadInterface {
   permissions?: Array<PermissionPayload>;
 }
 
-interface SubModulePayloadInterface {
+export interface SubModulePayloadInterface {
   name: string;
   resource?: string;
   icon: string;
@@ -44,8 +44,9 @@ interface SubModulePayloadInterface {
   permissions?: Array<PermissionPayload>;
 }
 
-interface PermissionPayload {
+export interface PermissionPayload {
   name: string;
+  resource?: string;
   route: Array<RoutePayloadInterface>;
 }
 
@@ -54,8 +55,18 @@ export const PermissionConfiguration: PermissionConfigInterface = {
     name: 'superuser',
     description: 'superuser of the system'
   },
-  defaultPermissionGrantedRoutes: [],
-  permissionDeniedToSuperUserRoutes: [],
+  defaultRoutes: [
+    {
+      name: 'Check Route',
+      resource: 'check',
+      route: [
+        {
+          path: '/check',
+          method: MethodList.GET
+        }
+      ]
+    }
+  ],
   modules: [
     {
       name: 'User management',
@@ -70,40 +81,36 @@ export const PermissionConfiguration: PermissionConfigInterface = {
           route: '/users',
           permissions: [
             {
-              name: 'View user',
+              name: 'View all user',
               route: [
                 {
-                  description: 'View all user',
                   path: '/users',
                   method: MethodList.GET
                 }
               ]
             },
             {
-              name: 'Store user',
+              name: 'Store new user',
               route: [
                 {
-                  description: 'Store new user',
                   path: '/users',
                   method: MethodList.POST
                 }
               ]
             },
             {
-              name: 'Update user',
+              name: 'Update user by id',
               route: [
                 {
-                  description: 'Update existing user',
                   path: '/users/:id',
                   method: MethodList.PUT
                 }
               ]
             },
             {
-              name: 'Delete user',
+              name: 'Delete user by id',
               route: [
                 {
-                  description: 'Delete user',
                   path: '/users/:id',
                   method: MethodList.DELETE
                 }
@@ -118,41 +125,99 @@ export const PermissionConfiguration: PermissionConfigInterface = {
           route: '/roles',
           permissions: [
             {
-              name: 'View role',
+              name: 'View all role',
               route: [
                 {
-                  description: 'View all role',
                   path: '/roles',
                   method: MethodList.GET
                 }
               ]
             },
             {
-              name: 'Store role',
+              name: 'View role by id',
               route: [
                 {
-                  description: 'Store new role',
+                  path: '/roles/:id',
+                  method: MethodList.GET
+                }
+              ]
+            },
+            {
+              name: 'Store new role',
+              route: [
+                {
                   path: '/roles',
                   method: MethodList.POST
                 }
               ]
             },
             {
-              name: 'Update role',
+              name: 'Update role by id',
               route: [
                 {
-                  description: 'update existing role',
                   path: '/roles/:id',
                   method: MethodList.PUT
                 }
               ]
             },
             {
-              name: 'Delete role',
+              name: 'Delete role by id',
               route: [
                 {
-                  description: 'Delete existing role',
                   path: '/roles/:id',
+                  method: MethodList.DELETE
+                }
+              ]
+            }
+          ]
+        },
+        {
+          name: 'Permission',
+          resource: 'permission',
+          icon: `permission-icon`,
+          route: '/permissions',
+          permissions: [
+            {
+              name: 'View all permission',
+              route: [
+                {
+                  path: '/permissions',
+                  method: MethodList.GET
+                }
+              ]
+            },
+            {
+              name: 'View permission by id',
+              route: [
+                {
+                  path: '/permissions/:id',
+                  method: MethodList.GET
+                }
+              ]
+            },
+            {
+              name: 'Store new permission',
+              route: [
+                {
+                  path: '/permissions',
+                  method: MethodList.POST
+                }
+              ]
+            },
+            {
+              name: 'Update permission by id',
+              route: [
+                {
+                  path: '/permissions/:id',
+                  method: MethodList.PUT
+                }
+              ]
+            },
+            {
+              name: 'Delete permission by id',
+              route: [
+                {
+                  path: '/permissions/:id',
                   method: MethodList.DELETE
                 }
               ]

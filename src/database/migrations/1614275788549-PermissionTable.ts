@@ -39,6 +39,11 @@ export class PermissionTable1614275788549 implements MigrationInterface {
             length: '20'
           },
           {
+            name: 'isDefault',
+            type: 'boolean',
+            default: false
+          },
+          {
             name: 'createdAt',
             type: 'timestamp',
             default: 'now()'

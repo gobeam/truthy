@@ -12,6 +12,15 @@ const mockPermission = {
   save: jest.fn(),
   remove: jest.fn()
 };
+const getQueryBuilderMock = (data) => {
+  return jest.fn(() => ({
+    update: jest.fn().mockReturnThis(),
+    set: jest.fn().mockReturnThis(),
+    where: jest.fn().mockReturnThis(),
+    returning: jest.fn().mockReturnThis(),
+    execute: jest.fn().mockReturnValue(data)
+  }));
+};
 
 describe('PermissionRepository', () => {
   let repository;
@@ -25,28 +34,17 @@ describe('PermissionRepository', () => {
 
   describe('update', () => {
     it('update item that exists in database', async () => {
-      repository.createQueryBuilder = jest.fn(() => ({
-        update: jest.fn().mockReturnThis(),
-        set: jest.fn().mockReturnThis(),
-        where: jest.fn().mockReturnThis(),
-        returning: jest.fn().mockReturnThis(),
-        execute: jest
-          .fn()
-          .mockReturnValue({ affected: 1, raw: [mockPermission] })
-      }));
+      repository.createQueryBuilder = getQueryBuilderMock({
+        affected: 1,
+        raw: [mockPermission]
+      });
       const updatePermissionDto: UpdatePermissionDto = mockPermission;
       const result = await repository.updateItem(1, updatePermissionDto);
       expect(result).toEqual(mockPermission);
     });
 
     it('trying to update item that does not exists in database', async () => {
-      repository.createQueryBuilder = jest.fn(() => ({
-        update: jest.fn().mockReturnThis(),
-        set: jest.fn().mockReturnThis(),
-        where: jest.fn().mockReturnThis(),
-        returning: jest.fn().mockReturnThis(),
-        execute: jest.fn().mockReturnValue({ affected: 0 })
-      }));
+      repository.createQueryBuilder = getQueryBuilderMock({ affected: 0 });
       const updatePermissionDto: UpdatePermissionDto = mockPermission;
       await expect(
         repository.updateItem(1, updatePermissionDto)

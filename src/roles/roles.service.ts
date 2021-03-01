@@ -31,12 +31,7 @@ export class RolesService {
   }
 
   async update(id: number, updateRoleDto: UpdateRoleDto): Promise<RoleEntity> {
-    const { name, description } = updateRoleDto;
-    const role = await this.findOne(id);
-    role.name = name;
-    role.description = description;
-    await role.save();
-    return role;
+    return this.repository.updateItem(id, updateRoleDto);
   }
 
   async remove(id: number): Promise<void> {

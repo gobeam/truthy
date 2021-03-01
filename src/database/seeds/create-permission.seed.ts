@@ -1,15 +1,25 @@
 import { Factory } from 'typeorm-seeding';
 import { Connection } from 'typeorm';
 import {
+  ModulesPayloadInterface,
   PermissionConfiguration,
-  RoutePayloadInterface
+  PermissionPayload,
+  RoutePayloadInterface,
+  SubModulePayloadInterface
 } from '../../config/permission-config';
 import { PermissionEntity } from '../../permissions/entities/permission.entity';
 
 export default class CreatePermissionSeed {
   permissions: RoutePayloadInterface[] = [];
+
   public async run(factory: Factory, connection: Connection): Promise<any> {
     const modules = PermissionConfiguration.modules;
+    const defaultRoutes = PermissionConfiguration.defaultRoutes;
+    for (const defaultRoute of defaultRoutes) {
+      const resource = defaultRoute.resource;
+      this.concatPermissions(defaultRoute, resource, true);
+    }
+
     for (const moduleData of modules) {
       let resource = moduleData.resource;
       this.assignResourceAndConcatPermission(moduleData, resource);
@@ -33,14 +43,29 @@ export default class CreatePermissionSeed {
     }
   }
 
-  assignResourceAndConcatPermission(modules, resource) {
+  assignResourceAndConcatPermission(
+    modules: ModulesPayloadInterface | SubModulePayloadInterface,
+    resource: string,
+    isDefault?: false
+  ) {
     if (modules.permissions) {
       for (const permission of modules.permissions) {
-        for (const data of permission.route) {
-          data.resource = resource;
-        }
-        this.permissions = this.permissions.concat(permission.route);
+        this.concatPermissions(permission, resource, isDefault);
       }
     }
+  }
+
+  concatPermissions(
+    permission: PermissionPayload,
+    resource: string,
+    isDefault: boolean
+  ) {
+    const description = permission.name;
+    for (const data of permission.route) {
+      data.resource = data.resource || resource;
+      data.description = data.description || description;
+      data.isDefault = isDefault;
+    }
+    this.permissions = this.permissions.concat(permission.route);
   }
 }
