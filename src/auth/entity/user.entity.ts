@@ -9,8 +9,9 @@ import {
 } from 'typeorm';
 import { UserStatusEnum } from '../user-status.enum';
 import * as bcrypt from 'bcrypt';
-import { CustomBaseEntity } from '../../custom-base.entity';
+import { CustomBaseEntity } from '../../common/entity/custom-base.entity';
 import { RoleEntity } from '../../roles/entities/role.entity';
+import { Exclude } from 'class-transformer';
 
 @Entity({ name: 'user' })
 export class User extends CustomBaseEntity {
@@ -23,6 +24,7 @@ export class User extends CustomBaseEntity {
   email: string;
 
   @Column()
+  @Exclude({ toPlainOnly: true })
   password: string;
 
   @Index()
@@ -36,6 +38,7 @@ export class User extends CustomBaseEntity {
   token: string;
 
   @Column()
+  @Exclude({ toPlainOnly: true })
   salt: string;
 
   skipHashPassword = false;

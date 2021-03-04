@@ -1,4 +1,4 @@
-import { CustomBaseEntity } from '../../custom-base.entity';
+import { CustomBaseEntity } from '../../common/entity/custom-base.entity';
 import { Column, Entity, JoinColumn, OneToMany, Unique } from 'typeorm';
 import { PermissionRoleEntity } from './permission-role.entity';
 
