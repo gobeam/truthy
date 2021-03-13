@@ -23,13 +23,15 @@ async function bootstrap() {
   app.useGlobalPipes(
     new ValidationPipe({
       transform: true,
+      whitelist: true,
+      forbidNonWhitelisted: true,
       exceptionFactory: (errors) => {
         const errorMessages = {};
         errors.forEach(
           (error) =>
             (errorMessages[error.property] = Object.values(error.constraints)
               .join('. ')
-              .trim()),
+              .trim())
         );
         return new UnprocessableEntityException(errorMessages);
       },

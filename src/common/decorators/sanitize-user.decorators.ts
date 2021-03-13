@@ -1,4 +1,4 @@
-import { User } from '../auth/entity/user.entity';
+import { User } from '../../auth/entity/user.entity';
 
 export const SanitizeUser = (userField?: string, strong = true) => {
   return (
@@ -7,7 +7,6 @@ export const SanitizeUser = (userField?: string, strong = true) => {
     descriptor: TypedPropertyDescriptor<any>
   ): TypedPropertyDescriptor<any> => {
     const decoratedFn = descriptor.value;
-
     async function newFunction(...args) {
       const data: any = await decoratedFn.apply(this, args);
       const user: User = userField ? data[userField] : data;
@@ -23,7 +22,6 @@ export const SanitizeUser = (userField?: string, strong = true) => {
       }
       return data;
     }
-
     return {
       value: newFunction
     };
@@ -53,7 +51,6 @@ export const SanitizeUsers = (userField?: string) => {
         return entity;
       });
     }
-
     return {
       value: newFunction
     };

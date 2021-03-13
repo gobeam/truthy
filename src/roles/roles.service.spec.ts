@@ -8,10 +8,14 @@ import { UpdateRoleDto } from './dto/update-role.dto';
 
 const roleRepositoryMock = () => ({
   findAll: jest.fn(),
+  get: jest.fn(),
+  createEntity: jest.fn(),
+  getAll: jest.fn(),
   findOne: jest.fn(),
   store: jest.fn(),
-  updateItem: jest.fn()
+  updateEntity: jest.fn()
 });
+
 const mockRole = {
   id: 1,
   description: 'test description',
@@ -22,7 +26,6 @@ const mockRole = {
 
 describe('RolesService', () => {
   let service: RolesService, roleRepository;
-
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -39,47 +42,51 @@ describe('RolesService', () => {
     const roleFilterDto: RoleFilterDto = {
       name: 'example'
     };
-    roleRepository.findAll.mockResolvedValue('result');
+    roleRepository.getAll.mockResolvedValue('result');
     const result = await service.findAll(roleFilterDto);
-    expect(roleRepository.findAll).toHaveBeenCalledWith(roleFilterDto);
+    expect(roleRepository.getAll).toHaveBeenCalledWith(roleFilterDto);
     expect(result).toEqual('result');
   });
 
   it('create', async () => {
     const createRoleDto: CreateRoleDto = mockRole;
-    const result = await service.create(createRoleDto);
-    expect(roleRepository.store).toHaveBeenCalledWith(createRoleDto);
-    expect(roleRepository.store).not.toThrow();
+    const result = await service.store(createRoleDto);
+    expect(roleRepository.createEntity).toHaveBeenCalledWith(createRoleDto);
+    expect(roleRepository.createEntity).not.toThrow();
     expect(result).toBe(undefined);
   });
 
   describe('findOne', () => {
     it('role find success', async () => {
-      roleRepository.findOne.mockResolvedValue(mockRole);
+      roleRepository.get.mockResolvedValue(mockRole);
       const result = await service.findOne(1);
-      expect(roleRepository.findOne).toHaveBeenCalledWith({
-        where: { id: 1 }
-      });
-      expect(roleRepository.findOne).not.toThrow();
+      expect(roleRepository.get).toHaveBeenCalledWith(1);
+      expect(roleRepository.get).not.toThrow();
       expect(result).toBe(mockRole);
     });
     it('find fail', async () => {
-      roleRepository.findOne.mockResolvedValue(null);
+      roleRepository.get.mockRejectedValue(new NotFoundException());
       await expect(service.findOne(1)).rejects.toThrowError(NotFoundException);
     });
   });
 
   describe('update', () => {
     it('update item that exists in database', async () => {
-      roleRepository.updateItem.mockResolvedValue(mockRole);
+      roleRepository.updateEntity.mockResolvedValue(mockRole);
+      roleRepository.get.mockResolvedValue(mockRole);
       const updateRoleDto: UpdateRoleDto = mockRole;
       const role = await service.update(1, updateRoleDto);
-      expect(roleRepository.updateItem).toHaveBeenCalledWith(1, updateRoleDto);
+      expect(roleRepository.get).toHaveBeenCalledWith(1);
+      expect(roleRepository.updateEntity).toHaveBeenCalledWith(
+        mockRole,
+        updateRoleDto
+      );
       expect(role).toEqual(mockRole);
     });
 
     it('trying to update item that does not exists in database', async () => {
-      roleRepository.updateItem.mockRejectedValue(new NotFoundException());
+      roleRepository.get.mockRejectedValue(new NotFoundException());
+      roleRepository.updateEntity.mockRejectedValue(null);
       const updateRoleDto: UpdateRoleDto = mockRole;
       await expect(service.update(1, updateRoleDto)).rejects.toThrowError(
         NotFoundException
@@ -88,22 +95,24 @@ describe('RolesService', () => {
   });
 
   describe('remove', () => {
+    beforeEach(() => {
+      roleRepository.get.mockResolvedValue(mockRole);
+    });
     it('trying to delete existing role', async () => {
-      service.findOne = jest.fn().mockResolvedValue(mockRole);
-      const result = await service.remove(1);
-      expect(service.findOne).toHaveBeenCalledTimes(1);
-      expect(service.findOne).toHaveBeenCalledWith(1);
-      expect(service.findOne).not.toThrow();
+      const result = await service.remove(2);
+      expect(roleRepository.get).toHaveBeenCalledTimes(1);
+      expect(roleRepository.get).toHaveBeenCalledWith(2);
+      expect(roleRepository.get).not.toThrow();
       expect(mockRole.remove).toHaveBeenCalledTimes(1);
       expect(result).toEqual(undefined);
     });
 
     it('trying to delete no existing role', async () => {
-      service.findOne = jest.fn().mockImplementation(() => {
+      roleRepository.get = jest.fn().mockImplementation(() => {
         throw NotFoundException;
       });
       await expect(service.remove(1)).rejects.toThrow();
-      expect(service.findOne).toHaveBeenCalledTimes(1);
+      expect(roleRepository.get).toHaveBeenCalledTimes(1);
     });
   });
 });

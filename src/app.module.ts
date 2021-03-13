@@ -6,6 +6,11 @@ import { PermissionsModule } from './permissions/permissions.module';
 import * as ormConfig from './config/ormconfig';
 
 @Module({
-  imports: [TypeOrmModule.forRoot(ormConfig), AuthModule, RolesModule, PermissionsModule]
+  imports: [
+    TypeOrmModule.forRoot(ormConfig),
+    AuthModule,
+    RolesModule,
+    PermissionsModule
+  ]
 })
 export class AppModule {}

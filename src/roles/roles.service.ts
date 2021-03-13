@@ -1,41 +1,61 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { CreateRoleDto } from './dto/create-role.dto';
 import { UpdateRoleDto } from './dto/update-role.dto';
-import { RoleEntity } from './entities/role.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { RoleRepository } from './role.repository';
 import { RoleFilterDto } from './dto/role-filter.dto';
+import { RoleSerializer } from './serializer/role.serializer';
+import { CommonServiceInterface } from '../common/interfaces/common-service.interface';
 
 @Injectable()
-export class RolesService {
+export class RolesService implements CommonServiceInterface<RoleSerializer> {
   constructor(
     @InjectRepository(RoleRepository) private repository: RoleRepository
   ) {}
 
-  create(createRoleDto: CreateRoleDto): Promise<RoleEntity> {
-    return this.repository.store(createRoleDto);
+  /**
+   * create new role
+   * @param createRoleDto
+   */
+  store(createRoleDto: CreateRoleDto): Promise<RoleSerializer> {
+    return this.repository.createEntity(createRoleDto);
   }
 
-  findAll(roleFilterDto: RoleFilterDto): Promise<RoleEntity[]> {
-    return this.repository.findAll(roleFilterDto);
+  /**
+   * find and return collection of roles
+   * @param roleFilterDto
+   */
+  findAll(roleFilterDto: RoleFilterDto): Promise<RoleSerializer[]> {
+    return this.repository.getAll(roleFilterDto);
   }
 
-  async findOne(id: number): Promise<RoleEntity> {
-    const role = await this.repository.findOne({
-      where: { id }
-    });
-    if (!role) {
-      throw new NotFoundException();
-    }
-    return role;
+  /**
+   * find role by id
+   * @param id
+   */
+  async findOne(id: number): Promise<RoleSerializer> {
+    return this.repository.get(id);
   }
 
-  async update(id: number, updateRoleDto: UpdateRoleDto): Promise<RoleEntity> {
-    return this.repository.updateItem(id, updateRoleDto);
+  /**
+   * update role by id
+   * @param id
+   * @param updateRoleDto
+   */
+  async update(
+    id: number,
+    updateRoleDto: UpdateRoleDto
+  ): Promise<RoleSerializer> {
+    const user = await this.repository.get(id);
+    return this.repository.updateEntity(user, updateRoleDto);
   }
 
+  /**
+   * remove role by id
+   * @param id
+   */
   async remove(id: number): Promise<void> {
     const role = await this.findOne(id);
-    await role.remove();
+    return role.remove();
   }
 }

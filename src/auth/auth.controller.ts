@@ -10,10 +10,10 @@ import {
 import { CreateUserDto } from './dto/create-user.dto';
 import { AuthService } from './auth.service';
 import { UserLoginDto } from './dto/user-login.dto';
-import { GetUser } from '../decorators/get-user.decorator';
+import { GetUser } from '../common/decorators/get-user.decorator';
 import { User } from './entity/user.entity';
 import { AuthGuard } from '@nestjs/passport';
-import { SanitizeUser } from '../decorators/sanitize-user.decorators';
+import { SanitizeUser } from '../common/decorators/sanitize-user.decorators';
 
 @Controller('auth')
 export class AuthController {
