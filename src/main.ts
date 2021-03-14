@@ -3,7 +3,7 @@ import { AppModule } from './app.module';
 import {
   Logger,
   UnprocessableEntityException,
-  ValidationPipe,
+  ValidationPipe
 } from '@nestjs/common';
 import { useContainer } from 'class-validator';
 import * as config from 'config';
@@ -34,8 +34,8 @@ async function bootstrap() {
               .trim())
         );
         return new UnprocessableEntityException(errorMessages);
-      },
-    }),
+      }
+    })
   );
   await app.listen(port);
   logger.log(`Application listening in port: ${port}`);

@@ -1,5 +1,5 @@
 import { plainToClass } from 'class-transformer';
-import { DeepPartial, Repository } from 'typeorm';
+import { DeepPartial, ObjectLiteral, Repository, Not } from 'typeorm';
 import { NotFoundException } from '@nestjs/common';
 import { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity';
 import { ModelSerializer } from '../serializer/model.serializer';
@@ -33,6 +33,52 @@ export class BaseRepository<
         return Promise.resolve(
           entity ? this.transform(entity, transformOptions) : null
         );
+      })
+      .catch((error) => Promise.reject(error));
+  }
+
+  /**
+   * find by condition
+   * @param fieldName
+   * @param value
+   * @param relations
+   * @param transformOptions
+   */
+  async findBy(
+    fieldName: string,
+    value: any,
+    relations: string[] = [],
+    transformOptions = {}
+  ): Promise<K | null> {
+    return await this.findOne({
+      where: { [fieldName]: value },
+      relations
+    })
+      .then((entity) => {
+        if (!entity) {
+          return Promise.reject(new NotFoundException());
+        }
+        return Promise.resolve(
+          entity ? this.transform(entity, transformOptions) : null
+        );
+      })
+      .catch((error) => Promise.reject(error));
+  }
+
+  /**
+   * get count of entity by condition
+   * @param conditions
+   * @param id
+   */
+  async countEntityByCondition(
+    conditions: ObjectLiteral,
+    id: number
+  ): Promise<number> {
+    return this.count({
+      where: { id: Not(id), ...conditions }
+    })
+      .then((count) => {
+        return Promise.resolve(count);
       })
       .catch((error) => Promise.reject(error));
   }

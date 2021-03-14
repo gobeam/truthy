@@ -3,13 +3,14 @@ import { RolesService } from './roles.service';
 import { RoleRepository } from './role.repository';
 import { RoleFilterDto } from './dto/role-filter.dto';
 import { CreateRoleDto } from './dto/create-role.dto';
-import { NotFoundException } from '@nestjs/common';
+import { NotFoundException, PreconditionFailedException } from '@nestjs/common';
 import { UpdateRoleDto } from './dto/update-role.dto';
 
 const roleRepositoryMock = () => ({
   findAll: jest.fn(),
   get: jest.fn(),
   createEntity: jest.fn(),
+  countEntityByCondition: jest.fn(),
   getAll: jest.fn(),
   findOne: jest.fn(),
   store: jest.fn(),
@@ -71,8 +72,17 @@ describe('RolesService', () => {
   });
 
   describe('update', () => {
+    it('try to update using duplicate role name', async () => {
+      roleRepository.countEntityByCondition.mockResolvedValue(1);
+      const updateRoleDto: UpdateRoleDto = mockRole;
+      await expect(service.update(1, updateRoleDto)).rejects.toThrowError(
+        PreconditionFailedException
+      );
+      expect(roleRepository.countEntityByCondition).toHaveBeenCalledTimes(1);
+    });
     it('update item that exists in database', async () => {
       roleRepository.updateEntity.mockResolvedValue(mockRole);
+      roleRepository.countEntityByCondition.mockResolvedValue(0);
       roleRepository.get.mockResolvedValue(mockRole);
       const updateRoleDto: UpdateRoleDto = mockRole;
       const role = await service.update(1, updateRoleDto);
@@ -86,6 +96,7 @@ describe('RolesService', () => {
 
     it('trying to update item that does not exists in database', async () => {
       roleRepository.get.mockRejectedValue(new NotFoundException());
+      roleRepository.countEntityByCondition.mockResolvedValue(0);
       roleRepository.updateEntity.mockRejectedValue(null);
       const updateRoleDto: UpdateRoleDto = mockRole;
       await expect(service.update(1, updateRoleDto)).rejects.toThrowError(

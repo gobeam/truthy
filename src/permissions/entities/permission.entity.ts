@@ -1,5 +1,5 @@
 import { CustomBaseEntity } from '../../common/entity/custom-base.entity';
-import { Column, Entity, JoinColumn, OneToMany, Unique } from 'typeorm';
+import { Column, Entity, Index, JoinColumn, OneToMany, Unique } from 'typeorm';
 import { PermissionRoleEntity } from './permission-role.entity';
 
 @Entity({ name: 'permission' })
@@ -8,6 +8,7 @@ export class PermissionEntity extends CustomBaseEntity {
   @Column('varchar', { length: 100 })
   resource: string;
   @Column()
+  @Index({ unique: true })
   description: string;
   @Column()
   path: string;

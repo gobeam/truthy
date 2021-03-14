@@ -3,14 +3,24 @@ import {
   IsString,
   MaxLength,
   MinLength,
-  ValidateIf
+  Validate,
+  ValidateIf,
+  ValidationArguments
 } from 'class-validator';
+import { UniqueValidatorPipe } from '../../common/pipes/unique-validator.pipe';
+import { RoleEntity } from '../entities/role.entity';
 
 export class CreateRoleDto {
   @IsNotEmpty()
   @IsString()
   @MinLength(2)
   @MaxLength(100)
+  @Validate(UniqueValidatorPipe, [
+    RoleEntity,
+    ({ object: { name } }: { object: RoleEntity }) => ({
+      name
+    })
+  ])
   name: string;
 
   @ValidateIf((object, value) => value)
