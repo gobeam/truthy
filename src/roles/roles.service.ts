@@ -6,18 +6,13 @@ import { RoleRepository } from './role.repository';
 import { RoleFilterDto } from './dto/role-filter.dto';
 import { RoleSerializer } from './serializer/role.serializer';
 import { CommonServiceInterface } from '../common/interfaces/common-service.interface';
-import { CommonService } from '../common/services/common.service';
 import { ObjectLiteral } from 'typeorm';
 
 @Injectable()
-export class RolesService
-  extends CommonService
-  implements CommonServiceInterface<RoleSerializer> {
+export class RolesService implements CommonServiceInterface<RoleSerializer> {
   constructor(
     @InjectRepository(RoleRepository) private repository: RoleRepository
-  ) {
-    super();
-  }
+  ) {}
 
   /**
    * create new role
@@ -31,7 +26,7 @@ export class RolesService
    * find and return collection of roles
    * @param roleFilterDto
    */
-  findAll(roleFilterDto: RoleFilterDto): Promise<RoleSerializer[]> {
+  async findAll(roleFilterDto: RoleFilterDto): Promise<RoleSerializer[]> {
     return this.repository.getAll(roleFilterDto);
   }
 
@@ -73,9 +68,5 @@ export class RolesService
   async remove(id: number): Promise<void> {
     const role = await this.findOne(id);
     return role.remove();
-  }
-
-  findBy(fieldName: string, value: any) {
-    return this.findBy(fieldName, value);
   }
 }

@@ -1,43 +1,57 @@
-import { HttpCode, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  HttpCode,
+  HttpStatus,
+  Injectable,
+  PreconditionFailedException
+} from '@nestjs/common';
 import { CreatePermissionDto } from './dto/create-permission.dto';
 import { UpdatePermissionDto } from './dto/update-permission.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PermissionRepository } from './permission.repository';
-import { PermissionEntity } from './entities/permission.entity';
 import { PermissionFilterDto } from './dto/permission-filter.dto';
+import { CommonServiceInterface } from '../common/interfaces/common-service.interface';
+import { Permission } from './serializer/permission.serializer';
+import { ObjectLiteral } from 'typeorm';
 
 @Injectable()
-export class PermissionsService {
+export class PermissionsService implements CommonServiceInterface<Permission> {
   constructor(
     @InjectRepository(PermissionRepository)
     private repository: PermissionRepository
   ) {}
 
-  create(createPermissionDto: CreatePermissionDto): Promise<PermissionEntity> {
-    return this.repository.store(createPermissionDto);
+  async store(createPermissionDto: CreatePermissionDto): Promise<Permission> {
+    return this.repository.createEntity(createPermissionDto);
   }
 
-  findAll(
+  async findAll(
     permissionFilterDto: PermissionFilterDto
-  ): Promise<PermissionEntity[]> {
-    return this.repository.findAll(permissionFilterDto);
+  ): Promise<Permission[]> {
+    return this.repository.getAll(permissionFilterDto);
   }
 
-  async findOne(id: number): Promise<PermissionEntity> {
-    const permission = await this.repository.findOne({
-      where: { id }
-    });
-    if (!permission) {
-      throw new NotFoundException();
-    }
-    return permission;
+  async findOne(id: number): Promise<Permission> {
+    return this.repository.get(id);
   }
 
-  update(
+  async update(
     id: number,
     updatePermissionDto: UpdatePermissionDto
-  ): Promise<PermissionEntity> {
-    return this.repository.updateItem(id, updatePermissionDto);
+  ): Promise<Permission> {
+    const condition: ObjectLiteral = {
+      description: updatePermissionDto.description
+    };
+    const countSameDescription = await this.repository.countEntityByCondition(
+      condition,
+      id
+    );
+    if (countSameDescription > 0) {
+      throw new PreconditionFailedException({
+        name: 'description already exists'
+      });
+    }
+    const permission = await this.repository.get(id);
+    return this.repository.updateEntity(permission, updatePermissionDto);
   }
 
   @HttpCode(HttpStatus.NO_CONTENT)

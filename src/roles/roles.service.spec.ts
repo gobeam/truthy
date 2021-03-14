@@ -66,7 +66,9 @@ describe('RolesService', () => {
       expect(result).toBe(mockRole);
     });
     it('find fail', async () => {
-      roleRepository.get.mockRejectedValue(new NotFoundException());
+      roleRepository.get.mockImplementation(() => {
+        throw new NotFoundException();
+      });
       await expect(service.findOne(1)).rejects.toThrowError(NotFoundException);
     });
   });
@@ -95,7 +97,9 @@ describe('RolesService', () => {
     });
 
     it('trying to update item that does not exists in database', async () => {
-      roleRepository.get.mockRejectedValue(new NotFoundException());
+      roleRepository.get.mockImplementation(() => {
+        throw new NotFoundException();
+      });
       roleRepository.countEntityByCondition.mockResolvedValue(0);
       roleRepository.updateEntity.mockRejectedValue(null);
       const updateRoleDto: UpdateRoleDto = mockRole;

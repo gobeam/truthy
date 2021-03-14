@@ -1,39 +1,37 @@
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Put,
+  Controller,
+  Delete,
+  Get,
   Param,
-  Delete, Query
+  Post,
+  Put,
+  Query
 } from '@nestjs/common';
 import { PermissionsService } from './permissions.service';
 import { CreatePermissionDto } from './dto/create-permission.dto';
 import { UpdatePermissionDto } from './dto/update-permission.dto';
-import { PermissionEntity } from './entities/permission.entity';
 import { PermissionFilterDto } from './dto/permission-filter.dto';
-import { UpdateResult } from 'typeorm';
+import { Permission } from './serializer/permission.serializer';
 
 @Controller('permissions')
 export class PermissionsController {
   constructor(private readonly permissionsService: PermissionsService) {}
 
   @Post()
-  create(
-    @Body() createPermissionDto: CreatePermissionDto
-  ): Promise<PermissionEntity> {
-    return this.permissionsService.create(createPermissionDto);
+  store(@Body() createPermissionDto: CreatePermissionDto): Promise<Permission> {
+    return this.permissionsService.store(createPermissionDto);
   }
 
   @Get()
-  findAll(
+  index(
     @Query() permissionFilterDto: PermissionFilterDto
-  ): Promise<PermissionEntity[]> {
+  ): Promise<Permission[]> {
     return this.permissionsService.findAll(permissionFilterDto);
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string): Promise<PermissionEntity> {
+  show(@Param('id') id: string): Promise<Permission> {
     return this.permissionsService.findOne(+id);
   }
 
@@ -41,12 +39,12 @@ export class PermissionsController {
   update(
     @Param('id') id: string,
     @Body() updatePermissionDto: UpdatePermissionDto
-  ): Promise<PermissionEntity> {
+  ): Promise<Permission> {
     return this.permissionsService.update(+id, updatePermissionDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string): Promise<void> {
+  destroy(@Param('id') id: string): Promise<void> {
     return this.permissionsService.remove(+id);
   }
 }
