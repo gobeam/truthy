@@ -2,7 +2,7 @@ import { Test } from '@nestjs/testing';
 import { UserRepository } from './user.repository';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UserLoginDto } from './dto/user-login.dto';
-import { User } from './entity/user.entity';
+import { UserEntity } from './entity/user.entity';
 import { UnauthorizedException } from '@nestjs/common';
 
 const mockUser = {
@@ -38,7 +38,7 @@ describe('User Repository', () => {
     let user, userLoginDto: UserLoginDto;
     beforeEach(async () => {
       userRepository.findOne = jest.fn();
-      user = new User();
+      user = new UserEntity();
       user.username = mockUser.username;
       user.password = mockUser.password;
       user.validatePassword = jest.fn();

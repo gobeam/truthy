@@ -11,15 +11,16 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { AuthService } from './auth.service';
 import { UserLoginDto } from './dto/user-login.dto';
 import { GetUser } from '../common/decorators/get-user.decorator';
-import { User } from './entity/user.entity';
+import { UserEntity } from './entity/user.entity';
 import { AuthGuard } from '@nestjs/passport';
 import { SanitizeUser } from '../common/decorators/sanitize-user.decorators';
+import { UserSerializer } from './serializer/user.serializer';
 
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
 
-  @Post('/signup')
+  @Post('/register')
   signUp(@Body(ValidationPipe) createUserDto: CreateUserDto): Promise<void> {
     return this.authService.addUser(createUserDto);
   }
@@ -32,8 +33,7 @@ export class AuthController {
 
   @UseGuards(AuthGuard())
   @Get('/profile')
-  @SanitizeUser()
-  getProfile(@GetUser() user: User) {
-    return user;
+  profile(@GetUser() user: UserEntity): Promise<UserSerializer> {
+    return this.authService.get(user);
   }
 }

@@ -1,4 +1,4 @@
-import { User } from './entity/user.entity';
+import { UserEntity } from './entity/user.entity';
 import { JwtPayloadDto } from './dto/jwt-payload.dto';
 import { Test } from '@nestjs/testing';
 import { UserRepository } from './user.repository';
@@ -6,7 +6,7 @@ import { JwtStrategy } from './jwt.strategy';
 import { UnauthorizedException } from '@nestjs/common';
 
 const mockUserRepository = () => ({
-  findOne: jest.fn(),
+  findOne: jest.fn()
 });
 
 describe('Test JWT strategy', () => {
@@ -14,14 +14,14 @@ describe('Test JWT strategy', () => {
   beforeEach(async () => {
     jest.mock('config', () => ({
       default: {
-        get: () => jest.fn().mockImplementation(() => 'hello'),
-      },
+        get: () => jest.fn().mockImplementation(() => 'hello')
+      }
     }));
     const module = await Test.createTestingModule({
       providers: [
         JwtStrategy,
-        { provide: UserRepository, useFactory: mockUserRepository },
-      ],
+        { provide: UserRepository, useFactory: mockUserRepository }
+      ]
     }).compile();
     jwtStrategy = await module.get<JwtStrategy>(JwtStrategy);
     userRepository = await module.get<UserRepository>(UserRepository);
@@ -29,17 +29,17 @@ describe('Test JWT strategy', () => {
 
   describe('validate user', () => {
     it('should return user if username is found on database', async () => {
-      const user = new User();
+      const user = new UserEntity();
       user.name = 'test';
       user.username = 'tester';
       const payload: JwtPayloadDto = {
         username: 'tester',
-        name: 'test',
+        name: 'test'
       };
       userRepository.findOne.mockResolvedValue(user);
       const result = await jwtStrategy.validate(payload);
       expect(userRepository.findOne).toHaveBeenCalledWith({
-        username: payload.username,
+        username: payload.username
       });
       expect(result).toEqual(user);
     });
@@ -47,11 +47,11 @@ describe('Test JWT strategy', () => {
     it('should throw error if username is found on database', async () => {
       const payload: JwtPayloadDto = {
         username: 'tester',
-        name: 'test',
+        name: 'test'
       };
       userRepository.findOne.mockResolvedValue(null);
       await expect(jwtStrategy.validate(payload)).rejects.toThrow(
-        UnauthorizedException,
+        UnauthorizedException
       );
     });
   });

@@ -1,12 +1,15 @@
-import { EntityRepository, Repository } from 'typeorm';
-import { User } from './entity/user.entity';
+import { EntityRepository } from 'typeorm';
+import { UserEntity } from './entity/user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import * as bcrypt from 'bcrypt';
 import { UserLoginDto } from './dto/user-login.dto';
 import { UnauthorizedException } from '@nestjs/common';
+import { BaseRepository } from '../common/repository/base.repository';
+import { UserSerializer } from './serializer/user.serializer';
+import { classToPlain, plainToClass } from 'class-transformer';
 
-@EntityRepository(User)
-export class UserRepository extends Repository<User> {
+@EntityRepository(UserEntity)
+export class UserRepository extends BaseRepository<UserEntity, UserSerializer> {
   async store(createUserDto: CreateUserDto): Promise<void> {
     const { name, username, password, email } = createUserDto;
     const user = this.create();
@@ -19,12 +22,25 @@ export class UserRepository extends Repository<User> {
     await user.save();
   }
 
-  async login(userLoginDto: UserLoginDto): Promise<User> {
+  async login(userLoginDto: UserLoginDto): Promise<UserEntity> {
     const { username, password } = userLoginDto;
     const user = await this.findOne({ username });
     if (user && (await user.validatePassword(password))) {
       return user;
     }
     throw new UnauthorizedException();
+  }
+
+  /**
+   * transform user
+   * @param model
+   * @param transformOption
+   */
+  transform(model: UserEntity, transformOption = {}): UserSerializer {
+    return plainToClass(
+      UserSerializer,
+      classToPlain(model, transformOption),
+      transformOption
+    );
   }
 }

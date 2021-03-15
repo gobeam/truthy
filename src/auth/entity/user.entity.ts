@@ -14,7 +14,7 @@ import { RoleEntity } from '../../roles/entities/role.entity';
 import { Exclude } from 'class-transformer';
 
 @Entity({ name: 'user' })
-export class User extends CustomBaseEntity {
+export class UserEntity extends CustomBaseEntity {
   @Index({ unique: true })
   @Column()
   username: string;
@@ -35,12 +35,14 @@ export class User extends CustomBaseEntity {
   status: UserStatusEnum;
 
   @Column()
+  @Exclude({ toPlainOnly: true })
   token: string;
 
   @Column()
   @Exclude({ toPlainOnly: true })
   salt: string;
 
+  @Exclude({ toPlainOnly: true })
   skipHashPassword = false;
 
   @OneToOne(() => RoleEntity)

@@ -2,10 +2,11 @@ import { Injectable } from '@nestjs/common';
 import { UserRepository } from './user.repository';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
-import { User } from './entity/user.entity';
+import { UserEntity } from './entity/user.entity';
 import { UserLoginDto } from './dto/user-login.dto';
 import { JwtService } from '@nestjs/jwt';
 import { JwtPayloadDto } from './dto/jwt-payload.dto';
+import { UserSerializer } from './serializer/user.serializer';
 
 @Injectable()
 export class AuthService {
@@ -18,7 +19,7 @@ export class AuthService {
     return this.userRepository.store(createUserDto);
   }
 
-  async findBy(field: string, value: string): Promise<User> {
+  async findBy(field: string, value: string): Promise<UserEntity> {
     return await this.userRepository.findOne({ where: { [field]: value } });
   }
 
@@ -30,5 +31,9 @@ export class AuthService {
     };
     const accessToken = await this.jwtService.sign(payload);
     return { accessToken };
+  }
+
+  async get(user: UserEntity): Promise<UserSerializer> {
+    return this.userRepository.transform(user);
   }
 }

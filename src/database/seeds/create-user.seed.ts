@@ -1,7 +1,7 @@
 import { Factory } from 'typeorm-seeding';
 import { Connection } from 'typeorm';
 import { PermissionConfiguration } from '../../config/permission-config';
-import { User } from '../../auth/entity/user.entity';
+import { UserEntity } from '../../auth/entity/user.entity';
 import { UserStatusEnum } from '../../auth/user-status.enum';
 import { RoleEntity } from '../../roles/entities/role.entity';
 
@@ -19,7 +19,7 @@ export default class CreateUserSeed {
     await connection
       .createQueryBuilder()
       .insert()
-      .into(User)
+      .into(UserEntity)
       .values([
         {
           username: 'admin',

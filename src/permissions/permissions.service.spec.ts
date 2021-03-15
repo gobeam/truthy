@@ -6,7 +6,6 @@ import { NotFoundException, PreconditionFailedException } from '@nestjs/common';
 import { PermissionFilterDto } from './dto/permission-filter.dto';
 import { CreatePermissionDto } from './dto/create-permission.dto';
 import { UpdatePermissionDto } from './dto/update-permission.dto';
-import { UpdateRoleDto } from '../roles/dto/update-role.dto';
 
 const permissionRepositoryMock = () => ({
   getAll: jest.fn(),

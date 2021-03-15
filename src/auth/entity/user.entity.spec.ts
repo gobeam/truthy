@@ -1,10 +1,10 @@
-import { User } from './user.entity';
+import { UserEntity } from './user.entity';
 import * as bcrypt from 'bcrypt';
 
 describe('test validate password', () => {
-  let user: User;
+  let user: UserEntity;
   beforeEach(async () => {
-    user = new User();
+    user = new UserEntity();
     user.password = 'testPassword';
     user.salt = 'testSalt';
     bcrypt.hash = jest.fn();

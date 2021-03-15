@@ -4,7 +4,7 @@ import { UserRepository } from './user.repository';
 import { CreateUserDto } from './dto/create-user.dto';
 import { JwtService } from '@nestjs/jwt';
 import { UserLoginDto } from './dto/user-login.dto';
-import { User } from './entity/user.entity';
+import { UserEntity } from './entity/user.entity';
 
 const mockUserRepository = () => ({
   findOne: jest.fn(),
@@ -66,7 +66,7 @@ describe('AuthService', () => {
         password: mockUser.password,
         username: mockUser.username
       };
-      user = new User();
+      user = new UserEntity();
       user.email = mockUser.email;
       user.username = mockUser.username;
       user.password = mockUser.password;
