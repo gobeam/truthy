@@ -15,7 +15,7 @@ export interface UniqueValidationArguments<E> extends ValidationArguments {
 }
 
 /**
- * Abstract class to validate unique
+ * abstract class to validate unique
  */
 export abstract class AbstractUniqueValidator
   implements ValidatorConstraintInterface {

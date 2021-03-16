@@ -1,5 +1,11 @@
 import { UserEntity } from '../../auth/entity/user.entity';
 
+/**
+ * sanitize user fields
+ * @param userField
+ * @param strong
+ * @constructor
+ */
 export const SanitizeUser = (userField?: string, strong = true) => {
   return (
     target: any,
@@ -28,6 +34,11 @@ export const SanitizeUser = (userField?: string, strong = true) => {
   };
 };
 
+/**
+ * sanitize array of users
+ * @param userField
+ * @constructor
+ */
 export const SanitizeUsers = (userField?: string) => {
   return (
     target: any,

@@ -26,5 +26,4 @@ const jwtConfig = config.jwt;
   providers: [AuthService, JwtStrategy, UniqueValidatorPipe],
   exports: [JwtStrategy, PassportModule]
 })
-export class AuthModule {
-}
+export class AuthModule {}

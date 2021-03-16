@@ -1,5 +1,8 @@
 import { CommonDtoInterface } from './common-dto.interface';
 
+/**
+ * common service interface
+ */
 export interface CommonServiceInterface<T> {
   store(filter: CommonDtoInterface): Promise<T>;
   findOne(id: number): Promise<T>;
