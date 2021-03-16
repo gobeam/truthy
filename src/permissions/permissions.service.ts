@@ -2,7 +2,7 @@ import {
   HttpCode,
   HttpStatus,
   Injectable,
-  PreconditionFailedException
+  UnprocessableEntityException
 } from '@nestjs/common';
 import { CreatePermissionDto } from './dto/create-permission.dto';
 import { UpdatePermissionDto } from './dto/update-permission.dto';
@@ -46,7 +46,7 @@ export class PermissionsService implements CommonServiceInterface<Permission> {
       id
     );
     if (countSameDescription > 0) {
-      throw new PreconditionFailedException({
+      throw new UnprocessableEntityException({
         name: 'description already exists'
       });
     }

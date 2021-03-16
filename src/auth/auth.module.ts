@@ -3,13 +3,14 @@ import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserRepository } from './user.repository';
-import { IsUsernameAlreadyExist } from './pipes/username-unique-validation.pipes';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { JwtStrategy } from './jwt.strategy';
 import * as config from 'config';
+import { UniqueValidatorPipe } from '../common/pipes/unique-validator.pipe';
 
 const jwtConfig = config.jwt;
+
 @Module({
   imports: [
     PassportModule.register({ defaultStrategy: 'jwt' }),
@@ -22,7 +23,8 @@ const jwtConfig = config.jwt;
     TypeOrmModule.forFeature([UserRepository])
   ],
   controllers: [AuthController],
-  providers: [AuthService, JwtStrategy, IsUsernameAlreadyExist],
+  providers: [AuthService, JwtStrategy, UniqueValidatorPipe],
   exports: [JwtStrategy, PassportModule]
 })
-export class AuthModule {}
+export class AuthModule {
+}

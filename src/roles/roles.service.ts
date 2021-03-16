@@ -1,4 +1,4 @@
-import { Injectable, PreconditionFailedException } from '@nestjs/common';
+import { Injectable, UnprocessableEntityException } from '@nestjs/common';
 import { CreateRoleDto } from './dto/create-role.dto';
 import { UpdateRoleDto } from './dto/update-role.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -55,7 +55,7 @@ export class RolesService implements CommonServiceInterface<RoleSerializer> {
       id
     );
     if (checkUniqueTitle > 0) {
-      throw new PreconditionFailedException({ name: 'name already exists' });
+      throw new UnprocessableEntityException({ name: 'name already exists' });
     }
     const user = await this.repository.get(id);
     return this.repository.updateEntity(user, updateRoleDto);

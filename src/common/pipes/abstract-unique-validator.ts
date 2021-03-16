@@ -7,7 +7,7 @@ import { Connection, EntitySchema, FindConditions, ObjectType } from 'typeorm';
 /**
  * unique validation arguments
  */
-interface UniqueValidationArguments<E> extends ValidationArguments {
+export interface UniqueValidationArguments<E> extends ValidationArguments {
   constraints: [
     ObjectType<E> | EntitySchema<E> | string,
     ((validationArguments: ValidationArguments) => FindConditions<E>) | keyof E

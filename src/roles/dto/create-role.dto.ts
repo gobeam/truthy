@@ -4,8 +4,7 @@ import {
   MaxLength,
   MinLength,
   Validate,
-  ValidateIf,
-  ValidationArguments
+  ValidateIf
 } from 'class-validator';
 import { UniqueValidatorPipe } from '../../common/pipes/unique-validator.pipe';
 import { RoleEntity } from '../entities/role.entity';

@@ -4,6 +4,7 @@ import {
   Get,
   HttpCode,
   Post,
+  Put,
   UseGuards,
   ValidationPipe
 } from '@nestjs/common';
@@ -13,8 +14,8 @@ import { UserLoginDto } from './dto/user-login.dto';
 import { GetUser } from '../common/decorators/get-user.decorator';
 import { UserEntity } from './entity/user.entity';
 import { AuthGuard } from '@nestjs/passport';
-import { SanitizeUser } from '../common/decorators/sanitize-user.decorators';
 import { UserSerializer } from './serializer/user.serializer';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -35,5 +36,14 @@ export class AuthController {
   @Get('/profile')
   profile(@GetUser() user: UserEntity): Promise<UserSerializer> {
     return this.authService.get(user);
+  }
+
+  @UseGuards(AuthGuard())
+  @Put('/profile')
+  update(
+    @GetUser() user: UserEntity,
+    @Body() updateUserDto: UpdateUserDto
+  ): Promise<UserSerializer> {
+    return this.authService.update(user, updateUserDto);
   }
 }

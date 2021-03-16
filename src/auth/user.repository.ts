@@ -10,6 +10,10 @@ import { classToPlain, plainToClass } from 'class-transformer';
 
 @EntityRepository(UserEntity)
 export class UserRepository extends BaseRepository<UserEntity, UserSerializer> {
+  /**
+   * store new user
+   * @param createUserDto
+   */
   async store(createUserDto: CreateUserDto): Promise<void> {
     const { name, username, password, email } = createUserDto;
     const user = this.create();
@@ -22,6 +26,10 @@ export class UserRepository extends BaseRepository<UserEntity, UserSerializer> {
     await user.save();
   }
 
+  /**
+   * login user
+   * @param userLoginDto
+   */
   async login(userLoginDto: UserLoginDto): Promise<UserEntity> {
     const { username, password } = userLoginDto;
     const user = await this.findOne({ username });

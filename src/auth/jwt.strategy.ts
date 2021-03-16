@@ -18,6 +18,10 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
   }
 
+  /**
+   * Validate if user exists and return user entity
+   * @param payload
+   */
   async validate(payload: JwtPayloadDto): Promise<UserEntity> {
     const { username } = payload;
     const user = await this.userRepository.findOne({ username });

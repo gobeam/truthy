@@ -3,7 +3,7 @@ import { RolesService } from './roles.service';
 import { RoleRepository } from './role.repository';
 import { RoleFilterDto } from './dto/role-filter.dto';
 import { CreateRoleDto } from './dto/create-role.dto';
-import { NotFoundException, PreconditionFailedException } from '@nestjs/common';
+import { NotFoundException, UnprocessableEntityException } from '@nestjs/common';
 import { UpdateRoleDto } from './dto/update-role.dto';
 
 const roleRepositoryMock = () => ({
@@ -78,7 +78,7 @@ describe('RolesService', () => {
       roleRepository.countEntityByCondition.mockResolvedValue(1);
       const updateRoleDto: UpdateRoleDto = mockRole;
       await expect(service.update(1, updateRoleDto)).rejects.toThrowError(
-        PreconditionFailedException
+        UnprocessableEntityException
       );
       expect(roleRepository.countEntityByCondition).toHaveBeenCalledTimes(1);
     });

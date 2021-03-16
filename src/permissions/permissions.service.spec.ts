@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { PermissionsService } from './permissions.service';
 import { MethodList } from '../config/permission-config';
 import { PermissionRepository } from './permission.repository';
-import { NotFoundException, PreconditionFailedException } from '@nestjs/common';
+import { NotFoundException, UnprocessableEntityException } from '@nestjs/common';
 import { PermissionFilterDto } from './dto/permission-filter.dto';
 import { CreatePermissionDto } from './dto/create-permission.dto';
 import { UpdatePermissionDto } from './dto/update-permission.dto';
@@ -89,7 +89,7 @@ describe('PermissionsService', () => {
     it('try to update using duplicate description', async () => {
       repository.countEntityByCondition.mockResolvedValue(1);
       await expect(service.update(1, updatePermissionDto)).rejects.toThrowError(
-        PreconditionFailedException
+        UnprocessableEntityException
       );
       expect(repository.countEntityByCondition).toHaveBeenCalledTimes(1);
     });

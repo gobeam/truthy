@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnprocessableEntityException } from '@nestjs/common';
 import { UserRepository } from './user.repository';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -7,6 +7,8 @@ import { UserLoginDto } from './dto/user-login.dto';
 import { JwtService } from '@nestjs/jwt';
 import { JwtPayloadDto } from './dto/jwt-payload.dto';
 import { UserSerializer } from './serializer/user.serializer';
+import { UpdateUserDto } from './dto/update-user.dto';
+import { ObjectLiteral } from 'typeorm';
 
 @Injectable()
 export class AuthService {
@@ -15,14 +17,27 @@ export class AuthService {
     private jwtService: JwtService
   ) {}
 
+  /**
+   * add new user
+   * @param createUserDto
+   */
   async addUser(createUserDto: CreateUserDto): Promise<void> {
     return this.userRepository.store(createUserDto);
   }
 
-  async findBy(field: string, value: string): Promise<UserEntity> {
-    return await this.userRepository.findOne({ where: { [field]: value } });
+  /**
+   * find user entity by condition
+   * @param field
+   * @param value
+   */
+  async findBy(field: string, value: string): Promise<UserSerializer> {
+    return await this.userRepository.findBy(field, value);
   }
 
+  /**
+   * login user
+   * @param userLoginDto
+   */
   async login(userLoginDto: UserLoginDto): Promise<{ accessToken: string }> {
     const user = await this.userRepository.login(userLoginDto);
     const payload: JwtPayloadDto = {
@@ -33,7 +48,40 @@ export class AuthService {
     return { accessToken };
   }
 
+  /**
+   * get user profile
+   * @param user
+   */
   async get(user: UserEntity): Promise<UserSerializer> {
     return this.userRepository.transform(user);
+  }
+
+  /**
+   * update logged in user
+   * @param user
+   * @param updateUserDto
+   */
+  async update(
+    user: UserEntity,
+    updateUserDto: UpdateUserDto
+  ): Promise<UserSerializer> {
+    const checkUniqueFieldArray = ['username', 'email'];
+    const error = {};
+    for (const field of checkUniqueFieldArray) {
+      const condition: ObjectLiteral = {
+        [field]: updateUserDto[field]
+      };
+      const checkUnique = await this.userRepository.countEntityByCondition(
+        condition,
+        user.id
+      );
+      if (checkUnique > 0) {
+        error[field] = `${field} already exists`;
+      }
+    }
+    if (Object.keys(error).length > 0) {
+      throw new UnprocessableEntityException(error);
+    }
+    return this.userRepository.updateEntity(user, updateUserDto);
   }
 }

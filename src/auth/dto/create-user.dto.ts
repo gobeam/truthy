@@ -7,14 +7,22 @@ import {
   MinLength,
   Validate
 } from 'class-validator';
-import { IsUsernameAlreadyExist } from '../pipes/username-unique-validation.pipes';
+import { UniqueValidatorPipe } from '../../common/pipes/unique-validator.pipe';
+import { UserEntity } from '../entity/user.entity';
 
+/**
+ * create user data transform object
+ */
 export class CreateUserDto {
   @IsNotEmpty()
   @IsString()
-  @Validate(IsUsernameAlreadyExist, {
-    message: 'Username $value already exists. Choose another username.'
-  })
+  @Validate(UniqueValidatorPipe, [
+    UserEntity,
+    ({ object: { username, email } }: { object: UserEntity }) => ({
+      username,
+      email
+    })
+  ])
   username: string;
 
   @IsNotEmpty()

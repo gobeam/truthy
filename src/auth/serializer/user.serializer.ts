@@ -8,6 +8,9 @@ export const adminUserGroupsForSerializing: string[] = ['admin'];
 export const ownerUserGroupsForSerializing: string[] = ['owner'];
 export const defaultUserGroupsForSerializing: string[] = ['user.timestamps'];
 
+/**
+ * user serializer
+ */
 export class UserSerializer extends ModelSerializer {
   username: string;
   email: string;
