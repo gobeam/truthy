@@ -47,6 +47,7 @@ async function bootstrap() {
     .setTitle(apiConfig.name)
     .setDescription(apiConfig.description)
     .setVersion(apiConfig.version)
+    .addBearerAuth()
     .build();
   const customOptions: SwaggerCustomOptions = {
     swaggerOptions: {

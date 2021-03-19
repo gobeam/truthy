@@ -3,7 +3,11 @@ import { UserStatusEnum } from '../user-status.enum';
 import { RoleEntity } from '../../roles/entities/role.entity';
 import { Exclude, Expose, Type } from 'class-transformer';
 import { RoleSerializer } from '../../roles/serializer/role.serializer';
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import {
+  ApiHideProperty,
+  ApiProperty,
+  ApiPropertyOptional
+} from '@nestjs/swagger';
 
 export const adminUserGroupsForSerializing: string[] = ['admin'];
 export const ownerUserGroupsForSerializing: string[] = ['owner'];
@@ -26,7 +30,7 @@ export class UserSerializer extends ModelSerializer {
   @Expose({ groups: adminUserGroupsForSerializing })
   status: UserStatusEnum;
 
-  @ApiPropertyOptional()
+  @ApiHideProperty()
   @Expose({ groups: ownerUserGroupsForSerializing })
   @Type(() => RoleSerializer)
   role: RoleEntity;

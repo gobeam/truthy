@@ -6,17 +6,21 @@ import {
   Param,
   Post,
   Put,
-  Query
+  Query,
+  UseGuards
 } from '@nestjs/common';
 import { PermissionsService } from './permissions.service';
 import { CreatePermissionDto } from './dto/create-permission.dto';
 import { UpdatePermissionDto } from './dto/update-permission.dto';
 import { PermissionFilterDto } from './dto/permission-filter.dto';
 import { Permission } from './serializer/permission.serializer';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { AuthGuard } from '@nestjs/passport';
 
 @ApiTags('permissions')
+@UseGuards(AuthGuard())
 @Controller('permissions')
+@ApiBearerAuth()
 export class PermissionsController {
   constructor(private readonly permissionsService: PermissionsService) {}
 
@@ -26,6 +30,7 @@ export class PermissionsController {
   }
 
   @Get()
+  @ApiQuery({ type: PermissionFilterDto })
   index(
     @Query() permissionFilterDto: PermissionFilterDto
   ): Promise<Permission[]> {

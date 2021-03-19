@@ -16,14 +16,13 @@ import { UserEntity } from './entity/user.entity';
 import { AuthGuard } from '@nestjs/passport';
 import { UserSerializer } from './serializer/user.serializer';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('auth')
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
 
-  @Post('/register')
   signUp(@Body(ValidationPipe) createUserDto: CreateUserDto): Promise<void> {
     return this.authService.addUser(createUserDto);
   }
@@ -36,12 +35,14 @@ export class AuthController {
 
   @UseGuards(AuthGuard())
   @Get('/profile')
+  @ApiBearerAuth()
   profile(@GetUser() user: UserEntity): Promise<UserSerializer> {
     return this.authService.get(user);
   }
 
   @UseGuards(AuthGuard())
   @Put('/profile')
+  @ApiBearerAuth()
   update(
     @GetUser() user: UserEntity,
     @Body() updateUserDto: UpdateUserDto

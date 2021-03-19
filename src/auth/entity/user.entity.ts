@@ -12,6 +12,7 @@ import * as bcrypt from 'bcrypt';
 import { CustomBaseEntity } from '../../common/entity/custom-base.entity';
 import { RoleEntity } from '../../roles/entities/role.entity';
 import { Exclude } from 'class-transformer';
+import { ApiHideProperty } from '@nestjs/swagger';
 
 /**
  * User Entity

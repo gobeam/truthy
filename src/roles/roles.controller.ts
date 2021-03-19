@@ -1,23 +1,26 @@
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Put,
-  Param,
+  Controller,
   Delete,
-  Query
+  Get,
+  Param,
+  Post,
+  Put,
+  Query,
+  UseGuards
 } from '@nestjs/common';
 import { RolesService } from './roles.service';
 import { CreateRoleDto } from './dto/create-role.dto';
 import { UpdateRoleDto } from './dto/update-role.dto';
 import { RoleFilterDto } from './dto/role-filter.dto';
-import { RoleEntity } from './entities/role.entity';
 import { RoleSerializer } from './serializer/role.serializer';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { AuthGuard } from '@nestjs/passport';
 
 @ApiTags('roles')
+@UseGuards(AuthGuard())
 @Controller('roles')
+@ApiBearerAuth()
 export class RolesController {
   constructor(private readonly rolesService: RolesService) {}
 
@@ -27,6 +30,7 @@ export class RolesController {
   }
 
   @Get()
+  @ApiQuery({ type: RoleFilterDto })
   index(@Query() roleFilterDto: RoleFilterDto): Promise<RoleSerializer[]> {
     return this.rolesService.findAll(roleFilterDto);
   }
