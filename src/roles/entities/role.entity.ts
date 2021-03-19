@@ -1,6 +1,6 @@
 import { CustomBaseEntity } from '../../common/entity/custom-base.entity';
-import { Column, Entity, Index, JoinColumn, OneToMany, Unique } from 'typeorm';
-import { PermissionRoleEntity } from '../../permissions/entities/permission-role.entity';
+import { Column, Entity, Index, JoinTable, ManyToMany, Unique } from 'typeorm';
+import { PermissionEntity } from '../../permissions/entities/permission.entity';
 
 @Entity({ name: 'role' })
 @Unique(['name'])
@@ -12,12 +12,19 @@ export class RoleEntity extends CustomBaseEntity {
   @Column('text')
   description: string;
 
-  @OneToMany(
-    (type) => PermissionRoleEntity,
-    (permissionRole) => permissionRole.role
-  )
-  @JoinColumn()
-  permissionRoles: PermissionRoleEntity[];
+  @ManyToMany(() => PermissionEntity)
+  @JoinTable({
+    name: 'role_permission',
+    joinColumn: {
+      name: 'roleId',
+      referencedColumnName: 'id'
+    },
+    inverseJoinColumn: {
+      name: 'permissionId',
+      referencedColumnName: 'id'
+    }
+  })
+  permission: PermissionEntity[];
 
   constructor(data?: Partial<RoleEntity>) {
     super();

@@ -1,6 +1,5 @@
 import { CustomBaseEntity } from '../../common/entity/custom-base.entity';
-import { Column, Entity, Index, JoinColumn, OneToMany, Unique } from 'typeorm';
-import { PermissionRoleEntity } from './permission-role.entity';
+import { Column, Entity, Index, Unique } from 'typeorm';
 
 @Entity({ name: 'permission' })
 @Unique(['description'])
@@ -16,12 +15,6 @@ export class PermissionEntity extends CustomBaseEntity {
   method: string;
   @Column()
   isDefault: boolean;
-  @OneToMany(
-    (type) => PermissionRoleEntity,
-    (permissionRole) => permissionRole.permission
-  )
-  @JoinColumn()
-  permissionRoles: PermissionRoleEntity[];
 
   constructor(data?: Partial<PermissionEntity>) {
     super();

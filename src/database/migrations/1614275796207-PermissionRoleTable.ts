@@ -1,24 +1,30 @@
-import { MigrationInterface, QueryRunner, Table, TableColumn, TableForeignKey } from 'typeorm';
+import {
+  MigrationInterface,
+  QueryRunner,
+  Table,
+  TableColumn,
+  TableForeignKey
+} from 'typeorm';
 
 export class PermissionRoleTable1614275796207 implements MigrationInterface {
   foreignKeysArray = [
-    { table: 'permission', field: 'permissionId', reference: 'id' },
-    { table: 'role', field: 'roleId', reference: 'id' }
+    { table: 'role', field: 'roleId', reference: 'id' },
+    { table: 'permission', field: 'permissionId', reference: 'id' }
   ];
-  tableName = 'permission_role';
+  tableName = 'role_permission';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.createTable(
       new Table({
         name: this.tableName,
         columns: [
-          {
-            name: 'id',
-            type: 'int',
-            isPrimary: true,
-            isGenerated: true,
-            generationStrategy: 'increment'
-          }
+          // {
+          //   name: 'id',
+          //   type: 'int',
+          //   isPrimary: true,
+          //   isGenerated: true,
+          //   generationStrategy: 'increment'
+          // }
         ]
       }),
       false
