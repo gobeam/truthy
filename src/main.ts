@@ -7,6 +7,11 @@ import {
 } from '@nestjs/common';
 import { useContainer } from 'class-validator';
 import * as config from 'config';
+import {
+  DocumentBuilder,
+  SwaggerCustomOptions,
+  SwaggerModule
+} from '@nestjs/swagger';
 
 async function bootstrap() {
   const logger = new Logger('bootstrap');
@@ -37,6 +42,21 @@ async function bootstrap() {
       }
     })
   );
+  const apiConfig = config.get('app');
+  const swaggerConfig = new DocumentBuilder()
+    .setTitle(apiConfig.name)
+    .setDescription(apiConfig.description)
+    .setVersion(apiConfig.version)
+    .build();
+  const customOptions: SwaggerCustomOptions = {
+    swaggerOptions: {
+      persistAuthorization: true
+    },
+    customSiteTitle: apiConfig.description
+  };
+  const document = SwaggerModule.createDocument(app, swaggerConfig);
+  SwaggerModule.setup('api', app, document, customOptions);
+
   await app.listen(port);
   logger.log(`Application listening in port: ${port}`);
 }

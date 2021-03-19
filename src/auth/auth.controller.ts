@@ -16,7 +16,9 @@ import { UserEntity } from './entity/user.entity';
 import { AuthGuard } from '@nestjs/passport';
 import { UserSerializer } from './serializer/user.serializer';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('auth')
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}

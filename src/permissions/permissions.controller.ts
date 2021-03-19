@@ -13,7 +13,9 @@ import { CreatePermissionDto } from './dto/create-permission.dto';
 import { UpdatePermissionDto } from './dto/update-permission.dto';
 import { PermissionFilterDto } from './dto/permission-filter.dto';
 import { Permission } from './serializer/permission.serializer';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('permissions')
 @Controller('permissions')
 export class PermissionsController {
   constructor(private readonly permissionsService: PermissionsService) {}

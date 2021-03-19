@@ -1,9 +1,10 @@
-import { PartialType } from '@nestjs/mapped-types';
 import { CreateRoleDto } from './create-role.dto';
-import { IsNotEmpty, IsString, MaxLength, MinLength } from 'class-validator';
+import { IsString, MaxLength, MinLength, ValidateIf } from 'class-validator';
+import { ApiPropertyOptional, PartialType } from '@nestjs/swagger';
 
 export class UpdateRoleDto extends PartialType(CreateRoleDto) {
-  @IsNotEmpty()
+  @ApiPropertyOptional()
+  @ValidateIf((object, value) => value)
   @IsString()
   @MinLength(2)
   @MaxLength(100)

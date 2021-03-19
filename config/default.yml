@@ -9,3 +9,8 @@ db:
 
 jwt:
   expiresIn: 3600
+
+app:
+  name: 'Truthy'
+  version: 'v0.1'
+  description: 'Official Truthy API'
