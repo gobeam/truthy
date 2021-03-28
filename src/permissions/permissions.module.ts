@@ -8,6 +8,7 @@ import { AuthModule } from '../auth/auth.module';
 
 @Module({
   imports: [TypeOrmModule.forFeature([PermissionRepository]), AuthModule],
+  exports: [PermissionsService],
   controllers: [PermissionsController],
   providers: [PermissionsService, UniqueValidatorPipe]
 })

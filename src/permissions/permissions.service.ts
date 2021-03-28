@@ -1,9 +1,4 @@
-import {
-  HttpCode,
-  HttpStatus,
-  Injectable,
-  UnprocessableEntityException
-} from '@nestjs/common';
+import { Injectable, UnprocessableEntityException } from '@nestjs/common';
 import { CreatePermissionDto } from './dto/create-permission.dto';
 import { UpdatePermissionDto } from './dto/update-permission.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -12,6 +7,7 @@ import { PermissionFilterDto } from './dto/permission-filter.dto';
 import { CommonServiceInterface } from '../common/interfaces/common-service.interface';
 import { Permission } from './serializer/permission.serializer';
 import { ObjectLiteral } from 'typeorm';
+import { PermissionEntity } from './entities/permission.entity';
 
 @Injectable()
 export class PermissionsService implements CommonServiceInterface<Permission> {
@@ -54,9 +50,15 @@ export class PermissionsService implements CommonServiceInterface<Permission> {
     return this.repository.updateEntity(permission, updatePermissionDto);
   }
 
-  @HttpCode(HttpStatus.NO_CONTENT)
   async remove(id: number): Promise<void> {
     const permission = await this.findOne(id);
     await permission.remove();
+  }
+
+  async whereInIds(ids: number[]): Promise<PermissionEntity[]> {
+    return this.repository
+      .createQueryBuilder('permission')
+      .whereInIds(ids)
+      .getMany();
   }
 }

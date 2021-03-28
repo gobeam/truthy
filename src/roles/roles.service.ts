@@ -7,19 +7,30 @@ import { RoleFilterDto } from './dto/role-filter.dto';
 import { RoleSerializer } from './serializer/role.serializer';
 import { CommonServiceInterface } from '../common/interfaces/common-service.interface';
 import { ObjectLiteral } from 'typeorm';
+import { PermissionsService } from '../permissions/permissions.service';
 
 @Injectable()
 export class RolesService implements CommonServiceInterface<RoleSerializer> {
   constructor(
-    @InjectRepository(RoleRepository) private repository: RoleRepository
+    @InjectRepository(RoleRepository) private repository: RoleRepository,
+    private readonly permissionsService: PermissionsService
   ) {}
+
+  async getPermissionByIds(ids) {
+    if (ids && ids.length > 0) {
+      return await this.permissionsService.whereInIds(ids);
+    }
+    return [];
+  }
 
   /**
    * create new role
    * @param createRoleDto
    */
-  store(createRoleDto: CreateRoleDto): Promise<RoleSerializer> {
-    return this.repository.createEntity(createRoleDto);
+  async store(createRoleDto: CreateRoleDto): Promise<RoleSerializer> {
+    const { permissions } = createRoleDto;
+    const permission = await this.getPermissionByIds(permissions);
+    return this.repository.store(createRoleDto, permission);
   }
 
   /**
@@ -57,8 +68,9 @@ export class RolesService implements CommonServiceInterface<RoleSerializer> {
     if (checkUniqueTitle > 0) {
       throw new UnprocessableEntityException({ name: 'name already exists' });
     }
-    const user = await this.repository.get(id);
-    return this.repository.updateEntity(user, updateRoleDto);
+    const { permissions } = updateRoleDto;
+    const permission = await this.getPermissionByIds(permissions);
+    return this.repository.updateItem(id, updateRoleDto, permission);
   }
 
   /**

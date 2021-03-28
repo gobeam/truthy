@@ -3,8 +3,12 @@ import { RolesService } from './roles.service';
 import { RoleRepository } from './role.repository';
 import { RoleFilterDto } from './dto/role-filter.dto';
 import { CreateRoleDto } from './dto/create-role.dto';
-import { NotFoundException, UnprocessableEntityException } from '@nestjs/common';
+import {
+  NotFoundException,
+  UnprocessableEntityException
+} from '@nestjs/common';
 import { UpdateRoleDto } from './dto/update-role.dto';
+import { PermissionsService } from '../permissions/permissions.service';
 
 const roleRepositoryMock = () => ({
   findAll: jest.fn(),
@@ -17,25 +21,32 @@ const roleRepositoryMock = () => ({
   updateEntity: jest.fn()
 });
 
+const permissionServiceMock = () => ({
+  findAll: jest.fn()
+});
+
 const mockRole = {
   id: 1,
   description: 'test description',
+  permissions: [1],
   name: 'test',
   save: jest.fn(),
   remove: jest.fn()
 };
 
 describe('RolesService', () => {
-  let service: RolesService, roleRepository;
+  let service: RolesService, roleRepository, permissionService;
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         RolesService,
-        { provide: RoleRepository, useFactory: roleRepositoryMock }
+        { provide: RoleRepository, useFactory: roleRepositoryMock },
+        { provide: PermissionsService, useFactory: permissionServiceMock }
       ]
     }).compile();
 
     service = module.get<RolesService>(RolesService);
+    permissionService = module.get<PermissionsService>(PermissionsService);
     roleRepository = module.get<RoleRepository>(RoleRepository);
   });
 

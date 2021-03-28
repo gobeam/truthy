@@ -1,6 +1,5 @@
 import { ModelSerializer } from '../../common/serializer/model.serializer';
-import { PermissionRoleEntity } from '../../roles/entities/permission-role.entity';
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { ApiProperty } from '@nestjs/swagger';
 
 export class Permission extends ModelSerializer {
   @ApiProperty()
@@ -17,7 +16,4 @@ export class Permission extends ModelSerializer {
 
   @ApiProperty()
   isDefault: boolean;
-
-  @ApiPropertyOptional()
-  permissionRoles: PermissionRoleEntity[];
 }
