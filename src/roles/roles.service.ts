@@ -1,4 +1,4 @@
-import { Injectable, UnprocessableEntityException } from '@nestjs/common';
+import { Injectable, NotFoundException, UnprocessableEntityException } from '@nestjs/common';
 import { CreateRoleDto } from './dto/create-role.dto';
 import { UpdateRoleDto } from './dto/update-role.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -58,6 +58,10 @@ export class RolesService implements CommonServiceInterface<RoleSerializer> {
     id: number,
     updateRoleDto: UpdateRoleDto
   ): Promise<RoleSerializer> {
+    const role = await this.repository.findOne(id);
+    if (!role) {
+      throw new NotFoundException();
+    }
     const condition: ObjectLiteral = {
       name: updateRoleDto.name
     };
@@ -70,7 +74,7 @@ export class RolesService implements CommonServiceInterface<RoleSerializer> {
     }
     const { permissions } = updateRoleDto;
     const permission = await this.getPermissionByIds(permissions);
-    return this.repository.updateItem(id, updateRoleDto, permission);
+    return this.repository.updateItem(role, updateRoleDto, permission);
   }
 
   /**

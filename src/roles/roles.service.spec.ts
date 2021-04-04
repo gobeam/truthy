@@ -9,6 +9,7 @@ import {
 } from '@nestjs/common';
 import { UpdateRoleDto } from './dto/update-role.dto';
 import { PermissionsService } from '../permissions/permissions.service';
+import { MethodList } from '../config/permission-config';
 
 const roleRepositoryMock = () => ({
   findAll: jest.fn(),
@@ -18,12 +19,21 @@ const roleRepositoryMock = () => ({
   getAll: jest.fn(),
   findOne: jest.fn(),
   store: jest.fn(),
+  updateItem: jest.fn(),
   updateEntity: jest.fn()
 });
 
 const permissionServiceMock = () => ({
-  findAll: jest.fn()
+  findAll: jest.fn(),
+  whereInIds: jest.fn()
 });
+
+const mockPermission = {
+  description: 'example test description',
+  path: '/tests',
+  method: MethodList.POST,
+  resource: 'test'
+};
 
 const mockRole = {
   id: 1,
@@ -48,6 +58,11 @@ describe('RolesService', () => {
     service = module.get<RolesService>(RolesService);
     permissionService = module.get<PermissionsService>(PermissionsService);
     roleRepository = module.get<RoleRepository>(RoleRepository);
+    jest.clearAllMocks();
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
   });
 
   it('findAll', async () => {
@@ -62,8 +77,13 @@ describe('RolesService', () => {
 
   it('create', async () => {
     const createRoleDto: CreateRoleDto = mockRole;
+    permissionService.whereInIds.mockResolvedValue([mockPermission]);
+    service.getPermissionByIds = jest.fn().mockResolvedValue([mockPermission]);
     const result = await service.store(createRoleDto);
-    expect(roleRepository.createEntity).toHaveBeenCalledWith(createRoleDto);
+    expect(service.getPermissionByIds).toHaveBeenCalledWith([1]);
+    expect(roleRepository.store).toHaveBeenCalledWith(createRoleDto, [
+      mockPermission
+    ]);
     expect(roleRepository.createEntity).not.toThrow();
     expect(result).toBe(undefined);
   });
@@ -86,6 +106,7 @@ describe('RolesService', () => {
 
   describe('update', () => {
     it('try to update using duplicate role name', async () => {
+      roleRepository.findOne.mockResolvedValue(mockRole);
       roleRepository.countEntityByCondition.mockResolvedValue(1);
       const updateRoleDto: UpdateRoleDto = mockRole;
       await expect(service.update(1, updateRoleDto)).rejects.toThrowError(
@@ -95,24 +116,29 @@ describe('RolesService', () => {
     });
     it('update item that exists in database', async () => {
       roleRepository.updateEntity.mockResolvedValue(mockRole);
+      roleRepository.findOne.mockResolvedValue(mockRole);
       roleRepository.countEntityByCondition.mockResolvedValue(0);
       roleRepository.get.mockResolvedValue(mockRole);
+      service.getPermissionByIds = jest
+        .fn()
+        .mockResolvedValue([mockPermission]);
       const updateRoleDto: UpdateRoleDto = mockRole;
-      const role = await service.update(1, updateRoleDto);
-      expect(roleRepository.get).toHaveBeenCalledWith(1);
-      expect(roleRepository.updateEntity).toHaveBeenCalledWith(
+      await service.update(1, updateRoleDto);
+      expect(roleRepository.countEntityByCondition).toHaveBeenCalled();
+      expect(service.getPermissionByIds).toHaveBeenCalledWith([1]);
+      expect(roleRepository.updateItem).toHaveBeenCalledWith(
         mockRole,
-        updateRoleDto
+        updateRoleDto,
+        [mockPermission]
       );
-      expect(role).toEqual(mockRole);
     });
 
     it('trying to update item that does not exists in database', async () => {
-      roleRepository.get.mockImplementation(() => {
-        throw new NotFoundException();
-      });
+      service.getPermissionByIds = jest
+        .fn()
+        .mockResolvedValue([mockPermission]);
       roleRepository.countEntityByCondition.mockResolvedValue(0);
-      roleRepository.updateEntity.mockRejectedValue(null);
+      roleRepository.findOne.mockResolvedValue(null);
       const updateRoleDto: UpdateRoleDto = mockRole;
       await expect(service.update(1, updateRoleDto)).rejects.toThrowError(
         NotFoundException

@@ -24,18 +24,14 @@ export class RoleRepository extends BaseRepository<RoleEntity, RoleSerializer> {
   }
 
   async updateItem(
-    id: number,
-    updatePermissionDto: UpdateRoleDto,
+    role: RoleEntity,
+    updateRoleDto: UpdateRoleDto,
     permission: PermissionEntity[]
   ): Promise<RoleSerializer> {
-    const role = await this.findOne(id);
-    if (!role) {
-      throw new NotFoundException();
-    }
     const fields = ['name', 'description'];
     for (const field of fields) {
-      if (updatePermissionDto[field]) {
-        role[field] = updatePermissionDto[field];
+      if (updateRoleDto[field]) {
+        role[field] = updateRoleDto[field];
       }
     }
     if (permission && permission.length > 0) {
