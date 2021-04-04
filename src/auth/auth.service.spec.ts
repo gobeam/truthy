@@ -7,6 +7,8 @@ import { UserLoginDto } from './dto/user-login.dto';
 import { UserEntity } from './entity/user.entity';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UnprocessableEntityException } from '@nestjs/common';
+import { MailerService } from '@nestjs-modules/mailer';
+import { ResetPasswordDto } from './dto/reset-password.dto';
 
 const mockUserRepository = () => ({
   findOne: jest.fn(),
@@ -28,21 +30,36 @@ const jwtServiceMock = () => ({
   sign: jest.fn()
 });
 
+const mailServiceMock = () => ({
+  sendMail: jest.fn()
+});
+
 describe('AuthService', () => {
-  let service: AuthService, userRepository, jwtService;
+  let service: AuthService, userRepository, jwtService, mailService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         AuthService,
         { provide: UserRepository, useFactory: mockUserRepository },
-        { provide: JwtService, useFactory: jwtServiceMock }
+        { provide: JwtService, useFactory: jwtServiceMock },
+        { provide: MailerService, useFactory: mailServiceMock }
       ]
     }).compile();
 
     service = await module.get<AuthService>(AuthService);
     userRepository = await module.get<UserRepository>(UserRepository);
     jwtService = await module.get<JwtService>(JwtService);
+    mailService = await module.get<MailerService>(MailerService);
+  });
+
+  describe('change or forgot password', () => {
+    it('reset', async () => {
+      const resetPasswordDto: ResetPasswordDto = {
+        email: 'truthycms@gmail.com'
+      };
+      await service.resetPassword(resetPasswordDto);
+    });
   });
 
   describe('addUser', () => {

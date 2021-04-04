@@ -14,3 +14,11 @@ app:
   name: 'Truthy'
   version: 'v0.1'
   description: 'Official Truthy API'
+
+mail:
+  host: 'smtp.mailtrap.io'
+  port: 2525
+  user: 'f4a511d60957e6'
+  pass: '7522797b96cef0'
+  from: 'truthycms'
+  fromMail: 'truthycms@gmail.com'

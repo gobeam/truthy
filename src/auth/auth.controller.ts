@@ -17,19 +17,20 @@ import { AuthGuard } from '@nestjs/passport';
 import { UserSerializer } from './serializer/user.serializer';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ResetPasswordDto } from './dto/reset-password.dto';
 
-@ApiTags('auth')
+@ApiTags('user')
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
 
-  signUp(@Body(ValidationPipe) createUserDto: CreateUserDto): Promise<void> {
+  register(@Body(ValidationPipe) createUserDto: CreateUserDto): Promise<void> {
     return this.authService.addUser(createUserDto);
   }
 
   @Post('/login')
   @HttpCode(200)
-  signIn(@Body() userLoginDto: UserLoginDto) {
+  login(@Body() userLoginDto: UserLoginDto) {
     return this.authService.login(userLoginDto);
   }
 
@@ -48,5 +49,11 @@ export class AuthController {
     @Body() updateUserDto: UpdateUserDto
   ): Promise<UserSerializer> {
     return this.authService.update(user, updateUserDto);
+  }
+
+  @Put('/profile')
+  @HttpCode(200)
+  changePassword(@Body() resetPasswordDto: ResetPasswordDto): Promise<void> {
+    return this.authService.resetPassword(resetPasswordDto);
   }
 }

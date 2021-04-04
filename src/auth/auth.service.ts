@@ -9,12 +9,16 @@ import { JwtPayloadDto } from './dto/jwt-payload.dto';
 import { UserSerializer } from './serializer/user.serializer';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { ObjectLiteral } from 'typeorm';
+import { MailerService } from '@nestjs-modules/mailer';
+import { ResetPasswordDto } from './dto/reset-password.dto';
+import * as config from 'config';
 
 @Injectable()
 export class AuthService {
   constructor(
     @InjectRepository(UserRepository) private userRepository: UserRepository,
-    private jwtService: JwtService
+    private jwtService: JwtService,
+    private readonly mailerService: MailerService
   ) {}
 
   /**
@@ -83,5 +87,24 @@ export class AuthService {
       throw new UnprocessableEntityException(error);
     }
     return this.userRepository.updateEntity(user, updateUserDto);
+  }
+
+  async resetPassword(resetPasswordDto: ResetPasswordDto): Promise<void> {
+    const { email } = resetPasswordDto;
+    const user = await this.userRepository.findOne({ where: { email } });
+    if (!user) {
+      return;
+    }
+    const mailConfig = config.get('mail');
+    await this.mailerService.sendMail({
+      to: user.email,
+      from: mailConfig.fromMail,
+      subject: 'Reset Password',
+      template: __dirname + '/templates/email/password-reset',
+      context: {
+        code: 'cf1a3f828287',
+        username: user.name
+      }
+    });
   }
 }

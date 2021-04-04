@@ -1,7 +1,7 @@
 import {
   BeforeInsert,
   BeforeUpdate,
-  Column,
+  Column, CreateDateColumn,
   Entity,
   Index,
   JoinColumn,
@@ -12,7 +12,6 @@ import * as bcrypt from 'bcrypt';
 import { CustomBaseEntity } from '../../common/entity/custom-base.entity';
 import { RoleEntity } from '../../roles/entities/role.entity';
 import { Exclude } from 'class-transformer';
-import { ApiHideProperty } from '@nestjs/swagger';
 
 /**
  * User Entity
@@ -41,6 +40,9 @@ export class UserEntity extends CustomBaseEntity {
   @Column()
   @Exclude({ toPlainOnly: true })
   token: string;
+
+  @CreateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  tokenValidityDate: Date;
 
   @Column()
   @Exclude({ toPlainOnly: true })
