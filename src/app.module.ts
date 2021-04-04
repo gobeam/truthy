@@ -13,10 +13,20 @@ const mailConfig = config.get('mail');
   imports: [
     TypeOrmModule.forRoot(ormConfig),
     MailerModule.forRoot({
-      transport: `smtps://${mailConfig.user}:${mailConfig.pass}@${mailConfig.host}`,
+      transport: {
+        host: mailConfig.host,
+        port: mailConfig.port,
+        ignoreTLS: true,
+        secure: false,
+        auth: {
+          user: mailConfig.user,
+          pass: mailConfig.pass
+        }
+      },
       defaults: {
         from: `"${mailConfig.from}" <${mailConfig.fromMail}>`
       },
+      preview: true,
       template: {
         dir: __dirname + '/templates',
         adapter: new PugAdapter(),

@@ -2,7 +2,11 @@
   "collection": "@nestjs/schematics",
   "sourceRoot": "src",
   "compilerOptions": {
-    "plugins": ["@nestjs/swagger"]
+    "plugins": ["@nestjs/swagger"],
+    "assets": [
+      { "include": "**/*.pug", "watchAssets": true },
+      { "include": "**/*.css", "watchAssets": true }
+    ]
   },
   "plugins": [
     {

@@ -51,9 +51,9 @@ export class AuthController {
     return this.authService.update(user, updateUserDto);
   }
 
-  @Put('/profile')
+  @Put('/forgot-password')
   @HttpCode(200)
-  changePassword(@Body() resetPasswordDto: ResetPasswordDto): Promise<void> {
-    return this.authService.resetPassword(resetPasswordDto);
+  forgotPassword(@Body() resetPasswordDto: ResetPasswordDto): Promise<void> {
+    return this.authService.forgotPassword(resetPasswordDto);
   }
 }

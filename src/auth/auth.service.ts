@@ -89,22 +89,47 @@ export class AuthService {
     return this.userRepository.updateEntity(user, updateUserDto);
   }
 
-  async resetPassword(resetPasswordDto: ResetPasswordDto): Promise<void> {
+  /**
+   * forget password and send reset code by email
+   * @param resetPasswordDto
+   */
+  async forgotPassword(resetPasswordDto: ResetPasswordDto): Promise<void> {
     const { email } = resetPasswordDto;
     const user = await this.userRepository.findOne({ where: { email } });
     if (!user) {
       return;
     }
+    user.token = this.generateRandomCode(6);
+    const currentDateTime = new Date();
+    currentDateTime.setHours(currentDateTime.getHours() + 1);
+    user.tokenValidityDate = currentDateTime;
+    user.skipHashPassword = true;
+    await user.save();
     const mailConfig = config.get('mail');
     await this.mailerService.sendMail({
       to: user.email,
       from: mailConfig.fromMail,
       subject: 'Reset Password',
-      template: __dirname + '/templates/email/password-reset',
+      template: __dirname + '/../templates/email/password-reset',
       context: {
-        code: 'cf1a3f828287',
+        code: user.token,
         username: user.name
       }
     });
+  }
+
+  /**
+   * generate random string code providing length
+   * @param length
+   */
+  generateRandomCode(length: number): string {
+    let result = '';
+    const characters =
+      'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    const charactersLength = characters.length;
+    for (let i = 0; i < length; i++) {
+      result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    }
+    return result;
   }
 }

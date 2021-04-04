@@ -23,7 +23,8 @@ const mockUser = {
   email: 'test@mail.com',
   username: 'tester',
   name: 'test',
-  password: 'test123'
+  password: 'test123',
+  save: jest.fn()
 };
 
 const jwtServiceMock = () => ({
@@ -55,10 +56,18 @@ describe('AuthService', () => {
 
   describe('change or forgot password', () => {
     it('reset', async () => {
+      userRepository.findOne.mockResolvedValue(mockUser);
       const resetPasswordDto: ResetPasswordDto = {
         email: 'truthycms@gmail.com'
       };
-      await service.resetPassword(resetPasswordDto);
+      await service.forgotPassword(resetPasswordDto);
+      expect(mockUser.save).toHaveBeenCalledTimes(1);
+      expect(mailService.sendMail).toHaveBeenCalled();
+    });
+    it('check if generate code works as expected', () => {
+      const result = service.generateRandomCode(5);
+      expect(typeof result).toBe('string');
+      expect(result.length).toEqual(5);
     });
   });
 
