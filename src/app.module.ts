@@ -26,7 +26,7 @@ const mailConfig = config.get('mail');
       defaults: {
         from: `"${mailConfig.from}" <${mailConfig.fromMail}>`
       },
-      preview: true,
+      preview: mailConfig.preview,
       template: {
         dir: __dirname + '/templates',
         adapter: new PugAdapter(),
