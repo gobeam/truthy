@@ -6,9 +6,13 @@ import { JwtService } from '@nestjs/jwt';
 import { UserLoginDto } from './dto/user-login.dto';
 import { UserEntity } from './entity/user.entity';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { UnprocessableEntityException } from '@nestjs/common';
+import {
+  NotFoundException,
+  UnprocessableEntityException
+} from '@nestjs/common';
 import { MailerService } from '@nestjs-modules/mailer';
 import { ResetPasswordDto } from './dto/reset-password.dto';
+import { ForgetPasswordDto } from './dto/forget-password.dto';
 
 const mockUserRepository = () => ({
   findOne: jest.fn(),
@@ -17,6 +21,7 @@ const mockUserRepository = () => ({
   transform: jest.fn(),
   findBy: jest.fn(),
   updateEntity: jest.fn(),
+  getUserForResetPassword: jest.fn(),
   countEntityByCondition: jest.fn()
 });
 const mockUser = {
@@ -55,12 +60,12 @@ describe('AuthService', () => {
   });
 
   describe('change or forgot password', () => {
-    it('reset', async () => {
+    it('forgot password with email', async () => {
       userRepository.findOne.mockResolvedValue(mockUser);
-      const resetPasswordDto: ResetPasswordDto = {
+      const forgetPasswordDto: ForgetPasswordDto = {
         email: 'truthycms@gmail.com'
       };
-      await service.forgotPassword(resetPasswordDto);
+      await service.forgotPassword(forgetPasswordDto);
       expect(mockUser.save).toHaveBeenCalledTimes(1);
       expect(mailService.sendMail).toHaveBeenCalled();
     });
@@ -68,6 +73,44 @@ describe('AuthService', () => {
       const result = service.generateRandomCode(5);
       expect(typeof result).toBe('string');
       expect(result.length).toEqual(5);
+    });
+
+    it('generate unique code test', async () => {
+      service.generateRandomCode = jest.fn().mockReturnValue('W45Rft');
+      userRepository.countEntityByCondition.mockResolvedValue(0);
+      await service.generateUniqueToken(6);
+      expect(service.generateRandomCode).toHaveBeenCalledWith(6);
+      expect(userRepository.countEntityByCondition).toHaveBeenCalledWith(
+        { token: 'W45Rft' },
+        0
+      );
+    });
+
+    describe('reset password test', () => {
+      let resetPasswordDto: ResetPasswordDto;
+      beforeEach(() => {
+        resetPasswordDto = {
+          password: 'Truthy@123',
+          confirmPassword: 'Truthy@123',
+          token: 'Aer23C'
+        };
+      });
+      it('reset password for existing user', async () => {
+        userRepository.getUserForResetPassword.mockResolvedValue(mockUser);
+        service.generateUniqueToken = jest.fn();
+        await service.resetPassword(resetPasswordDto);
+        expect(userRepository.getUserForResetPassword).toHaveBeenCalledWith(
+          resetPasswordDto
+        );
+        expect(service.generateUniqueToken).toHaveBeenCalledTimes(1);
+        expect(mockUser.save).toHaveBeenCalled();
+      });
+      it('try to reset password with invalid token', async () => {
+        userRepository.getUserForResetPassword.mockResolvedValue(null);
+        await expect(
+          service.resetPassword(resetPasswordDto)
+        ).rejects.toThrowError(NotFoundException);
+      });
     });
   });
 

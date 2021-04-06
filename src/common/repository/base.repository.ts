@@ -74,8 +74,13 @@ export class BaseRepository<
     conditions: ObjectLiteral,
     id: number
   ): Promise<number> {
+    let filteredCondition: ObjectLiteral = {};
+    if (id > 0) {
+      filteredCondition.id = Not(id);
+    }
+    filteredCondition = { ...conditions, ...filteredCondition };
     return this.count({
-      where: { id: Not(id), ...conditions }
+      where: filteredCondition
     })
       .then((count) => {
         return Promise.resolve(count);

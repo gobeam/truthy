@@ -18,6 +18,7 @@ import { UserSerializer } from './serializer/user.serializer';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { ResetPasswordDto } from './dto/reset-password.dto';
+import { ForgetPasswordDto } from './dto/forget-password.dto';
 
 @ApiTags('user')
 @Controller('auth')
@@ -52,8 +53,12 @@ export class AuthController {
   }
 
   @Put('/forgot-password')
-  @HttpCode(200)
-  forgotPassword(@Body() resetPasswordDto: ResetPasswordDto): Promise<void> {
-    return this.authService.forgotPassword(resetPasswordDto);
+  forgotPassword(@Body() forgetPasswordDto: ForgetPasswordDto): Promise<void> {
+    return this.authService.forgotPassword(forgetPasswordDto);
+  }
+
+  @Put('/reset-password')
+  resetPassword(@Body() resetPasswordDto: ResetPasswordDto): Promise<void> {
+    return this.authService.resetPassword(resetPasswordDto);
   }
 }

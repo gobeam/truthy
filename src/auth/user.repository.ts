@@ -1,4 +1,4 @@
-import { EntityRepository } from 'typeorm';
+import { EntityRepository, LessThan } from 'typeorm';
 import { UserEntity } from './entity/user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import * as bcrypt from 'bcrypt';
@@ -7,6 +7,7 @@ import { UnauthorizedException } from '@nestjs/common';
 import { BaseRepository } from '../common/repository/base.repository';
 import { UserSerializer } from './serializer/user.serializer';
 import { classToPlain, plainToClass } from 'class-transformer';
+import { ResetPasswordDto } from './dto/reset-password.dto';
 
 @EntityRepository(UserEntity)
 export class UserRepository extends BaseRepository<UserEntity, UserSerializer> {
@@ -37,6 +38,20 @@ export class UserRepository extends BaseRepository<UserEntity, UserSerializer> {
       return user;
     }
     throw new UnauthorizedException();
+  }
+
+  /**
+   * Get user entity for reset password
+   * @param resetPasswordDto
+   */
+  async getUserForResetPassword(
+    resetPasswordDto: ResetPasswordDto
+  ): Promise<UserEntity> {
+    const { token } = resetPasswordDto;
+    const query = this.createQueryBuilder('user');
+    query.where('user.token = :token', { token });
+    query.andWhere('user.tokenValidityDate > :date', { date: new Date() });
+    return query.getOne();
   }
 
   /**
