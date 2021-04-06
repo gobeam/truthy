@@ -1,0 +1,21 @@
+extends layouts/email-layout
+include mixins/_button
+block preHeader
+    - let previewText = subject
+
+block content
+    table.main(role='presentation')
+        tbody
+            tr
+                td.wrapper
+                    table(role='presentation' border='0' cellpadding='0' cellspacing='0')
+                        tbody
+                            tr
+                                td
+                                    p Hi #{username},
+                                    p
+                                        | A new account has been created using your email #{email}. Click below button to activate your account.
+                                    +button(activateUrl, 'Activate Account →')
+                                    p
+                                        | If you haven't requested the code please ignore the email.
+                                    p Thank you!.

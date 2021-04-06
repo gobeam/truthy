@@ -14,6 +14,7 @@ app:
   name: 'Truthy'
   version: 'v0.1'
   description: 'Official Truthy API'
+  appUrl: 'http://localhost:3000'
 
 mail:
   host: 'smtp.mailtrap.io'

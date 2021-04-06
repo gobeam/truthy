@@ -1,4 +1,6 @@
 import {
+  HttpException,
+  HttpStatus,
   Injectable,
   NotFoundException,
   UnprocessableEntityException
@@ -17,6 +19,7 @@ import { MailerService } from '@nestjs-modules/mailer';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import * as config from 'config';
 import { ForgetPasswordDto } from './dto/forget-password.dto';
+import { UserStatusEnum } from './user-status.enum';
 
 @Injectable()
 export class AuthService {
@@ -31,7 +34,24 @@ export class AuthService {
    * @param createUserDto
    */
   async addUser(createUserDto: CreateUserDto): Promise<void> {
-    return this.userRepository.store(createUserDto);
+    const token = await this.generateUniqueToken(12);
+    await this.userRepository.store(createUserDto, token);
+    const mailConfig = config.get('mail');
+    const appConfig = config.get('app');
+    const subject = 'Account created';
+    const { username, email } = createUserDto;
+    await this.mailerService.sendMail({
+      to: email,
+      from: mailConfig.fromMail,
+      subject,
+      template: __dirname + '/../templates/email/activate-account',
+      context: {
+        email,
+        activateUrl: `${appConfig.appUrl}/auth/activate-account?token=${token}`,
+        username: username,
+        subject
+      }
+    });
   }
 
   /**
@@ -92,6 +112,24 @@ export class AuthService {
       throw new UnprocessableEntityException(error);
     }
     return this.userRepository.updateEntity(user, updateUserDto);
+  }
+
+  /**
+   * activate newly register account
+   * @param token
+   */
+  async activateAccount(token: string): Promise<void> {
+    const user = await this.userRepository.findOne({ token });
+    if (!user) {
+      throw new NotFoundException();
+    }
+    if (user.status !== UserStatusEnum.INACTIVE) {
+      throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);
+    }
+    user.status = UserStatusEnum.ACTIVE;
+    user.token = await this.generateUniqueToken(6);
+    user.skipHashPassword = true;
+    await user.save();
   }
 
   /**

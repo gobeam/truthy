@@ -1,4 +1,4 @@
-import { EntityRepository, LessThan } from 'typeorm';
+import { EntityRepository } from 'typeorm';
 import { UserEntity } from './entity/user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import * as bcrypt from 'bcrypt';
@@ -8,20 +8,24 @@ import { BaseRepository } from '../common/repository/base.repository';
 import { UserSerializer } from './serializer/user.serializer';
 import { classToPlain, plainToClass } from 'class-transformer';
 import { ResetPasswordDto } from './dto/reset-password.dto';
+import { UserStatusEnum } from './user-status.enum';
 
 @EntityRepository(UserEntity)
 export class UserRepository extends BaseRepository<UserEntity, UserSerializer> {
   /**
    * store new user
    * @param createUserDto
+   * @param token
    */
-  async store(createUserDto: CreateUserDto): Promise<void> {
+  async store(createUserDto: CreateUserDto, token: string): Promise<void> {
     const { name, username, password, email } = createUserDto;
     const user = this.create();
     user.name = name;
+    user.status = UserStatusEnum.INACTIVE;
     user.username = username;
     user.email = email;
     user.salt = await bcrypt.genSalt();
+    user.token = token;
     user.password = password;
     user.roleId = 1;
     await user.save();
@@ -34,7 +38,11 @@ export class UserRepository extends BaseRepository<UserEntity, UserSerializer> {
   async login(userLoginDto: UserLoginDto): Promise<UserEntity> {
     const { username, password } = userLoginDto;
     const user = await this.findOne({ username });
-    if (user && (await user.validatePassword(password))) {
+    if (
+      user &&
+      user.status === UserStatusEnum.ACTIVE &&
+      (await user.validatePassword(password))
+    ) {
       return user;
     }
     throw new UnauthorizedException();

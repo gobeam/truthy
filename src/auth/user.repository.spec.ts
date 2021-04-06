@@ -4,6 +4,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UserLoginDto } from './dto/user-login.dto';
 import { UserEntity } from './entity/user.entity';
 import { UnauthorizedException } from '@nestjs/common';
+import { UserStatusEnum } from './user-status.enum';
 
 const mockUser = {
   email: 'test@email.com',
@@ -39,6 +40,7 @@ describe('User Repository', () => {
     beforeEach(async () => {
       userRepository.findOne = jest.fn();
       user = new UserEntity();
+      user.status = UserStatusEnum.ACTIVE;
       user.username = mockUser.username;
       user.password = mockUser.password;
       user.validatePassword = jest.fn();

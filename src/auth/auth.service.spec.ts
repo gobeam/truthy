@@ -13,6 +13,7 @@ import {
 import { MailerService } from '@nestjs-modules/mailer';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { ForgetPasswordDto } from './dto/forget-password.dto';
+import { UserStatusEnum } from './user-status.enum';
 
 const mockUserRepository = () => ({
   findOne: jest.fn(),
@@ -29,6 +30,7 @@ const mockUser = {
   username: 'tester',
   name: 'test',
   password: 'test123',
+  status: UserStatusEnum.ACTIVE,
   save: jest.fn()
 };
 
@@ -44,6 +46,7 @@ describe('AuthService', () => {
   let service: AuthService, userRepository, jwtService, mailService;
 
   beforeEach(async () => {
+    jest.clearAllMocks();
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         AuthService,
@@ -116,10 +119,35 @@ describe('AuthService', () => {
 
   describe('addUser', () => {
     it('add new user test', async () => {
+      const token = 'Adf2vBnVV';
+      service.generateUniqueToken = jest.fn().mockResolvedValue(token);
       const createUserDto: CreateUserDto = mockUser;
       await service.addUser(createUserDto);
-      expect(userRepository.store).toHaveBeenCalledWith(createUserDto);
+      expect(service.generateUniqueToken).toHaveBeenCalled();
+      expect(userRepository.store).toHaveBeenCalledWith(createUserDto, token);
+      expect(mailService.sendMail).toHaveBeenCalled();
       expect(userRepository.store).not.toThrow();
+    });
+
+    it('activate account with valid token', async () => {
+      service.generateUniqueToken = jest.fn();
+      userRepository.findOne.mockResolvedValue(mockUser);
+      mockUser.status = UserStatusEnum.INACTIVE; // initially user will have inactive status
+      const token = 'Adf2vBnVV';
+      await service.activateAccount(token);
+      expect(userRepository.findOne).toHaveBeenCalledWith({ token });
+      expect(service.generateUniqueToken).toHaveBeenCalled();
+      expect(mockUser.save).toHaveBeenCalled();
+    });
+
+    it('activate account with invalid token', async () => {
+      userRepository.findOne.mockResolvedValue(null);
+      const token = 'Bgf2vBnVV';
+      await expect(service.activateAccount(token)).rejects.toThrowError(
+        NotFoundException
+      );
+      expect(userRepository.findOne).toHaveBeenCalledTimes(1);
+      expect(mockUser.save).toHaveBeenCalledTimes(0);
     });
   });
 

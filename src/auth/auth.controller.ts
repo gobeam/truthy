@@ -5,6 +5,7 @@ import {
   HttpCode,
   Post,
   Put,
+  Query,
   UseGuards,
   ValidationPipe
 } from '@nestjs/common';
@@ -25,6 +26,7 @@ import { ForgetPasswordDto } from './dto/forget-password.dto';
 export class AuthController {
   constructor(private authService: AuthService) {}
 
+  @Post('/register')
   register(@Body(ValidationPipe) createUserDto: CreateUserDto): Promise<void> {
     return this.authService.addUser(createUserDto);
   }
@@ -50,6 +52,11 @@ export class AuthController {
     @Body() updateUserDto: UpdateUserDto
   ): Promise<UserSerializer> {
     return this.authService.update(user, updateUserDto);
+  }
+
+  @Get('/activate-account')
+  activateAccount(@Query('token') token: string): Promise<void> {
+    return this.authService.activateAccount(token);
   }
 
   @Put('/forgot-password')
