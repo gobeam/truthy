@@ -20,6 +20,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { ForgetPasswordDto } from './dto/forget-password.dto';
+import { ChangePasswordDto } from './dto/change-password.dto';
 
 @ApiTags('user')
 @Controller('auth')
@@ -67,5 +68,12 @@ export class AuthController {
   @Put('/reset-password')
   resetPassword(@Body() resetPasswordDto: ResetPasswordDto): Promise<void> {
     return this.authService.resetPassword(resetPasswordDto);
+  }
+
+  @UseGuards(AuthGuard())
+  @ApiBearerAuth()
+  @Put('/change-password')
+  changePassword(@GetUser() user: UserEntity, @Body() changePasswordDto: ChangePasswordDto): Promise<void> {
+    return this.authService.changePassword(user, changePasswordDto);
   }
 }

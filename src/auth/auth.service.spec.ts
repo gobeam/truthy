@@ -8,12 +8,15 @@ import { UserEntity } from './entity/user.entity';
 import { UpdateUserDto } from './dto/update-user.dto';
 import {
   NotFoundException,
+  UnauthorizedException,
   UnprocessableEntityException
 } from '@nestjs/common';
 import { MailerService } from '@nestjs-modules/mailer';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { ForgetPasswordDto } from './dto/forget-password.dto';
 import { UserStatusEnum } from './user-status.enum';
+import { ChangePasswordDto } from './dto/change-password.dto';
+import * as bcrypt from 'bcrypt';
 
 const mockUserRepository = () => ({
   findOne: jest.fn(),
@@ -113,6 +116,40 @@ describe('AuthService', () => {
         await expect(
           service.resetPassword(resetPasswordDto)
         ).rejects.toThrowError(NotFoundException);
+      });
+      describe('change password', () => {
+        let user: UserEntity, changePasswordDto: ChangePasswordDto;
+        beforeEach(() => {
+          jest.clearAllMocks();
+          changePasswordDto = {
+            oldPassword: 'Truthy@prev',
+            password: 'Truthy@123',
+            confirmPassword: 'Truthy@123'
+          };
+
+          user = new UserEntity();
+          user.email = mockUser.email;
+          user.username = mockUser.username;
+          user.password = mockUser.password;
+          user.salt = 'result';
+          user.save = mockUser.save;
+        });
+        it('change password for loggedin user with correct password', async () => {
+          user.validatePassword = jest.fn().mockResolvedValue(true);
+          bcrypt.hash = jest.fn().mockResolvedValue('result');
+          await service.changePassword(user, changePasswordDto);
+          expect(user.validatePassword).toHaveBeenCalledTimes(1);
+          expect(user.save).toHaveBeenCalledTimes(1);
+        });
+        it('change password for loggedin user with incorrect password', async () => {
+          bcrypt.hash = jest.fn().mockResolvedValue('result');
+          user.validatePassword = jest.fn().mockResolvedValue(false);
+          await expect(
+            service.changePassword(user, changePasswordDto)
+          ).rejects.toThrowError(UnauthorizedException);
+          expect(user.validatePassword).toHaveBeenCalledTimes(1);
+          expect(user.save).toHaveBeenCalledTimes(0);
+        });
       });
     });
   });

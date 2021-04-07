@@ -3,6 +3,7 @@ import {
   HttpStatus,
   Injectable,
   NotFoundException,
+  UnauthorizedException,
   UnprocessableEntityException
 } from '@nestjs/common';
 import { UserRepository } from './user.repository';
@@ -20,6 +21,7 @@ import { ResetPasswordDto } from './dto/reset-password.dto';
 import * as config from 'config';
 import { ForgetPasswordDto } from './dto/forget-password.dto';
 import { UserStatusEnum } from './user-status.enum';
+import { ChangePasswordDto } from './dto/change-password.dto';
 
 @Injectable()
 export class AuthService {
@@ -176,6 +178,24 @@ export class AuthService {
       throw new NotFoundException();
     }
     user.token = await this.generateUniqueToken(6);
+    user.password = password;
+    await user.save();
+  }
+
+  /**
+   * change password of logged in user
+   * @param user
+   * @param changePasswordDto
+   */
+  async changePassword(
+    user: UserEntity,
+    changePasswordDto: ChangePasswordDto
+  ): Promise<void> {
+    const { oldPassword, password } = changePasswordDto;
+    const checkOldPwdMatches = await user.validatePassword(oldPassword);
+    if (!checkOldPwdMatches) {
+      throw new UnauthorizedException();
+    }
     user.password = password;
     await user.save();
   }
