@@ -7,6 +7,7 @@ import * as ormConfig from './config/ormconfig';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { PugAdapter } from '@nestjs-modules/mailer/dist/adapters/pug.adapter';
 import * as config from 'config';
+
 const mailConfig = config.get('mail');
 
 @Module({
@@ -40,4 +41,5 @@ const mailConfig = config.get('mail');
     PermissionsModule
   ]
 })
-export class AppModule {}
+export class AppModule {
+}

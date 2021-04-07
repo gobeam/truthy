@@ -6,7 +6,6 @@ import { BaseRepository } from '../common/repository/base.repository';
 import { CreateRoleDto } from './dto/create-role.dto';
 import { PermissionEntity } from '../permissions/entities/permission.entity';
 import { UpdateRoleDto } from './dto/update-role.dto';
-import { NotFoundException } from '@nestjs/common';
 
 @EntityRepository(RoleEntity)
 export class RoleRepository extends BaseRepository<RoleEntity, RoleSerializer> {
@@ -40,6 +39,7 @@ export class RoleRepository extends BaseRepository<RoleEntity, RoleSerializer> {
     await role.save();
     return this.transform(role);
   }
+
   /**
    * transform single role
    * @param model

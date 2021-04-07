@@ -1,6 +1,6 @@
 interface PermissionConfigInterface {
   superRole: superRole;
-  defaultRoutes?: Array<PermissionPayload>;
+  defaultRoutes?: Array<RoutePayloadInterface>;
   modules: Array<ModulesPayloadInterface>;
 }
 
@@ -57,14 +57,40 @@ export const PermissionConfiguration: PermissionConfigInterface = {
   },
   defaultRoutes: [
     {
-      name: 'Check Route',
-      resource: 'check',
-      route: [
-        {
-          path: '/check',
-          method: MethodList.GET
-        }
-      ]
+      path: '/check',
+      method: MethodList.GET
+    },
+    {
+      path: '/auth/register',
+      method: MethodList.POST
+    },
+    {
+      path: '/auth/login',
+      method: MethodList.POST
+    },
+    {
+      path: '/auth/profile',
+      method: MethodList.GET
+    },
+    {
+      path: '/auth/activate-account',
+      method: MethodList.GET
+    },
+    {
+      path: '/auth/forgot-password',
+      method: MethodList.PUT
+    },
+    {
+      path: '/auth/reset-password',
+      method: MethodList.PUT
+    },
+    {
+      path: '/auth/change-password',
+      method: MethodList.PUT
+    },
+    {
+      path: '/auth/profile',
+      method: MethodList.PUT
     }
   ],
   modules: [

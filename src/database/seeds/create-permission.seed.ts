@@ -15,10 +15,10 @@ export default class CreatePermissionSeed {
   public async run(factory: Factory, connection: Connection): Promise<any> {
     const modules = PermissionConfiguration.modules;
     const defaultRoutes = PermissionConfiguration.defaultRoutes;
-    for (const defaultRoute of defaultRoutes) {
-      const resource = defaultRoute.resource;
-      this.concatPermissions(defaultRoute, resource, true);
-    }
+    // for (const defaultRoute of defaultRoutes) {
+    //   const resource = defaultRoute.resource;
+    //   // this.concatPermissions(defaultRoute, resource, true);
+    // }
 
     for (const moduleData of modules) {
       let resource = moduleData.resource;
