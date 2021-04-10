@@ -2,7 +2,10 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { PermissionsService } from './permissions.service';
 import { MethodList } from '../config/permission-config';
 import { PermissionRepository } from './permission.repository';
-import { NotFoundException, UnprocessableEntityException } from '@nestjs/common';
+import {
+  NotFoundException,
+  UnprocessableEntityException
+} from '@nestjs/common';
 import { PermissionFilterDto } from './dto/permission-filter.dto';
 import { CreatePermissionDto } from './dto/create-permission.dto';
 import { UpdatePermissionDto } from './dto/update-permission.dto';

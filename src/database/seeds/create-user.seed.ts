@@ -10,7 +10,9 @@ export default class CreateUserSeed {
     const role = await connection
       .getRepository(RoleEntity)
       .createQueryBuilder('role')
-      .where('role.name = :name', { name: PermissionConfiguration.superRole.name })
+      .where('role.name = :name', {
+        name: PermissionConfiguration.superRole.name
+      })
       .getOne();
 
     if (!role) {
