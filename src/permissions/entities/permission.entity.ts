@@ -1,5 +1,6 @@
 import { CustomBaseEntity } from '../../common/entity/custom-base.entity';
-import { Column, Entity, Index, Unique } from 'typeorm';
+import { Column, Entity, Index, ManyToMany, Unique } from 'typeorm';
+import { RoleEntity } from '../../roles/entities/role.entity';
 
 @Entity({ name: 'permission' })
 @Unique(['description'])
@@ -15,6 +16,9 @@ export class PermissionEntity extends CustomBaseEntity {
   method: string;
   @Column()
   isDefault: boolean;
+
+  @ManyToMany((type) => RoleEntity, (role) => role.permission)
+  role: RoleEntity[];
 
   constructor(data?: Partial<PermissionEntity>) {
     super();

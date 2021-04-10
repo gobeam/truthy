@@ -12,7 +12,7 @@ export class RoleEntity extends CustomBaseEntity {
   @Column('text')
   description: string;
 
-  @ManyToMany(() => PermissionEntity)
+  @ManyToMany(() => PermissionEntity, (permission) => permission.role)
   @JoinTable({
     name: 'role_permission',
     joinColumn: {

@@ -1,7 +1,8 @@
 import {
   BeforeInsert,
   BeforeUpdate,
-  Column, CreateDateColumn,
+  Column,
+  CreateDateColumn,
   Entity,
   Index,
   JoinColumn,

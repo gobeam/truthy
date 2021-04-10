@@ -41,5 +41,4 @@ const mailConfig = config.get('mail');
     PermissionsModule
   ]
 })
-export class AppModule {
-}
+export class AppModule {}

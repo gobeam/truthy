@@ -73,7 +73,10 @@ export class AuthController {
   @UseGuards(AuthGuard())
   @ApiBearerAuth()
   @Put('/change-password')
-  changePassword(@GetUser() user: UserEntity, @Body() changePasswordDto: ChangePasswordDto): Promise<void> {
+  changePassword(
+    @GetUser() user: UserEntity,
+    @Body() changePasswordDto: ChangePasswordDto
+  ): Promise<void> {
     return this.authService.changePassword(user, changePasswordDto);
   }
 }
