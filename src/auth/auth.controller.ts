@@ -21,6 +21,7 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { ForgetPasswordDto } from './dto/forget-password.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
+import { PermissionGuard } from '../common/guard/permission.guard';
 
 @ApiTags('user')
 @Controller('auth')
@@ -38,14 +39,14 @@ export class AuthController {
     return this.authService.login(userLoginDto);
   }
 
-  @UseGuards(AuthGuard())
+  @UseGuards(AuthGuard(), PermissionGuard)
   @Get('/profile')
   @ApiBearerAuth()
   profile(@GetUser() user: UserEntity): Promise<UserSerializer> {
     return this.authService.get(user);
   }
 
-  @UseGuards(AuthGuard())
+  @UseGuards(AuthGuard(), PermissionGuard)
   @Put('/profile')
   @ApiBearerAuth()
   update(
@@ -70,7 +71,7 @@ export class AuthController {
     return this.authService.resetPassword(resetPasswordDto);
   }
 
-  @UseGuards(AuthGuard())
+  @UseGuards(AuthGuard(), PermissionGuard)
   @ApiBearerAuth()
   @Put('/change-password')
   changePassword(

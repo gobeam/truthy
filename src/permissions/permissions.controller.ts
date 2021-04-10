@@ -2,7 +2,9 @@ import {
   Body,
   Controller,
   Delete,
-  Get, HttpCode, HttpStatus,
+  Get,
+  HttpCode,
+  HttpStatus,
   Param,
   Post,
   Put,
@@ -16,9 +18,10 @@ import { PermissionFilterDto } from './dto/permission-filter.dto';
 import { Permission } from './serializer/permission.serializer';
 import { ApiBearerAuth, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
+import { PermissionGuard } from '../common/guard/permission.guard';
 
 @ApiTags('permissions')
-@UseGuards(AuthGuard())
+@UseGuards(AuthGuard(), PermissionGuard)
 @Controller('permissions')
 @ApiBearerAuth()
 export class PermissionsController {

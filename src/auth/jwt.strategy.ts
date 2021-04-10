@@ -28,8 +28,6 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       { username },
       { relations: ['role', 'role.permission'] }
     );
-    console.log(user);
-    // const user = await this.userRepository.findBy('username', username, {});
     if (!user) {
       throw new UnauthorizedException();
     }
