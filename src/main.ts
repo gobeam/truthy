@@ -31,10 +31,12 @@ async function bootstrap() {
       whitelist: true,
       forbidNonWhitelisted: true,
       exceptionFactory: (errors) => {
-        const errorMessages = {};
+        const errorMessages = { error: {} };
         errors.forEach(
           (error) =>
-            (errorMessages[error.property] = Object.values(error.constraints)
+            (errorMessages.error[error.property] = Object.values(
+              error.constraints
+            )
               .join('. ')
               .trim())
         );

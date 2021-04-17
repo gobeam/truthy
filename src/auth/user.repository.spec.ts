@@ -53,7 +53,10 @@ describe('User Repository', () => {
       user.validatePassword.mockResolvedValue(true);
       const result = await userRepository.login(userLoginDto);
       expect(userRepository.findOne).toHaveBeenCalledWith({
-        username: userLoginDto.username
+        where: [
+          { username: userLoginDto.username },
+          { email: userLoginDto.username }
+        ]
       });
       expect(result).toEqual(user);
     });

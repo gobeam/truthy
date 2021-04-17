@@ -1,5 +1,6 @@
 server:
-  port: 3000
+  port: 7777
+  origin: 'http://localhost:3000'
 
 db:
   host: 'localhost'
@@ -8,7 +9,7 @@ db:
   database: 'truthy'
 
 jwt:
-  expiresIn: 3600
+  expiresIn: 120
 
 app:
   name: 'Truthy'

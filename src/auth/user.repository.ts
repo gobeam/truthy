@@ -37,7 +37,9 @@ export class UserRepository extends BaseRepository<UserEntity, UserSerializer> {
    */
   async login(userLoginDto: UserLoginDto): Promise<UserEntity> {
     const { username, password } = userLoginDto;
-    const user = await this.findOne({ username });
+    const user = await this.findOne({
+      where: [{ username }, { email: username }]
+    });
     if (
       user &&
       user.status === UserStatusEnum.ACTIVE &&
