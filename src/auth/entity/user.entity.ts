@@ -66,12 +66,6 @@ export class UserEntity extends CustomBaseEntity {
     }
   }
 
-  @BeforeInsert()
-  nameToUpperCaseBeforeInsert() {
-    this.email = this.email.toLowerCase();
-    this.username = this.username.toLowerCase();
-  }
-
   @BeforeUpdate()
   async hashPasswordBeforeUpdate() {
     if (this.password && !this.skipHashPassword) {
