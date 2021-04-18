@@ -3,7 +3,7 @@ import { UserEntity } from './entity/user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import * as bcrypt from 'bcrypt';
 import { UserLoginDto } from './dto/user-login.dto';
-import { UnauthorizedException } from '@nestjs/common';
+import { HttpException, HttpStatus, UnauthorizedException } from '@nestjs/common';
 import { BaseRepository } from '../common/repository/base.repository';
 import { UserSerializer } from './serializer/user.serializer';
 import { classToPlain, plainToClass } from 'class-transformer';
@@ -44,11 +44,10 @@ export class UserRepository extends BaseRepository<UserEntity, UserSerializer> {
     const user = await this.findOne({
       where: [{ username: username }, { email: username }]
     });
-    if (
-      user &&
-      user.status === UserStatusEnum.ACTIVE &&
-      (await user.validatePassword(password))
-    ) {
+    if (user && (await user.validatePassword(password))) {
+      if (user.status !== UserStatusEnum.ACTIVE) {
+        throw new HttpException('InactiveUser', HttpStatus.FORBIDDEN);
+      }
       return user;
     }
     throw new UnauthorizedException();
