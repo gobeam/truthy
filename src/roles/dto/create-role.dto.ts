@@ -15,12 +15,7 @@ export class CreateRoleDto {
   @IsString()
   @MinLength(2)
   @MaxLength(100)
-  @Validate(UniqueValidatorPipe, [
-    RoleEntity,
-    ({ object: { name } }: { object: RoleEntity }) => ({
-      name
-    })
-  ])
+  @Validate(UniqueValidatorPipe, [RoleEntity])
   name: string;
 
   @ValidateIf((object, value) => value)

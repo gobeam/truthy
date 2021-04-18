@@ -1,5 +1,6 @@
 import {
-  IsEmail, IsLowercase,
+  IsEmail,
+  IsLowercase,
   IsNotEmpty,
   IsString,
   Matches,
@@ -17,18 +18,13 @@ export class CreateUserDto {
   @IsNotEmpty()
   @IsString()
   @IsLowercase()
-  @Validate(UniqueValidatorPipe, [
-    UserEntity,
-    ({ object: { username, email } }: { object: UserEntity }) => ({
-      username,
-      email
-    })
-  ])
+  @Validate(UniqueValidatorPipe, [UserEntity])
   username: string;
 
   @IsNotEmpty()
   @IsEmail()
   @IsLowercase()
+  @Validate(UniqueValidatorPipe, [UserEntity])
   email: string;
 
   @IsNotEmpty()

@@ -17,7 +17,10 @@ export class UserRepository extends BaseRepository<UserEntity, UserSerializer> {
    * @param createUserDto
    * @param token
    */
-  async store(createUserDto: CreateUserDto, token: string): Promise<void> {
+  async store(
+    createUserDto: CreateUserDto,
+    token: string
+  ): Promise<UserSerializer> {
     const { name, username, password, email } = createUserDto;
     const user = this.create();
     user.name = name;
@@ -29,6 +32,7 @@ export class UserRepository extends BaseRepository<UserEntity, UserSerializer> {
     user.password = password;
     user.roleId = 1;
     await user.save();
+    return this.transform(user);
   }
 
   /**

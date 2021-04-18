@@ -24,4 +24,14 @@ mail:
   pass: '7522797b96cef0'
   from: 'truthycms'
   fromMail: 'truthycms@gmail.com'
-  preview: true
+  preview: false
+  secure: false
+  ignoreTLS: true
+  queueName: 'truthy-mail'
+
+queue:
+  driver: 'redis'
+  host: 'localhost'
+  port: 6379
+  db: ''
+  password: ''

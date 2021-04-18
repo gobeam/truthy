@@ -8,6 +8,7 @@ import { PassportModule } from '@nestjs/passport';
 import { JwtStrategy } from './jwt.strategy';
 import * as config from 'config';
 import { UniqueValidatorPipe } from '../common/pipes/unique-validator.pipe';
+import { MailModule } from '../mail/mail.module';
 
 const jwtConfig = config.jwt;
 
@@ -20,7 +21,8 @@ const jwtConfig = config.jwt;
         expiresIn: jwtConfig.expiresIn
       }
     }),
-    TypeOrmModule.forFeature([UserRepository])
+    TypeOrmModule.forFeature([UserRepository]),
+    MailModule
   ],
   controllers: [AuthController],
   providers: [AuthService, JwtStrategy, UniqueValidatorPipe],

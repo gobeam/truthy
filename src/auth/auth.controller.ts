@@ -29,7 +29,9 @@ export class AuthController {
   constructor(private authService: AuthService) {}
 
   @Post('/register')
-  register(@Body(ValidationPipe) createUserDto: CreateUserDto): Promise<void> {
+  register(
+    @Body(ValidationPipe) createUserDto: CreateUserDto
+  ): Promise<UserSerializer> {
     return this.authService.addUser(createUserDto);
   }
 

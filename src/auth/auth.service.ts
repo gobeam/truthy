@@ -16,44 +16,44 @@ import { JwtPayloadDto } from './dto/jwt-payload.dto';
 import { UserSerializer } from './serializer/user.serializer';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { ObjectLiteral } from 'typeorm';
-import { MailerService } from '@nestjs-modules/mailer';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import * as config from 'config';
 import { ForgetPasswordDto } from './dto/forget-password.dto';
 import { UserStatusEnum } from './user-status.enum';
 import { ChangePasswordDto } from './dto/change-password.dto';
+import { MailService } from '../mail/mail.service';
+import { MailJobInterface } from '../common/interfaces/mail-job.interface';
 
 @Injectable()
 export class AuthService {
   constructor(
     @InjectRepository(UserRepository) private userRepository: UserRepository,
     private jwtService: JwtService,
-    private readonly mailerService: MailerService
+    private mailService: MailService
   ) {}
 
   /**
    * add new user
    * @param createUserDto
    */
-  async addUser(createUserDto: CreateUserDto): Promise<void> {
+  async addUser(createUserDto: CreateUserDto): Promise<UserSerializer> {
     const token = await this.generateUniqueToken(12);
-    await this.userRepository.store(createUserDto, token);
-    const mailConfig = config.get('mail');
+    const user = await this.userRepository.store(createUserDto, token);
     const appConfig = config.get('app');
     const subject = 'Account created';
-    const { username, email } = createUserDto;
-    await this.mailerService.sendMail({
-      to: email,
-      from: mailConfig.fromMail,
+    const mailData: MailJobInterface = {
+      to: user.email,
       subject,
-      template: __dirname + '/../templates/email/activate-account',
+      template: __dirname + '/../mail/templates/email/activate-account',
       context: {
-        email,
+        email: user.email,
         activateUrl: `${appConfig.appUrl}/auth/activate-account?token=${token}`,
-        username: username,
+        username: user.username,
         subject
       }
-    });
+    };
+    await this.mailService.sendMail(mailData, 'system-mail');
+    return user;
   }
 
   /**
@@ -150,19 +150,18 @@ export class AuthService {
     user.tokenValidityDate = currentDateTime;
     user.skipHashPassword = true;
     await user.save();
-    const mailConfig = config.get('mail');
     const subject = 'Reset Password';
-    await this.mailerService.sendMail({
+    const mailData: MailJobInterface = {
       to: user.email,
-      from: mailConfig.fromMail,
       subject,
-      template: __dirname + '/../templates/email/password-reset',
+      template: __dirname + '/../mail/templates/email/password-reset',
       context: {
         code: user.token,
         username: user.name,
         subject
       }
-    });
+    };
+    await this.mailService.sendMail(mailData, 'system-mail');
   }
 
   /**

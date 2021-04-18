@@ -5,7 +5,6 @@ import { NextFunction, Request, Response } from 'express';
 export class LoggerMiddleware implements NestMiddleware {
   use(req: Request, res: Response, next: NextFunction) {
     const path = req.route.path;
-    console.log(req);
     next();
   }
 }
