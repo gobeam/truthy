@@ -11,12 +11,12 @@ import {
   UnauthorizedException,
   UnprocessableEntityException
 } from '@nestjs/common';
-import { MailerService } from '@nestjs-modules/mailer';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { ForgetPasswordDto } from './dto/forget-password.dto';
 import { UserStatusEnum } from './user-status.enum';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import * as bcrypt from 'bcrypt';
+import { MailService } from '../mail/mail.service';
 
 const mockUserRepository = () => ({
   findOne: jest.fn(),
@@ -55,14 +55,14 @@ describe('AuthService', () => {
         AuthService,
         { provide: UserRepository, useFactory: mockUserRepository },
         { provide: JwtService, useFactory: jwtServiceMock },
-        { provide: MailerService, useFactory: mailServiceMock }
+        { provide: MailService, useFactory: mailServiceMock }
       ]
     }).compile();
 
     service = await module.get<AuthService>(AuthService);
     userRepository = await module.get<UserRepository>(UserRepository);
     jwtService = await module.get<JwtService>(JwtService);
-    mailService = await module.get<MailerService>(MailerService);
+    mailService = await module.get<MailService>(MailService);
   });
 
   describe('change or forgot password', () => {
@@ -158,11 +158,12 @@ describe('AuthService', () => {
     it('add new user test', async () => {
       const token = 'Adf2vBnVV';
       service.generateUniqueToken = jest.fn().mockResolvedValue(token);
+      userRepository.store.mockResolvedValue(mockUser);
       const createUserDto: CreateUserDto = mockUser;
       await service.addUser(createUserDto);
       expect(service.generateUniqueToken).toHaveBeenCalled();
       expect(userRepository.store).toHaveBeenCalledWith(createUserDto, token);
-      expect(mailService.sendMail).toHaveBeenCalled();
+      expect(mailService.sendMail).toHaveBeenCalledTimes(1);
       expect(userRepository.store).not.toThrow();
     });
 
