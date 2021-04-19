@@ -16,6 +16,7 @@ app:
   version: 'v0.1'
   description: 'Official Truthy API'
   appUrl: 'http://localhost:7777'
+  frontendUrl: 'http://localhost:3000'
 
 mail:
   host: 'smtp.mailtrap.io'
@@ -24,7 +25,7 @@ mail:
   pass: '7522797b96cef0'
   from: 'truthycms'
   fromMail: 'truthycms@gmail.com'
-  preview: false
+  preview: true
   secure: false
   ignoreTLS: true
   queueName: 'truthy-mail'

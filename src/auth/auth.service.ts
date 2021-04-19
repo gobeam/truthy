@@ -47,7 +47,7 @@ export class AuthService {
       template: __dirname + '/../mail/templates/email/activate-account',
       context: {
         email: user.email,
-        activateUrl: `${appConfig.appUrl}/auth/activate-account?token=${token}`,
+        activateUrl: `${appConfig.frontendUrl}/verify/${token}`,
         username: user.username,
         subject
       }
@@ -144,7 +144,9 @@ export class AuthService {
     if (!user) {
       return;
     }
-    user.token = await this.generateUniqueToken(6);
+    const appConfig = config.get('app');
+    const token = await this.generateUniqueToken(6);
+    user.token = token;
     const currentDateTime = new Date();
     currentDateTime.setHours(currentDateTime.getHours() + 1);
     user.tokenValidityDate = currentDateTime;
@@ -156,7 +158,7 @@ export class AuthService {
       subject,
       template: __dirname + '/../mail/templates/email/password-reset',
       context: {
-        code: user.token,
+        resetUrl: `${appConfig.frontendUrl}/reset/${token}`,
         username: user.name,
         subject
       }

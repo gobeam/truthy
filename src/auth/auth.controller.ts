@@ -59,16 +59,19 @@ export class AuthController {
   }
 
   @Get('/activate-account')
+  @HttpCode(204)
   activateAccount(@Query('token') token: string): Promise<void> {
     return this.authService.activateAccount(token);
   }
 
   @Put('/forgot-password')
+  @HttpCode(204)
   forgotPassword(@Body() forgetPasswordDto: ForgetPasswordDto): Promise<void> {
     return this.authService.forgotPassword(forgetPasswordDto);
   }
 
   @Put('/reset-password')
+  @HttpCode(204)
   resetPassword(@Body() resetPasswordDto: ResetPasswordDto): Promise<void> {
     return this.authService.resetPassword(resetPasswordDto);
   }
