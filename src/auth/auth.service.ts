@@ -107,7 +107,7 @@ export class AuthService {
         user.id
       );
       if (checkUnique > 0) {
-        error[field] = `${field} already exists`;
+        error[field] = `already taken`;
       }
     }
     if (Object.keys(error).length > 0) {

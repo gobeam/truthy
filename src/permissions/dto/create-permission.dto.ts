@@ -3,13 +3,11 @@ import {
   IsNotEmpty,
   IsString,
   MaxLength,
-  Validate,
-  ValidationArguments
+  Validate
 } from 'class-validator';
 import { MethodList } from '../../config/permission-config';
 import { UniqueValidatorPipe } from '../../common/pipes/unique-validator.pipe';
 import { PermissionEntity } from '../entities/permission.entity';
-import { UserEntity } from '../../auth/entity/user.entity';
 
 export class CreatePermissionDto {
   @IsNotEmpty()
@@ -20,8 +18,7 @@ export class CreatePermissionDto {
   @IsNotEmpty()
   @IsString()
   @Validate(UniqueValidatorPipe, [PermissionEntity], {
-    message: ({ value }: ValidationArguments) =>
-      `permission with description ${value} already exist`
+    message: 'already taken'
   })
   description: string;
 

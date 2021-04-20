@@ -18,13 +18,13 @@ export class CreateUserDto {
   @IsNotEmpty()
   @IsString()
   @IsLowercase()
-  @Validate(UniqueValidatorPipe, [UserEntity])
+  @Validate(UniqueValidatorPipe, [UserEntity], { message: 'already taken' })
   username: string;
 
   @IsNotEmpty()
   @IsEmail()
   @IsLowercase()
-  @Validate(UniqueValidatorPipe, [UserEntity])
+  @Validate(UniqueValidatorPipe, [UserEntity], { message: 'already taken' })
   email: string;
 
   @IsNotEmpty()

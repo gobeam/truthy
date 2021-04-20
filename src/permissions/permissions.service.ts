@@ -43,7 +43,7 @@ export class PermissionsService implements CommonServiceInterface<Permission> {
     );
     if (countSameDescription > 0) {
       throw new UnprocessableEntityException({
-        name: 'description already exists'
+        name: 'already taken'
       });
     }
     const permission = await this.repository.get(id);

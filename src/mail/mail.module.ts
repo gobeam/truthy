@@ -35,6 +35,7 @@ const queueConfig = config.get('queue');
         defaults: {
           from: `"${mailConfig.from}" <${mailConfig.fromMail}>`
         },
+        preview: mailConfig.preview,
         template: {
           dir: __dirname + '/templates',
           adapter: new PugAdapter(),
