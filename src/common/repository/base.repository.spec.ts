@@ -75,6 +75,18 @@ describe('test base repository', () => {
     });
   });
 
+  describe('test paginate method', () => {
+    it('paginate', async () => {
+      const findAndCountSpy = jest
+        .spyOn(Repository.prototype, 'findAndCount')
+        .mockResolvedValue([[], 10]);
+      baseRepository.transformMany = jest.fn().mockResolvedValue([]);
+      await baseRepository.paginate(entity, { page: 1, limit: 10 });
+      expect(findAndCountSpy).toHaveBeenCalledTimes(1);
+      expect(baseRepository.transformMany).toHaveBeenCalledTimes(1);
+    });
+  });
+
   describe('test create entity', () => {
     it('create entity', async () => {
       const createSpy = jest

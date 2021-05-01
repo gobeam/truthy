@@ -29,7 +29,6 @@ export interface RoutePayloadInterface {
 export interface ModulesPayloadInterface {
   name: string;
   resource: string;
-  icon: string;
   hasSubmodules: boolean;
   route?: string;
   submodules?: Array<SubModulePayloadInterface>;
@@ -39,7 +38,6 @@ export interface ModulesPayloadInterface {
 export interface SubModulePayloadInterface {
   name: string;
   resource?: string;
-  icon: string;
   route?: string;
   permissions?: Array<PermissionPayload>;
 }
@@ -97,13 +95,11 @@ export const PermissionConfiguration: PermissionConfigInterface = {
     {
       name: 'User management',
       resource: 'user',
-      icon: `user-management-icon`,
       hasSubmodules: true,
       submodules: [
         {
           resource: 'user',
           name: 'Users',
-          icon: `user-icon`,
           route: '/users',
           permissions: [
             {
@@ -147,7 +143,6 @@ export const PermissionConfiguration: PermissionConfigInterface = {
         {
           name: 'Roles',
           resource: 'role',
-          icon: `role-icon`,
           route: '/roles',
           permissions: [
             {
@@ -200,7 +195,6 @@ export const PermissionConfiguration: PermissionConfigInterface = {
         {
           name: 'Permission',
           resource: 'permission',
-          icon: `permission-icon`,
           route: '/permissions',
           permissions: [
             {

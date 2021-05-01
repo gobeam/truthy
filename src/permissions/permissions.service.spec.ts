@@ -12,6 +12,7 @@ import { UpdatePermissionDto } from './dto/update-permission.dto';
 
 const permissionRepositoryMock = () => ({
   getAll: jest.fn(),
+  paginate: jest.fn(),
   findOne: jest.fn(),
   get: jest.fn(),
   createEntity: jest.fn(),
@@ -52,11 +53,13 @@ describe('PermissionsService', () => {
 
   it('findAll', async () => {
     const permissionFilterDto: PermissionFilterDto = {
-      description: 'test description'
+      description: 'test description',
+      limit: 10,
+      page: 1
     };
-    repository.getAll.mockResolvedValue('result');
+    repository.paginate.mockResolvedValue('result');
     const result = await service.findAll(permissionFilterDto);
-    expect(repository.getAll).toHaveBeenCalledWith(permissionFilterDto);
+    expect(repository.paginate).toHaveBeenCalledTimes(1);
     expect(result).toEqual('result');
   });
 

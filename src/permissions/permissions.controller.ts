@@ -19,6 +19,7 @@ import { Permission } from './serializer/permission.serializer';
 import { ApiBearerAuth, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { PermissionGuard } from '../common/guard/permission.guard';
+import { Pagination } from '../paginate';
 
 @ApiTags('permissions')
 @UseGuards(AuthGuard(), PermissionGuard)
@@ -36,7 +37,7 @@ export class PermissionsController {
   @ApiQuery({ type: PermissionFilterDto })
   index(
     @Query() permissionFilterDto: PermissionFilterDto
-  ): Promise<Permission[]> {
+  ): Promise<Pagination<Permission>> {
     return this.permissionsService.findAll(permissionFilterDto);
   }
 

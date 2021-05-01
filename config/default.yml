@@ -9,7 +9,7 @@ db:
   database: 'truthy'
 
 jwt:
-  expiresIn: 120
+  expiresIn: 300
 
 app:
   name: 'Truthy'

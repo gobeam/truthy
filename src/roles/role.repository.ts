@@ -56,8 +56,9 @@ export class RoleRepository extends BaseRepository<RoleEntity, RoleSerializer> {
   /**
    * transform array of roles
    * @param models
+   * @param transformOption
    */
-  transformMany(models: RoleEntity[]): RoleSerializer[] {
-    return models.map((model) => this.transform(model));
+  transformMany(models: RoleEntity[], transformOption = {}): RoleSerializer[] {
+    return models.map((model) => this.transform(model, transformOption));
   }
 }

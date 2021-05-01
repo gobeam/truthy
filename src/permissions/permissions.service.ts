@@ -8,6 +8,8 @@ import { CommonServiceInterface } from '../common/interfaces/common-service.inte
 import { Permission } from './serializer/permission.serializer';
 import { ObjectLiteral } from 'typeorm';
 import { PermissionEntity } from './entities/permission.entity';
+import { basicFieldGroupsForSerializing } from '../roles/serializer/role.serializer';
+import { Pagination } from '../paginate';
 
 @Injectable()
 export class PermissionsService implements CommonServiceInterface<Permission> {
@@ -22,8 +24,10 @@ export class PermissionsService implements CommonServiceInterface<Permission> {
 
   async findAll(
     permissionFilterDto: PermissionFilterDto
-  ): Promise<Permission[]> {
-    return this.repository.getAll(permissionFilterDto);
+  ): Promise<Pagination<Permission>> {
+    return this.repository.paginate(permissionFilterDto, permissionFilterDto, {
+      groups: [...basicFieldGroupsForSerializing]
+    });
   }
 
   async findOne(id: number): Promise<Permission> {

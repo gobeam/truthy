@@ -13,7 +13,10 @@ import { UserEntity } from './entity/user.entity';
 import { UserLoginDto } from './dto/user-login.dto';
 import { JwtService } from '@nestjs/jwt';
 import { JwtPayloadDto } from './dto/jwt-payload.dto';
-import { UserSerializer } from './serializer/user.serializer';
+import {
+  ownerUserGroupsForSerializing,
+  UserSerializer
+} from './serializer/user.serializer';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { ObjectLiteral } from 'typeorm';
 import { ResetPasswordDto } from './dto/reset-password.dto';
@@ -84,7 +87,9 @@ export class AuthService {
    * @param user
    */
   async get(user: UserEntity): Promise<UserSerializer> {
-    return this.userRepository.transform(user);
+    return this.userRepository.transform(user, {
+      groups: ownerUserGroupsForSerializing
+    });
   }
 
   /**

@@ -1,10 +1,27 @@
-import { CreateRoleDto } from './create-role.dto';
-import { IsString, ValidateIf } from 'class-validator';
-import { ApiPropertyOptional, PartialType } from '@nestjs/swagger';
+import { IsString, Min, ValidateIf } from 'class-validator';
+import { ApiPropertyOptional } from '@nestjs/swagger';
+import { Transform } from 'class-transformer';
 
-export class RoleFilterDto extends PartialType(CreateRoleDto) {
+export class RoleFilterDto {
   @ApiPropertyOptional()
   @ValidateIf((object, value) => value)
   @IsString()
   name: string;
+
+  @ApiPropertyOptional()
+  @ValidateIf((object, value) => value)
+  @IsString()
+  description: string;
+
+  @ApiPropertyOptional()
+  @ValidateIf((object, value) => value)
+  @Transform(({ value }) => Number.parseInt(value), { toClassOnly: true })
+  @Min(1)
+  limit: number;
+
+  @ApiPropertyOptional()
+  @ValidateIf((object, value) => value)
+  @Transform(({ value }) => Number.parseInt(value), { toClassOnly: true })
+  @Min(1)
+  page: number;
 }

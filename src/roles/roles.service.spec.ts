@@ -13,6 +13,7 @@ import { MethodList } from '../config/permission-config';
 
 const roleRepositoryMock = () => ({
   findAll: jest.fn(),
+  paginate: jest.fn(),
   get: jest.fn(),
   createEntity: jest.fn(),
   countEntityByCondition: jest.fn(),
@@ -67,11 +68,14 @@ describe('RolesService', () => {
 
   it('findAll', async () => {
     const roleFilterDto: RoleFilterDto = {
-      name: 'example'
+      name: 'example',
+      description: 'desc',
+      limit: 10,
+      page: 1
     };
-    roleRepository.getAll.mockResolvedValue('result');
+    roleRepository.paginate.mockResolvedValue('result');
     const result = await service.findAll(roleFilterDto);
-    expect(roleRepository.getAll).toHaveBeenCalledWith(roleFilterDto);
+    expect(roleRepository.paginate).toHaveBeenCalledTimes(1);
     expect(result).toEqual('result');
   });
 

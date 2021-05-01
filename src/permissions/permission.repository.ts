@@ -17,7 +17,10 @@ export class PermissionRepository extends BaseRepository<
     );
   }
 
-  transformMany(models: PermissionEntity[]): Permission[] {
-    return models.map((model) => this.transform(model));
+  transformMany(
+    models: PermissionEntity[],
+    transformOption = {}
+  ): Permission[] {
+    return models.map((model) => this.transform(model, transformOption));
   }
 }

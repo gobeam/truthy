@@ -8,10 +8,15 @@ import { UpdateRoleDto } from './dto/update-role.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { RoleRepository } from './role.repository';
 import { RoleFilterDto } from './dto/role-filter.dto';
-import { RoleSerializer } from './serializer/role.serializer';
+import {
+  adminUserGroupsForSerializing,
+  basicFieldGroupsForSerializing,
+  RoleSerializer
+} from './serializer/role.serializer';
 import { CommonServiceInterface } from '../common/interfaces/common-service.interface';
 import { ObjectLiteral } from 'typeorm';
 import { PermissionsService } from '../permissions/permissions.service';
+import { Pagination } from '../paginate';
 
 @Injectable()
 export class RolesService implements CommonServiceInterface<RoleSerializer> {
@@ -41,8 +46,15 @@ export class RolesService implements CommonServiceInterface<RoleSerializer> {
    * find and return collection of roles
    * @param roleFilterDto
    */
-  async findAll(roleFilterDto: RoleFilterDto): Promise<RoleSerializer[]> {
-    return this.repository.getAll(roleFilterDto);
+  async findAll(
+    roleFilterDto: RoleFilterDto
+  ): Promise<Pagination<RoleSerializer>> {
+    return this.repository.paginate(roleFilterDto, roleFilterDto, {
+      groups: [
+        ...adminUserGroupsForSerializing,
+        ...basicFieldGroupsForSerializing
+      ]
+    });
   }
 
   /**

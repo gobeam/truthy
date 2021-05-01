@@ -3,7 +3,11 @@ import { UserEntity } from './entity/user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import * as bcrypt from 'bcrypt';
 import { UserLoginDto } from './dto/user-login.dto';
-import { HttpException, HttpStatus, UnauthorizedException } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  UnauthorizedException
+} from '@nestjs/common';
 import { BaseRepository } from '../common/repository/base.repository';
 import { UserSerializer } from './serializer/user.serializer';
 import { classToPlain, plainToClass } from 'class-transformer';
