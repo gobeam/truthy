@@ -98,7 +98,7 @@ export class RolesService implements CommonServiceInterface<RoleSerializer> {
    * @param id
    */
   async remove(id: number): Promise<void> {
-    const role = await this.findOne(id);
-    return role.remove();
+    await this.findOne(id);
+    await this.repository.delete({ id });
   }
 }

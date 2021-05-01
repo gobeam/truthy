@@ -254,7 +254,7 @@ export class AuthService {
       0
     );
     if (tokenCount > 0) {
-      this.generateUniqueToken(length);
+      await this.generateUniqueToken(length);
     }
     return token;
   }

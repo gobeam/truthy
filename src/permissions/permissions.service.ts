@@ -55,8 +55,8 @@ export class PermissionsService implements CommonServiceInterface<Permission> {
   }
 
   async remove(id: number): Promise<void> {
-    const permission = await this.findOne(id);
-    await permission.remove();
+    await this.findOne(id);
+    await this.repository.delete({ id });
   }
 
   async whereInIds(ids: number[]): Promise<PermissionEntity[]> {
