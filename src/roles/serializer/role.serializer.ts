@@ -1,7 +1,6 @@
 import { Expose, Type } from 'class-transformer';
 import { ModelSerializer } from '../../common/serializer/model.serializer';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { PermissionEntity } from '../../permissions/entities/permission.entity';
 import { Permission } from '../../permissions/serializer/permission.serializer';
 
 export const adminUserGroupsForSerializing: string[] = ['admin'];
@@ -19,7 +18,7 @@ export class RoleSerializer extends ModelSerializer {
   description: string;
 
   @Type(() => Permission)
-  permission: PermissionEntity[];
+  permission: Permission[];
 
   @ApiPropertyOptional()
   @Expose({ groups: basicFieldGroupsForSerializing })

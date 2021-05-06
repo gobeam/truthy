@@ -3,6 +3,7 @@ import {
   Controller,
   Get,
   HttpCode,
+  HttpStatus,
   Post,
   Put,
   Query,
@@ -36,7 +37,7 @@ export class AuthController {
   }
 
   @Post('/login')
-  @HttpCode(200)
+  @HttpCode(HttpStatus.OK)
   login(@Body() userLoginDto: UserLoginDto) {
     return this.authService.login(userLoginDto);
   }
@@ -59,19 +60,19 @@ export class AuthController {
   }
 
   @Get('/activate-account')
-  @HttpCode(204)
+  @HttpCode(HttpStatus.NO_CONTENT)
   activateAccount(@Query('token') token: string): Promise<void> {
     return this.authService.activateAccount(token);
   }
 
   @Put('/forgot-password')
-  @HttpCode(204)
+  @HttpCode(HttpStatus.NO_CONTENT)
   forgotPassword(@Body() forgetPasswordDto: ForgetPasswordDto): Promise<void> {
     return this.authService.forgotPassword(forgetPasswordDto);
   }
 
   @Put('/reset-password')
-  @HttpCode(204)
+  @HttpCode(HttpStatus.NO_CONTENT)
   resetPassword(@Body() resetPasswordDto: ResetPasswordDto): Promise<void> {
     return this.authService.resetPassword(resetPasswordDto);
   }

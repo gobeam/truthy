@@ -1,9 +1,18 @@
 import { plainToClass } from 'class-transformer';
-import { DeepPartial, ILike, Not, ObjectLiteral, Repository } from 'typeorm';
+import {
+  DeepPartial,
+  FindManyOptions,
+  ILike,
+  Not,
+  ObjectLiteral,
+  Repository
+} from 'typeorm';
 import { NotFoundException } from '@nestjs/common';
 import { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity';
 import { ModelSerializer } from '../serializer/model.serializer';
 import { Pagination } from '../../paginate';
+import { PaginationInfoInterface } from '../../paginate/pagination-info.interface';
+import { SearchFilterInterface } from '../interfaces/search-filter.interface';
 
 /**
  * Base Repository for code reuse
@@ -91,15 +100,21 @@ export class BaseRepository<
 
   /**
    * get all entity with filters
-   * @param keywords
+   * @param searchFilter
+   * @param searchCriteria
+   * @param transformOptions
    */
-  async getAll(keywords: DeepPartial<T>, transformOptions = {}): Promise<K[]> {
-    const alias = keywords.constructor.name;
-    const query = this.createQueryBuilder(alias);
-    for (const key in keywords) {
-      if (keywords.hasOwnProperty(key) && keywords[key]) {
+  async getAll(
+    searchFilter: DeepPartial<SearchFilterInterface>,
+    searchCriteria: string[],
+    transformOptions = {}
+  ): Promise<K[]> {
+    const alias = searchFilter.constructor.name;
+    const query = this.createQueryBuilder();
+    if (searchFilter.hasOwnProperty('keywords') && searchFilter.keywords) {
+      for (const key of searchCriteria) {
         query.where(`${alias}.${key} LIKE :${key}`, {
-          [key]: `%${keywords[key]}%`
+          [key]: `%${searchFilter.keywords}%`
         });
       }
     }
@@ -107,44 +122,48 @@ export class BaseRepository<
   }
 
   /**
-   * get paginated result
-   * @param keywords
+   * Get pagination Skip & limit
    * @param options
-   * @param transformOptions
    */
-  async paginate(
-    keywords: DeepPartial<T>,
-    options,
-    transformOptions = {}
-  ): Promise<Pagination<K>> {
-    const whereCondition = [];
-    const ignoreKeys = ['page', 'limit'];
-    for (const key in keywords) {
-      if (
-        keywords.hasOwnProperty(key) &&
-        keywords[key] &&
-        !ignoreKeys.includes(key)
-      ) {
-        whereCondition.push({
-          [key]: ILike(`%${keywords[key]} #%`)
-        });
-      }
-    }
+  getPaginationInfo(options): PaginationInfoInterface {
     const page =
       typeof options.page !== 'undefined' && options.page > 0
         ? options.page
         : 1;
-    // const limit =
-    //   typeof options.limit !== 'undefined' && options.limit > 0
-    //     ? options.limit
-    //     : 10;
-    const limit = 5;
-    const skip = (page - 1) * limit;
-    const [results, total] = await this.findAndCount({
-      where: whereCondition,
-      take: limit,
-      skip
-    });
+    const limit =
+      typeof options.limit !== 'undefined' && options.limit > 0
+        ? options.limit
+        : 10;
+    return {
+      skip: (page - 1) * limit,
+      limit,
+      page
+    };
+  }
+
+  async paginate(
+    searchFilter: DeepPartial<SearchFilterInterface>,
+    searchCriteria: string[],
+    transformOptions = {}
+  ): Promise<Pagination<K>> {
+    const whereCondition = [];
+    const findOptions: FindManyOptions = {};
+    if (searchFilter.hasOwnProperty('keywords') && searchFilter.keywords) {
+      for (const key of searchCriteria) {
+        whereCondition.push({
+          [key]: ILike(`%${searchFilter.keywords}%`)
+        });
+      }
+    }
+    const paginationInfo: PaginationInfoInterface = this.getPaginationInfo(
+      searchFilter
+    );
+    findOptions.take = paginationInfo.limit;
+    findOptions.skip = paginationInfo.skip;
+    findOptions.where = whereCondition;
+    findOptions.order = { createdAt: 'DESC' };
+    const { page, skip, limit } = paginationInfo;
+    const [results, total] = await this.findAndCount(findOptions);
     const serializedResult = this.transformMany(results, transformOptions);
     return new Pagination<K>({
       results: serializedResult,

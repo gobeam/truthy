@@ -59,4 +59,10 @@ export class PermissionsController {
   destroy(@Param('id') id: string): Promise<void> {
     return this.permissionsService.remove(+id);
   }
+
+  @Post('/sync')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  syncPermission(): Promise<void> {
+    return this.permissionsService.syncPermission();
+  }
 }

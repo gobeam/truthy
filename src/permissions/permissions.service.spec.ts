@@ -12,9 +12,11 @@ import { UpdatePermissionDto } from './dto/update-permission.dto';
 
 const permissionRepositoryMock = () => ({
   getAll: jest.fn(),
+  syncPermission: jest.fn(),
   paginate: jest.fn(),
   findOne: jest.fn(),
   get: jest.fn(),
+  delete: jest.fn(),
   createEntity: jest.fn(),
   countEntityByCondition: jest.fn(),
   updateEntity: jest.fn(),
@@ -53,7 +55,7 @@ describe('PermissionsService', () => {
 
   it('findAll', async () => {
     const permissionFilterDto: PermissionFilterDto = {
-      description: 'test description',
+      keywords: 'test description',
       limit: 10,
       page: 1
     };
@@ -71,11 +73,18 @@ describe('PermissionsService', () => {
     expect(result).toBe(undefined);
   });
 
+  it('sync permission', async () => {
+    repository.syncPermission.mockResolvedValue(null);
+    const result = await service.syncPermission();
+    expect(repository.syncPermission).toHaveBeenCalledTimes(1);
+
+  })
+
   describe('findOne', () => {
     it('find success', async () => {
       repository.get.mockResolvedValue(mockPermission);
       const result = await service.findOne(1);
-      expect(repository.get).toHaveBeenCalledWith(1);
+      expect(repository.get).toHaveBeenCalledTimes(1);
       expect(repository.get).not.toThrow();
       expect(result).toBe(mockPermission);
     });
@@ -93,6 +102,7 @@ describe('PermissionsService', () => {
       updatePermissionDto = mockPermission;
     });
     it('try to update using duplicate description', async () => {
+      repository.findOne.mockResolvedValue(mockPermission);
       repository.countEntityByCondition.mockResolvedValue(1);
       await expect(service.update(1, updatePermissionDto)).rejects.toThrowError(
         UnprocessableEntityException
@@ -103,9 +113,9 @@ describe('PermissionsService', () => {
     it('update item that exists in database', async () => {
       repository.countEntityByCondition.mockResolvedValue(0);
       repository.updateEntity.mockResolvedValue(mockPermission);
-      repository.get.mockResolvedValue(mockPermission);
+      repository.findOne.mockResolvedValue(mockPermission);
       const role = await service.update(1, updatePermissionDto);
-      expect(repository.get).toHaveBeenCalledWith(1);
+      expect(repository.findOne).toHaveBeenCalledWith(1);
       expect(repository.updateEntity).toHaveBeenCalledWith(
         mockPermission,
         updatePermissionDto
@@ -116,6 +126,7 @@ describe('PermissionsService', () => {
     it('trying to update item that does not exists in database', async () => {
       repository.updateEntity.mockRejectedValue(new NotFoundException());
       const updatePermissionDto: UpdatePermissionDto = mockPermission;
+      repository.findOne.mockResolvedValue(null);
       await expect(service.update(1, updatePermissionDto)).rejects.toThrowError(
         NotFoundException
       );
@@ -125,11 +136,12 @@ describe('PermissionsService', () => {
   describe('remove', () => {
     it('trying to delete existing item', async () => {
       service.findOne = jest.fn().mockResolvedValue(mockPermission);
+      repository.delete = jest.fn().mockResolvedValue('');
       const result = await service.remove(1);
       expect(service.findOne).toHaveBeenCalledTimes(1);
       expect(service.findOne).toHaveBeenCalledWith(1);
       expect(service.findOne).not.toThrow();
-      expect(mockPermission.remove).toHaveBeenCalledTimes(1);
+      expect(repository.delete).toHaveBeenCalledTimes(1);
       expect(result).toEqual(undefined);
     });
 

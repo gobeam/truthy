@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { Queue } from 'bull';
 import * as config from 'config';
 import { InjectQueue } from '@nestjs/bull';
-import { MailJobInterface } from '../common/interfaces/mail-job.interface';
+import { MailJobInterface } from './interface/mail-job.interface';
 
 @Injectable()
 export class MailService {

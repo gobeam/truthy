@@ -14,7 +14,7 @@ import {
   RoleSerializer
 } from './serializer/role.serializer';
 import { CommonServiceInterface } from '../common/interfaces/common-service.interface';
-import { ObjectLiteral } from 'typeorm';
+import { ILike, ObjectLiteral } from 'typeorm';
 import { PermissionsService } from '../permissions/permissions.service';
 import { Pagination } from '../paginate';
 
@@ -49,7 +49,7 @@ export class RolesService implements CommonServiceInterface<RoleSerializer> {
   async findAll(
     roleFilterDto: RoleFilterDto
   ): Promise<Pagination<RoleSerializer>> {
-    return this.repository.paginate(roleFilterDto, roleFilterDto, {
+    return this.repository.paginate(roleFilterDto, ['name', 'description'], {
       groups: [
         ...adminUserGroupsForSerializing,
         ...basicFieldGroupsForSerializing
@@ -62,7 +62,12 @@ export class RolesService implements CommonServiceInterface<RoleSerializer> {
    * @param id
    */
   async findOne(id: number): Promise<RoleSerializer> {
-    return this.repository.get(id);
+    return this.repository.get(id, ['permission'], {
+      groups: [
+        ...adminUserGroupsForSerializing,
+        ...basicFieldGroupsForSerializing
+      ]
+    });
   }
 
   /**

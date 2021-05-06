@@ -3,6 +3,8 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
+  HttpStatus,
   Param,
   Post,
   Put,
@@ -53,6 +55,7 @@ export class RolesController {
   }
 
   @Delete(':id')
+  @HttpCode(HttpStatus.NO_CONTENT)
   destroy(@Param('id') id: string): Promise<void> {
     return this.rolesService.remove(+id);
   }

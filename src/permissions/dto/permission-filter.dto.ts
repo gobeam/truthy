@@ -1,12 +1,12 @@
-import { CreatePermissionDto } from './create-permission.dto';
 import { IsString, Min, ValidateIf } from 'class-validator';
-import { ApiPropertyOptional, PartialType } from '@nestjs/swagger';
+import { ApiPropertyOptional } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
 
-export class PermissionFilterDto extends PartialType(CreatePermissionDto) {
+export class PermissionFilterDto {
   @ApiPropertyOptional()
+  @ValidateIf((object, value) => value)
   @IsString()
-  description: string;
+  keywords: string;
 
   @ApiPropertyOptional()
   @ValidateIf((object, value) => value)

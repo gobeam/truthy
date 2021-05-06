@@ -95,152 +95,154 @@ export const PermissionConfiguration: PermissionConfigInterface = {
     {
       name: 'User management',
       resource: 'user',
-      hasSubmodules: true,
-      submodules: [
+      hasSubmodules: false,
+      permissions: [
         {
-          resource: 'user',
-          name: 'Users',
-          route: '/users',
-          permissions: [
+          name: 'View all user',
+          route: [
             {
-              name: 'View all user',
-              route: [
-                {
-                  path: '/users',
-                  method: MethodList.GET
-                }
-              ]
-            },
-            {
-              name: 'Store new user',
-              route: [
-                {
-                  path: '/users',
-                  method: MethodList.POST
-                }
-              ]
-            },
-            {
-              name: 'Update user by id',
-              route: [
-                {
-                  path: '/users/:id',
-                  method: MethodList.PUT
-                }
-              ]
-            },
-            {
-              name: 'Delete user by id',
-              route: [
-                {
-                  path: '/users/:id',
-                  method: MethodList.DELETE
-                }
-              ]
+              path: '/users',
+              method: MethodList.GET
             }
           ]
         },
         {
-          name: 'Roles',
-          resource: 'role',
-          route: '/roles',
-          permissions: [
+          name: 'Store new user',
+          route: [
             {
-              name: 'View all role',
-              route: [
-                {
-                  path: '/roles',
-                  method: MethodList.GET
-                }
-              ]
-            },
-            {
-              name: 'View role by id',
-              route: [
-                {
-                  path: '/roles/:id',
-                  method: MethodList.GET
-                }
-              ]
-            },
-            {
-              name: 'Store new role',
-              route: [
-                {
-                  path: '/roles',
-                  method: MethodList.POST
-                }
-              ]
-            },
-            {
-              name: 'Update role by id',
-              route: [
-                {
-                  path: '/roles/:id',
-                  method: MethodList.PUT
-                }
-              ]
-            },
-            {
-              name: 'Delete role by id',
-              route: [
-                {
-                  path: '/roles/:id',
-                  method: MethodList.DELETE
-                }
-              ]
+              path: '/users',
+              method: MethodList.POST
             }
           ]
         },
         {
-          name: 'Permission',
-          resource: 'permission',
-          route: '/permissions',
-          permissions: [
+          name: 'Update user by id',
+          route: [
             {
-              name: 'View all permission',
-              route: [
-                {
-                  path: '/permissions',
-                  method: MethodList.GET
-                }
-              ]
-            },
+              path: '/users/:id',
+              method: MethodList.PUT
+            }
+          ]
+        },
+        {
+          name: 'Delete user by id',
+          route: [
             {
-              name: 'View permission by id',
-              route: [
-                {
-                  path: '/permissions/:id',
-                  method: MethodList.GET
-                }
-              ]
-            },
+              path: '/users/:id',
+              method: MethodList.DELETE
+            }
+          ]
+        }
+      ]
+    },
+    {
+      name: 'Role management',
+      resource: 'role',
+      hasSubmodules: false,
+      permissions: [
+        {
+          name: 'View all role',
+          route: [
             {
-              name: 'Store new permission',
-              route: [
-                {
-                  path: '/permissions',
-                  method: MethodList.POST
-                }
-              ]
-            },
+              path: '/roles',
+              method: MethodList.GET
+            }
+          ]
+        },
+        {
+          name: 'View role by id',
+          route: [
             {
-              name: 'Update permission by id',
-              route: [
-                {
-                  path: '/permissions/:id',
-                  method: MethodList.PUT
-                }
-              ]
-            },
+              path: '/roles/:id',
+              method: MethodList.GET
+            }
+          ]
+        },
+        {
+          name: 'Store new role',
+          route: [
             {
-              name: 'Delete permission by id',
-              route: [
-                {
-                  path: '/permissions/:id',
-                  method: MethodList.DELETE
-                }
-              ]
+              path: '/roles',
+              method: MethodList.POST
+            }
+          ]
+        },
+        {
+          name: 'Update role by id',
+          route: [
+            {
+              path: '/roles/:id',
+              method: MethodList.PUT
+            }
+          ]
+        },
+        {
+          name: 'Delete role by id',
+          route: [
+            {
+              path: '/roles/:id',
+              method: MethodList.DELETE
+            }
+          ]
+        }
+      ]
+    },
+    {
+      name: 'Permission management',
+      resource: 'permission',
+      hasSubmodules: false,
+      permissions: [
+        {
+          name: 'View all permission',
+          route: [
+            {
+              path: '/permissions',
+              method: MethodList.GET
+            }
+          ]
+        },
+        {
+          name: 'Sync permission from config',
+          route: [
+            {
+              path: '/permissions/sync',
+              method: MethodList.POST
+            }
+          ]
+        },
+        {
+          name: 'View permission by id',
+          route: [
+            {
+              path: '/permissions/:id',
+              method: MethodList.GET
+            }
+          ]
+        },
+        {
+          name: 'Store new permission',
+          route: [
+            {
+              path: '/permissions',
+              method: MethodList.POST
+            }
+          ]
+        },
+        {
+          name: 'Update permission by id',
+          route: [
+            {
+              path: '/permissions/:id',
+              method: MethodList.PUT
+            }
+          ]
+        },
+        {
+          name: 'Delete permission by id',
+          route: [
+            {
+              path: '/permissions/:id',
+              method: MethodList.DELETE
             }
           ]
         }

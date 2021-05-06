@@ -16,7 +16,10 @@ const queueConfig = config.get('queue');
       useFactory: () => ({
         redis: {
           host: queueConfig.host,
-          port: queueConfig.port
+          port: queueConfig.port,
+          retryStrategy(times) {
+            return Math.min(times * 50, 2000);
+          }
         }
       })
     }),

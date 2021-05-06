@@ -9,7 +9,7 @@ import {
   Processor
 } from '@nestjs/bull';
 import { Job } from 'bull';
-import { MailJobInterface } from '../common/interfaces/mail-job.interface';
+import { MailJobInterface } from './interface/mail-job.interface';
 
 @Processor(config.get('mail.queueName'))
 export class MailProcessor {

@@ -25,7 +25,7 @@ import { ForgetPasswordDto } from './dto/forget-password.dto';
 import { UserStatusEnum } from './user-status.enum';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { MailService } from '../mail/mail.service';
-import { MailJobInterface } from '../common/interfaces/mail-job.interface';
+import { MailJobInterface } from '../mail/interface/mail-job.interface';
 
 @Injectable()
 export class AuthService {

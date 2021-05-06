@@ -6,12 +6,7 @@ export class RoleFilterDto {
   @ApiPropertyOptional()
   @ValidateIf((object, value) => value)
   @IsString()
-  name: string;
-
-  @ApiPropertyOptional()
-  @ValidateIf((object, value) => value)
-  @IsString()
-  description: string;
+  keywords: string;
 
   @ApiPropertyOptional()
   @ValidateIf((object, value) => value)
