@@ -67,11 +67,14 @@ describe('test base repository', () => {
 
   describe('test get all entity', () => {
     it('get all entity', async () => {
-      const createQueryBuilderSpy = jest
-        .spyOn(Repository.prototype, 'createQueryBuilder')
-        .mockImplementation(() => createQueryBuilder);
-      await baseRepository.getAll(entity);
-      expect(createQueryBuilderSpy).toHaveBeenCalledTimes(1);
+      // const createQueryBuilderSpy = jest
+      //   .spyOn(Repository.prototype, 'createQueryBuilder')
+      //   .mockImplementation(() => createQueryBuilder);
+      const findSpy = jest
+        .spyOn(Repository.prototype, 'find')
+        .mockResolvedValue([entity]);
+      await baseRepository.findAll(entity, []);
+      expect(findSpy).toHaveBeenCalledTimes(1);
     });
   });
 
@@ -81,7 +84,7 @@ describe('test base repository', () => {
         .spyOn(Repository.prototype, 'findAndCount')
         .mockResolvedValue([[], 10]);
       baseRepository.transformMany = jest.fn().mockResolvedValue([]);
-      await baseRepository.paginate(entity, { page: 1, limit: 10 });
+      await baseRepository.paginate(entity, [],{ page: 1, limit: 10 });
       expect(findAndCountSpy).toHaveBeenCalledTimes(1);
       expect(baseRepository.transformMany).toHaveBeenCalledTimes(1);
     });

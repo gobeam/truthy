@@ -5,7 +5,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { JwtService } from '@nestjs/jwt';
 import { UserLoginDto } from './dto/user-login.dto';
 import { UserEntity } from './entity/user.entity';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { UpdateUserProfileDto } from './dto/update-user-profile.dto';
 import {
   NotFoundException,
   UnauthorizedException,
@@ -20,6 +20,7 @@ import { MailService } from '../mail/mail.service';
 
 const mockUserRepository = () => ({
   findOne: jest.fn(),
+  get: jest.fn(),
   store: jest.fn(),
   login: jest.fn(),
   transform: jest.fn(),
@@ -28,11 +29,13 @@ const mockUserRepository = () => ({
   getUserForResetPassword: jest.fn(),
   countEntityByCondition: jest.fn()
 });
+
 const mockUser = {
   email: 'test@mail.com',
   username: 'tester',
   name: 'test',
   password: 'test123',
+  roleId: 2,
   status: UserStatusEnum.ACTIVE,
   save: jest.fn()
 };
@@ -86,10 +89,9 @@ describe('AuthService', () => {
       userRepository.countEntityByCondition.mockResolvedValue(0);
       await service.generateUniqueToken(6);
       expect(service.generateRandomCode).toHaveBeenCalledWith(6);
-      expect(userRepository.countEntityByCondition).toHaveBeenCalledWith(
-        { token: 'W45Rft' },
-        0
-      );
+      expect(userRepository.countEntityByCondition).toHaveBeenCalledWith({
+        token: 'W45Rft'
+      });
     });
 
     describe('reset password test', () => {
@@ -206,6 +208,7 @@ describe('AuthService', () => {
         username: mockUser.username
       };
       user = new UserEntity();
+      user.id = 1;
       user.email = mockUser.email;
       user.username = mockUser.username;
       user.password = mockUser.password;
@@ -225,19 +228,27 @@ describe('AuthService', () => {
       expect(userRepository.transform).toHaveBeenCalledTimes(1);
     });
 
+    it('get user by id', async () => {
+      userRepository.get.mockResolvedValue(mockUser);
+      await service.findById(1);
+      expect(userRepository.get).toHaveBeenCalledTimes(1);
+    });
+
     it('update user with non duplicate username & email', async () => {
       userRepository.updateEntity.mockResolvedValue(mockUser);
+      userRepository.get.mockResolvedValue(mockUser);
       userRepository.countEntityByCondition.mockResolvedValue(0);
-      const updateUserDto: UpdateUserDto = {
+      const updateUserDto: UpdateUserProfileDto = {
         email: 'test@test.com',
         username: 'tester123',
-        name: 'tester'
+        name: 'tester',
+        roleId: 2
       };
-      await service.update(user, updateUserDto);
+      await service.update(user.id, updateUserDto);
       expect(userRepository.countEntityByCondition).toHaveBeenCalledTimes(2);
       expect(userRepository.updateEntity).toHaveBeenCalledTimes(1);
       expect(userRepository.updateEntity).toHaveBeenCalledWith(
-        user,
+        mockUser,
         updateUserDto
       );
       expect(userRepository.updateEntity).not.toThrow();
@@ -245,11 +256,13 @@ describe('AuthService', () => {
 
     it('update user with duplicate username & email', async () => {
       userRepository.countEntityByCondition.mockResolvedValue(1);
-      const updateUserDto: UpdateUserDto = {
+      const updateUserDto: UpdateUserProfileDto = {
         email: 'test@test.com',
         username: 'tester123',
-        name: 'tester'
+        name: 'tester',
+        roleId: 2
       };
+      userRepository.get.mockResolvedValue(mockUser);
       await expect(service.update(user, updateUserDto)).rejects.toThrowError(
         UnprocessableEntityException
       );

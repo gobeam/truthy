@@ -7,9 +7,11 @@ import { UnauthorizedException } from '@nestjs/common';
 import { UserStatusEnum } from './user-status.enum';
 
 const mockUser = {
+  roleId: 1,
   email: 'test@email.com',
   username: 'tester',
   name: 'test',
+  status: UserStatusEnum.ACTIVE,
   password: 'pwd'
 };
 describe('User Repository', () => {

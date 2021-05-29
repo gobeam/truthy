@@ -1,6 +1,5 @@
 import { Factory } from 'typeorm-seeding';
 import { Connection } from 'typeorm';
-import { PermissionConfiguration } from '../../config/permission-config';
 import { UserEntity } from '../../auth/entity/user.entity';
 import { UserStatusEnum } from '../../auth/user-status.enum';
 import { RoleEntity } from '../../roles/entities/role.entity';
@@ -11,7 +10,7 @@ export default class CreateUserSeed {
       .getRepository(RoleEntity)
       .createQueryBuilder('role')
       .where('role.name = :name', {
-        name: PermissionConfiguration.superRole.name
+        name: 'superuser'
       })
       .getOne();
 

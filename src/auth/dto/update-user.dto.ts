@@ -1,5 +1,6 @@
-import { IsEmail, IsString, ValidateIf } from 'class-validator';
+import { IsEmail, IsIn, IsString, ValidateIf } from 'class-validator';
 import { ApiPropertyOptional } from '@nestjs/swagger';
+import { UserStatusEnum } from '../user-status.enum';
 
 /**
  * update user data transfer object
@@ -19,4 +20,17 @@ export class UpdateUserDto {
   @ValidateIf((object, value) => value)
   @IsString()
   name: string;
+
+  @ApiPropertyOptional()
+  @ValidateIf((object, value) => value)
+  @IsIn([
+    UserStatusEnum.ACTIVE,
+    UserStatusEnum.INACTIVE,
+    UserStatusEnum.BLOCKED
+  ])
+  status: UserStatusEnum;
+
+  @ApiPropertyOptional()
+  @ValidateIf((object, value) => value)
+  roleId: number;
 }

@@ -3,7 +3,6 @@ import {
   DeepPartial,
   FindManyOptions,
   ILike,
-  Not,
   ObjectLiteral,
   Repository
 } from 'typeorm';
@@ -78,19 +77,12 @@ export class BaseRepository<
   /**
    * get count of entity by condition
    * @param conditions
-   * @param id
    */
   async countEntityByCondition(
-    conditions: ObjectLiteral,
-    id: number
+    conditions: ObjectLiteral = {}
   ): Promise<number> {
-    let filteredCondition: ObjectLiteral = {};
-    if (id > 0) {
-      filteredCondition.id = Not(id);
-    }
-    filteredCondition = { ...conditions, ...filteredCondition };
     return this.count({
-      where: filteredCondition
+      where: conditions
     })
       .then((count) => {
         return Promise.resolve(count);
@@ -101,24 +93,29 @@ export class BaseRepository<
   /**
    * get all entity with filters
    * @param searchFilter
+   * @param relations
    * @param searchCriteria
    * @param transformOptions
    */
-  async getAll(
+  async findAll(
     searchFilter: DeepPartial<SearchFilterInterface>,
+    relations: string[] = [],
     searchCriteria: string[],
     transformOptions = {}
   ): Promise<K[]> {
-    const alias = searchFilter.constructor.name;
-    const query = this.createQueryBuilder();
+    const whereCondition = [];
     if (searchFilter.hasOwnProperty('keywords') && searchFilter.keywords) {
       for (const key of searchCriteria) {
-        query.where(`${alias}.${key} LIKE :${key}`, {
-          [key]: `%${searchFilter.keywords}%`
+        whereCondition.push({
+          [key]: ILike(`%${searchFilter.keywords}%`)
         });
       }
     }
-    return this.transformMany(await query.getMany(), transformOptions);
+    const results = await this.find({
+      where: whereCondition,
+      relations
+    });
+    return this.transformMany(results, transformOptions);
   }
 
   /**
@@ -141,8 +138,16 @@ export class BaseRepository<
     };
   }
 
+  /**
+   * Paginate data
+   * @param searchFilter
+   * @param relations
+   * @param searchCriteria
+   * @param transformOptions
+   */
   async paginate(
     searchFilter: DeepPartial<SearchFilterInterface>,
+    relations: string[] = [],
     searchCriteria: string[],
     transformOptions = {}
   ): Promise<Pagination<K>> {
@@ -158,6 +163,7 @@ export class BaseRepository<
     const paginationInfo: PaginationInfoInterface = this.getPaginationInfo(
       searchFilter
     );
+    findOptions.relations = relations;
     findOptions.take = paginationInfo.limit;
     findOptions.skip = paginationInfo.skip;
     findOptions.where = whereCondition;

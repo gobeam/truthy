@@ -10,7 +10,7 @@ import { PermissionRepository } from './permission.repository';
 import { PermissionFilterDto } from './dto/permission-filter.dto';
 import { CommonServiceInterface } from '../common/interfaces/common-service.interface';
 import { Permission } from './serializer/permission.serializer';
-import { ObjectLiteral } from 'typeorm';
+import { Not, ObjectLiteral } from 'typeorm';
 import { PermissionEntity } from './entities/permission.entity';
 import { basicFieldGroupsForSerializing } from '../roles/serializer/role.serializer';
 import { Pagination } from '../paginate';
@@ -58,8 +58,6 @@ export class PermissionsService
         }
       }
     }
-    console.log(permissionsList);
-
     return this.repository.syncPermission(permissionsList);
   }
 
@@ -68,6 +66,7 @@ export class PermissionsService
   ): Promise<Pagination<Permission>> {
     return this.repository.paginate(
       permissionFilterDto,
+      [],
       ['resource', 'description', 'path', 'method'],
       {
         groups: [...basicFieldGroupsForSerializing]
@@ -85,16 +84,13 @@ export class PermissionsService
     id: number,
     updatePermissionDto: UpdatePermissionDto
   ): Promise<Permission> {
-    const permission = await this.repository.findOne(id);
-    if (!permission) {
-      throw new NotFoundException();
-    }
+    const permission = await this.repository.get(id);
     const condition: ObjectLiteral = {
       description: updatePermissionDto.description
     };
+    condition.id = Not(id);
     const countSameDescription = await this.repository.countEntityByCondition(
-      condition,
-      id
+      condition
     );
     if (countSameDescription > 0) {
       throw new UnprocessableEntityException({

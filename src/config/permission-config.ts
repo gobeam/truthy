@@ -1,10 +1,11 @@
 interface PermissionConfigInterface {
-  superRole: superRole;
+  roles: Array<rolePayload>;
   defaultRoutes?: Array<RoutePayloadInterface>;
   modules: Array<ModulesPayloadInterface>;
 }
 
-interface superRole {
+interface rolePayload {
+  id: number;
   name: string;
   description: string;
 }
@@ -49,10 +50,18 @@ export interface PermissionPayload {
 }
 
 export const PermissionConfiguration: PermissionConfigInterface = {
-  superRole: {
-    name: 'superuser',
-    description: 'superuser of the system'
-  },
+  roles: [
+    {
+      id: 1,
+      name: 'superuser',
+      description: 'superuser of the system'
+    },
+    {
+      id: 2,
+      name: 'normal',
+      description: 'normal user of the system'
+    }
+  ],
   defaultRoutes: [
     {
       path: '/check',
@@ -125,11 +134,11 @@ export const PermissionConfiguration: PermissionConfigInterface = {
           ]
         },
         {
-          name: 'Delete user by id',
+          name: 'Get user by id',
           route: [
             {
               path: '/users/:id',
-              method: MethodList.DELETE
+              method: MethodList.GET
             }
           ]
         }

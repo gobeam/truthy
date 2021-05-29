@@ -14,7 +14,7 @@ import {
   RoleSerializer
 } from './serializer/role.serializer';
 import { CommonServiceInterface } from '../common/interfaces/common-service.interface';
-import { ILike, ObjectLiteral } from 'typeorm';
+import { Not, ObjectLiteral } from 'typeorm';
 import { PermissionsService } from '../permissions/permissions.service';
 import { Pagination } from '../paginate';
 
@@ -25,11 +25,23 @@ export class RolesService implements CommonServiceInterface<RoleSerializer> {
     private readonly permissionsService: PermissionsService
   ) {}
 
+  /**
+   * Get Permission Id array
+   * @param ids
+   */
   async getPermissionByIds(ids) {
     if (ids && ids.length > 0) {
       return await this.permissionsService.whereInIds(ids);
     }
     return [];
+  }
+
+  /**
+   * Find by name
+   * @param name
+   */
+  async findByName(name) {
+    return await this.repository.findOne({ name });
   }
 
   /**
@@ -49,12 +61,17 @@ export class RolesService implements CommonServiceInterface<RoleSerializer> {
   async findAll(
     roleFilterDto: RoleFilterDto
   ): Promise<Pagination<RoleSerializer>> {
-    return this.repository.paginate(roleFilterDto, ['name', 'description'], {
-      groups: [
-        ...adminUserGroupsForSerializing,
-        ...basicFieldGroupsForSerializing
-      ]
-    });
+    return this.repository.paginate(
+      roleFilterDto,
+      [],
+      ['name', 'description'],
+      {
+        groups: [
+          ...adminUserGroupsForSerializing,
+          ...basicFieldGroupsForSerializing
+        ]
+      }
+    );
   }
 
   /**
@@ -86,9 +103,9 @@ export class RolesService implements CommonServiceInterface<RoleSerializer> {
     const condition: ObjectLiteral = {
       name: updateRoleDto.name
     };
+    condition.id = Not(id);
     const checkUniqueTitle = await this.repository.countEntityByCondition(
-      condition,
-      id
+      condition
     );
     if (checkUniqueTitle > 0) {
       throw new UnprocessableEntityException({ name: 'already taken' });

@@ -1,6 +1,5 @@
-import { EntityRepository } from 'typeorm';
+import { DeepPartial, EntityRepository } from 'typeorm';
 import { UserEntity } from './entity/user.entity';
-import { CreateUserDto } from './dto/create-user.dto';
 import * as bcrypt from 'bcrypt';
 import { UserLoginDto } from './dto/user-login.dto';
 import {
@@ -22,19 +21,15 @@ export class UserRepository extends BaseRepository<UserEntity, UserSerializer> {
    * @param token
    */
   async store(
-    createUserDto: CreateUserDto,
+    createUserDto: DeepPartial<UserEntity>,
     token: string
   ): Promise<UserSerializer> {
-    const { name, username, password, email } = createUserDto;
-    const user = this.create();
-    user.name = name;
-    user.status = UserStatusEnum.INACTIVE;
-    user.username = username;
-    user.email = email;
-    user.salt = await bcrypt.genSalt();
-    user.token = token;
-    user.password = password;
-    user.roleId = 1;
+    if (!createUserDto.status) {
+      createUserDto.status = UserStatusEnum.INACTIVE;
+    }
+    createUserDto.salt = await bcrypt.genSalt();
+    createUserDto.token = token;
+    const user = this.create(createUserDto);
     await user.save();
     return this.transform(user);
   }
@@ -82,5 +77,14 @@ export class UserRepository extends BaseRepository<UserEntity, UserSerializer> {
       classToPlain(model, transformOption),
       transformOption
     );
+  }
+
+  /**
+   * transform users collection
+   * @param models
+   * @param transformOption
+   */
+  transformMany(models: UserEntity[], transformOption = {}): UserSerializer[] {
+    return models.map((model) => this.transform(model, transformOption));
   }
 }

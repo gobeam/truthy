@@ -4,6 +4,7 @@ import {
   Get,
   HttpCode,
   HttpStatus,
+  Param,
   Post,
   Put,
   Query,
@@ -17,61 +18,65 @@ import { GetUser } from '../common/decorators/get-user.decorator';
 import { UserEntity } from './entity/user.entity';
 import { AuthGuard } from '@nestjs/passport';
 import { UserSerializer } from './serializer/user.serializer';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { UpdateUserProfileDto } from './dto/update-user-profile.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { ForgetPasswordDto } from './dto/forget-password.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { PermissionGuard } from '../common/guard/permission.guard';
+import { Pagination } from '../paginate';
+import { UserSearchFilterDto } from './dto/user-search-filter.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
+import { RegisterUserDto } from './dto/register-user.dto';
 
 @ApiTags('user')
-@Controller('auth')
+@Controller()
 export class AuthController {
   constructor(private authService: AuthService) {}
 
-  @Post('/register')
+  @Post('/auth/register')
   register(
-    @Body(ValidationPipe) createUserDto: CreateUserDto
+    @Body(ValidationPipe) registerUserDto: RegisterUserDto
   ): Promise<UserSerializer> {
-    return this.authService.addUser(createUserDto);
+    return this.authService.addUser(registerUserDto);
   }
 
-  @Post('/login')
+  @Post('/auth/login')
   @HttpCode(HttpStatus.OK)
   login(@Body() userLoginDto: UserLoginDto) {
     return this.authService.login(userLoginDto);
   }
 
   @UseGuards(AuthGuard(), PermissionGuard)
-  @Get('/profile')
+  @Get('/auth/profile')
   @ApiBearerAuth()
   profile(@GetUser() user: UserEntity): Promise<UserSerializer> {
     return this.authService.get(user);
   }
 
   @UseGuards(AuthGuard(), PermissionGuard)
-  @Put('/profile')
+  @Put('/auth/profile')
   @ApiBearerAuth()
-  update(
+  updateProfile(
     @GetUser() user: UserEntity,
-    @Body() updateUserDto: UpdateUserDto
+    @Body() updateUserDto: UpdateUserProfileDto
   ): Promise<UserSerializer> {
-    return this.authService.update(user, updateUserDto);
+    return this.authService.update(user.id, updateUserDto);
   }
 
-  @Get('/activate-account')
+  @Get('/auth/activate-account')
   @HttpCode(HttpStatus.NO_CONTENT)
   activateAccount(@Query('token') token: string): Promise<void> {
     return this.authService.activateAccount(token);
   }
 
-  @Put('/forgot-password')
+  @Put('/auth/forgot-password')
   @HttpCode(HttpStatus.NO_CONTENT)
   forgotPassword(@Body() forgetPasswordDto: ForgetPasswordDto): Promise<void> {
     return this.authService.forgotPassword(forgetPasswordDto);
   }
 
-  @Put('/reset-password')
+  @Put('/auth/reset-password')
   @HttpCode(HttpStatus.NO_CONTENT)
   resetPassword(@Body() resetPasswordDto: ResetPasswordDto): Promise<void> {
     return this.authService.resetPassword(resetPasswordDto);
@@ -79,11 +84,42 @@ export class AuthController {
 
   @UseGuards(AuthGuard(), PermissionGuard)
   @ApiBearerAuth()
-  @Put('/change-password')
+  @Put('/auth/change-password')
   changePassword(
     @GetUser() user: UserEntity,
     @Body() changePasswordDto: ChangePasswordDto
   ): Promise<void> {
     return this.authService.changePassword(user, changePasswordDto);
+  }
+
+  @UseGuards(AuthGuard(), PermissionGuard)
+  @Get('/users')
+  @ApiBearerAuth()
+  index(
+    @Query() userSearchFilterDto: UserSearchFilterDto
+  ): Promise<Pagination<UserSerializer>> {
+    return this.authService.findAll(userSearchFilterDto);
+  }
+
+  @Post('/users')
+  store(
+    @Body(ValidationPipe) createUserDto: CreateUserDto
+  ): Promise<UserSerializer> {
+    return this.authService.addUser(createUserDto);
+  }
+
+  @ApiBearerAuth()
+  @Put('/users/:id')
+  update(
+    @Param('id') id: string,
+    @Body() updateUserDto: UpdateUserDto
+  ): Promise<UserSerializer> {
+    return this.authService.update(+id, updateUserDto);
+  }
+
+  @ApiBearerAuth()
+  @Get('/users/:id')
+  view(@Param('id') id: string): Promise<UserSerializer> {
+    return this.authService.findById(+id);
   }
 }

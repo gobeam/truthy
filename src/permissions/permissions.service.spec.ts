@@ -75,10 +75,9 @@ describe('PermissionsService', () => {
 
   it('sync permission', async () => {
     repository.syncPermission.mockResolvedValue(null);
-    const result = await service.syncPermission();
+    await service.syncPermission();
     expect(repository.syncPermission).toHaveBeenCalledTimes(1);
-
-  })
+  });
 
   describe('findOne', () => {
     it('find success', async () => {
@@ -113,9 +112,9 @@ describe('PermissionsService', () => {
     it('update item that exists in database', async () => {
       repository.countEntityByCondition.mockResolvedValue(0);
       repository.updateEntity.mockResolvedValue(mockPermission);
-      repository.findOne.mockResolvedValue(mockPermission);
+      repository.get.mockResolvedValue(mockPermission);
       const role = await service.update(1, updatePermissionDto);
-      expect(repository.findOne).toHaveBeenCalledWith(1);
+      expect(repository.get).toHaveBeenCalledWith(1);
       expect(repository.updateEntity).toHaveBeenCalledWith(
         mockPermission,
         updatePermissionDto
@@ -126,7 +125,7 @@ describe('PermissionsService', () => {
     it('trying to update item that does not exists in database', async () => {
       repository.updateEntity.mockRejectedValue(new NotFoundException());
       const updatePermissionDto: UpdatePermissionDto = mockPermission;
-      repository.findOne.mockResolvedValue(null);
+      repository.get.mockResolvedValue(null);
       await expect(service.update(1, updatePermissionDto)).rejects.toThrowError(
         NotFoundException
       );

@@ -1,6 +1,5 @@
 import { ModelSerializer } from '../../common/serializer/model.serializer';
 import { UserStatusEnum } from '../user-status.enum';
-import { RoleEntity } from '../../roles/entities/role.entity';
 import { Exclude, Expose, Type } from 'class-transformer';
 import { RoleSerializer } from '../../roles/serializer/role.serializer';
 import {

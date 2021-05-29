@@ -8,17 +8,17 @@ import {
 } from '@nestjs/common';
 import { UserRepository } from './user.repository';
 import { InjectRepository } from '@nestjs/typeorm';
-import { CreateUserDto } from './dto/create-user.dto';
 import { UserEntity } from './entity/user.entity';
 import { UserLoginDto } from './dto/user-login.dto';
 import { JwtService } from '@nestjs/jwt';
 import { JwtPayloadDto } from './dto/jwt-payload.dto';
 import {
+  adminUserGroupsForSerializing,
+  defaultUserGroupsForSerializing,
   ownerUserGroupsForSerializing,
   UserSerializer
 } from './serializer/user.serializer';
-import { UpdateUserDto } from './dto/update-user.dto';
-import { ObjectLiteral } from 'typeorm';
+import { DeepPartial, Not, ObjectLiteral } from 'typeorm';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import * as config from 'config';
 import { ForgetPasswordDto } from './dto/forget-password.dto';
@@ -26,6 +26,8 @@ import { UserStatusEnum } from './user-status.enum';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { MailService } from '../mail/mail.service';
 import { MailJobInterface } from '../mail/interface/mail-job.interface';
+import { Pagination } from '../paginate';
+import { UserSearchFilterDto } from './dto/user-search-filter.dto';
 
 @Injectable()
 export class AuthService {
@@ -36,26 +38,55 @@ export class AuthService {
   ) {}
 
   /**
-   * add new user
-   * @param createUserDto
+   * send mail
+   * @param user
+   * @param subject
+   * @param url
+   * @param templatePath
    */
-  async addUser(createUserDto: CreateUserDto): Promise<UserSerializer> {
-    const token = await this.generateUniqueToken(12);
-    const user = await this.userRepository.store(createUserDto, token);
+  async sendMailToUser(
+    user: UserSerializer,
+    subject: string,
+    url: string,
+    templatePath: string
+  ) {
     const appConfig = config.get('app');
-    const subject = 'Account created';
     const mailData: MailJobInterface = {
       to: user.email,
       subject,
-      template: __dirname + '/../mail/templates/email/activate-account',
+      template: __dirname + `/../mail/templates/email/${templatePath}`,
       context: {
         email: user.email,
-        activateUrl: `${appConfig.frontendUrl}/verify/${token}`,
+        link: `${appConfig.frontendUrl}/${url}`,
         username: user.username,
         subject
       }
     };
     await this.mailService.sendMail(mailData, 'system-mail');
+  }
+
+  /**
+   * add new user
+   * @param createUserDto
+   */
+  async addUser(
+    createUserDto: DeepPartial<UserEntity>
+  ): Promise<UserSerializer> {
+    const token = await this.generateUniqueToken(12);
+    if (!createUserDto.status) {
+      createUserDto.roleId = 2;
+      const currentDateTime = new Date();
+      currentDateTime.setHours(currentDateTime.getHours() + 1);
+      createUserDto.tokenValidityDate = currentDateTime;
+    }
+    const registerProcess = !createUserDto.status;
+    const user = await this.userRepository.store(createUserDto, token);
+    const subject = registerProcess ? 'Account created' : 'Set Password';
+    const link = registerProcess ? `verify/${token}` : `reset/${token}`;
+    const templatePath = registerProcess
+      ? 'activate-account'
+      : 'password-reset';
+    await this.sendMailToUser(user, subject, link, templatePath);
     return user;
   }
 
@@ -93,23 +124,63 @@ export class AuthService {
   }
 
   /**
-   * update logged in user
-   * @param user
+   * Get user By Id
+   * @param id
+   */
+  async findById(id: number): Promise<UserSerializer> {
+    return this.userRepository.get(id, ['role'], {
+      groups: [
+        ...adminUserGroupsForSerializing,
+        ...ownerUserGroupsForSerializing
+      ]
+    });
+  }
+
+  /**
+   * Get all user paginated
+   * @param userSearchFilterDto
+   */
+  async findAll(
+    userSearchFilterDto: UserSearchFilterDto
+  ): Promise<Pagination<UserSerializer>> {
+    return this.userRepository.paginate(
+      userSearchFilterDto,
+      ['role'],
+      ['username', 'email', 'name'],
+      {
+        groups: [
+          ...adminUserGroupsForSerializing,
+          ...ownerUserGroupsForSerializing,
+          ...defaultUserGroupsForSerializing
+        ]
+      }
+    );
+  }
+
+  /**
+   * update user
+   * @param id
    * @param updateUserDto
    */
   async update(
-    user: UserEntity,
-    updateUserDto: UpdateUserDto
+    id: number,
+    updateUserDto: DeepPartial<UserEntity>
   ): Promise<UserSerializer> {
+    const user = await this.userRepository.get(id, [], {
+      groups: [
+        ...ownerUserGroupsForSerializing,
+        ...adminUserGroupsForSerializing
+      ]
+    });
     const checkUniqueFieldArray = ['username', 'email'];
     const error = {};
     for (const field of checkUniqueFieldArray) {
       const condition: ObjectLiteral = {
         [field]: updateUserDto[field]
       };
+      condition.id = Not(id);
       const checkUnique = await this.userRepository.countEntityByCondition(
-        condition,
-        user.id
+        condition
       );
       if (checkUnique > 0) {
         error[field] = `already taken`;
@@ -149,7 +220,6 @@ export class AuthService {
     if (!user) {
       return;
     }
-    const appConfig = config.get('app');
     const token = await this.generateUniqueToken(6);
     user.token = token;
     const currentDateTime = new Date();
@@ -158,17 +228,12 @@ export class AuthService {
     user.skipHashPassword = true;
     await user.save();
     const subject = 'Reset Password';
-    const mailData: MailJobInterface = {
-      to: user.email,
+    await this.sendMailToUser(
+      user,
       subject,
-      template: __dirname + '/../mail/templates/email/password-reset',
-      context: {
-        resetUrl: `${appConfig.frontendUrl}/reset/${token}`,
-        username: user.name,
-        subject
-      }
-    };
-    await this.mailService.sendMail(mailData, 'system-mail');
+      `reset/${token}`,
+      'password-reset'
+    );
   }
 
   /**
@@ -250,8 +315,7 @@ export class AuthService {
       token
     };
     const tokenCount = await this.userRepository.countEntityByCondition(
-      condition,
-      0
+      condition
     );
     if (tokenCount > 0) {
       await this.generateUniqueToken(length);

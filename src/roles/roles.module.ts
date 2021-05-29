@@ -13,6 +13,7 @@ import { PermissionsModule } from '../permissions/permissions.module';
     AuthModule,
     PermissionsModule
   ],
+  exports: [],
   controllers: [RolesController],
   providers: [RolesService, UniqueValidatorPipe]
 })
