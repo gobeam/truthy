@@ -19,14 +19,7 @@ const permissionRepositoryMock = () => ({
   delete: jest.fn(),
   createEntity: jest.fn(),
   countEntityByCondition: jest.fn(),
-  updateEntity: jest.fn(),
-  createQueryBuilder: jest.fn(() => ({
-    update: jest.fn().mockReturnThis(),
-    set: jest.fn().mockReturnThis(),
-    where: jest.fn().mockReturnThis(),
-    returning: jest.fn().mockReturnThis(),
-    execute: jest.fn().mockReturnThis()
-  }))
+  updateEntity: jest.fn()
 });
 
 const mockPermission = {
@@ -67,7 +60,7 @@ describe('PermissionsService', () => {
 
   it('create', async () => {
     const createPermissionDto: CreatePermissionDto = mockPermission;
-    const result = await service.store(createPermissionDto);
+    const result = await service.create(createPermissionDto);
     expect(repository.createEntity).toHaveBeenCalledWith(createPermissionDto);
     expect(repository.createEntity).not.toThrow();
     expect(result).toBe(undefined);

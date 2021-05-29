@@ -69,7 +69,7 @@ export class AuthService {
    * add new user
    * @param createUserDto
    */
-  async addUser(
+  async create(
     createUserDto: DeepPartial<UserEntity>
   ): Promise<UserSerializer> {
     const token = await this.generateUniqueToken(12);

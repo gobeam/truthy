@@ -38,7 +38,7 @@ export class AuthController {
   register(
     @Body(ValidationPipe) registerUserDto: RegisterUserDto
   ): Promise<UserSerializer> {
-    return this.authService.addUser(registerUserDto);
+    return this.authService.create(registerUserDto);
   }
 
   @Post('/auth/login')
@@ -95,17 +95,17 @@ export class AuthController {
   @UseGuards(AuthGuard(), PermissionGuard)
   @Get('/users')
   @ApiBearerAuth()
-  index(
+  findAll(
     @Query() userSearchFilterDto: UserSearchFilterDto
   ): Promise<Pagination<UserSerializer>> {
     return this.authService.findAll(userSearchFilterDto);
   }
 
   @Post('/users')
-  store(
+  create(
     @Body(ValidationPipe) createUserDto: CreateUserDto
   ): Promise<UserSerializer> {
-    return this.authService.addUser(createUserDto);
+    return this.authService.create(createUserDto);
   }
 
   @ApiBearerAuth()
@@ -119,7 +119,7 @@ export class AuthController {
 
   @ApiBearerAuth()
   @Get('/users/:id')
-  view(@Param('id') id: string): Promise<UserSerializer> {
+  findOne(@Param('id') id: string): Promise<UserSerializer> {
     return this.authService.findById(+id);
   }
 }

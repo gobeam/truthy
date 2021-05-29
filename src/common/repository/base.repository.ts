@@ -148,7 +148,7 @@ export class BaseRepository<
   async paginate(
     searchFilter: DeepPartial<SearchFilterInterface>,
     relations: string[] = [],
-    searchCriteria: string[],
+    searchCriteria: string[] = [],
     transformOptions = {}
   ): Promise<Pagination<K>> {
     const whereCondition = [];

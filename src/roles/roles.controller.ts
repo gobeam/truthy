@@ -29,20 +29,20 @@ export class RolesController {
   constructor(private readonly rolesService: RolesService) {}
 
   @Post()
-  store(@Body() createRoleDto: CreateRoleDto): Promise<RoleSerializer> {
-    return this.rolesService.store(createRoleDto);
+  create(@Body() createRoleDto: CreateRoleDto): Promise<RoleSerializer> {
+    return this.rolesService.create(createRoleDto);
   }
 
   @Get()
   @ApiQuery({ type: RoleFilterDto })
-  index(
+  findAll(
     @Query() roleFilterDto: RoleFilterDto
   ): Promise<Pagination<RoleSerializer>> {
     return this.rolesService.findAll(roleFilterDto);
   }
 
   @Get(':id')
-  show(@Param('id') id: string): Promise<RoleSerializer> {
+  findOne(@Param('id') id: string): Promise<RoleSerializer> {
     return this.rolesService.findOne(+id);
   }
 
@@ -56,7 +56,7 @@ export class RolesController {
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  destroy(@Param('id') id: string): Promise<void> {
+  remove(@Param('id') id: string): Promise<void> {
     return this.rolesService.remove(+id);
   }
 }

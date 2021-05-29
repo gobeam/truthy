@@ -48,7 +48,7 @@ export class RolesService implements CommonServiceInterface<RoleSerializer> {
    * create new role
    * @param createRoleDto
    */
-  async store(createRoleDto: CreateRoleDto): Promise<RoleSerializer> {
+  async create(createRoleDto: CreateRoleDto): Promise<RoleSerializer> {
     const { permissions } = createRoleDto;
     const permission = await this.getPermissionByIds(permissions);
     return this.repository.store(createRoleDto, permission);

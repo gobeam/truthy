@@ -162,7 +162,7 @@ describe('AuthService', () => {
       service.generateUniqueToken = jest.fn().mockResolvedValue(token);
       userRepository.store.mockResolvedValue(mockUser);
       const createUserDto: CreateUserDto = mockUser;
-      await service.addUser(createUserDto);
+      await service.create(createUserDto);
       expect(service.generateUniqueToken).toHaveBeenCalled();
       expect(userRepository.store).toHaveBeenCalledWith(createUserDto, token);
       expect(mailService.sendMail).toHaveBeenCalledTimes(1);

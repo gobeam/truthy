@@ -256,6 +256,58 @@ export const PermissionConfiguration: PermissionConfigInterface = {
           ]
         }
       ]
-    }
+    },
+    {
+      name: 'Email Templates',
+      resource: 'emailTemplates',
+      hasSubmodules: false,
+      permissions: [
+        {
+          name: 'View all email templates',
+          route: [
+            {
+              path: '/email-templates',
+              method: MethodList.GET
+            }
+          ]
+        },
+        {
+          name: 'View email templates by id',
+          route: [
+            {
+              path: '/email-templates/:id',
+              method: MethodList.GET
+            }
+          ]
+        },
+        {
+          name: 'Store new email templates',
+          route: [
+            {
+              path: '/email-templates',
+              method: MethodList.POST
+            }
+          ]
+        },
+        {
+          name: 'Update email templates by id',
+          route: [
+            {
+              path: '/email-templates/:id',
+              method: MethodList.PUT
+            }
+          ]
+        },
+        {
+          name: 'Delete email templates by id',
+          route: [
+            {
+              path: '/email-templates/:id',
+              method: MethodList.DELETE
+            }
+          ]
+        }
+      ]
+    },
   ]
 };

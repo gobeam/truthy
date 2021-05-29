@@ -29,20 +29,22 @@ export class PermissionsController {
   constructor(private readonly permissionsService: PermissionsService) {}
 
   @Post()
-  store(@Body() createPermissionDto: CreatePermissionDto): Promise<Permission> {
-    return this.permissionsService.store(createPermissionDto);
+  create(
+    @Body() createPermissionDto: CreatePermissionDto
+  ): Promise<Permission> {
+    return this.permissionsService.create(createPermissionDto);
   }
 
   @Get()
   @ApiQuery({ type: PermissionFilterDto })
-  index(
+  findAll(
     @Query() permissionFilterDto: PermissionFilterDto
   ): Promise<Pagination<Permission>> {
     return this.permissionsService.findAll(permissionFilterDto);
   }
 
   @Get(':id')
-  show(@Param('id') id: string): Promise<Permission> {
+  findOne(@Param('id') id: string): Promise<Permission> {
     return this.permissionsService.findOne(+id);
   }
 
@@ -56,7 +58,7 @@ export class PermissionsController {
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  destroy(@Param('id') id: string): Promise<void> {
+  remove(@Param('id') id: string): Promise<void> {
     return this.permissionsService.remove(+id);
   }
 

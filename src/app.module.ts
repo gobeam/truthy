@@ -5,6 +5,7 @@ import { RolesModule } from './roles/roles.module';
 import { PermissionsModule } from './permissions/permissions.module';
 import * as ormConfig from './config/ormconfig';
 import { MailModule } from './mail/mail.module';
+import { EmailTemplateModule } from './email-template/email-template.module';
 
 @Module({
   imports: [
@@ -12,7 +13,8 @@ import { MailModule } from './mail/mail.module';
     AuthModule,
     RolesModule,
     PermissionsModule,
-    MailModule
+    MailModule,
+    EmailTemplateModule,
   ]
 })
 export class AppModule {}

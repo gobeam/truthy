@@ -82,7 +82,7 @@ describe('RolesService', () => {
     const createRoleDto: CreateRoleDto = mockRole;
     permissionService.whereInIds.mockResolvedValue([mockPermission]);
     service.getPermissionByIds = jest.fn().mockResolvedValue([mockPermission]);
-    const result = await service.store(createRoleDto);
+    const result = await service.create(createRoleDto);
     expect(service.getPermissionByIds).toHaveBeenCalledWith([1]);
     expect(roleRepository.store).toHaveBeenCalledWith(createRoleDto, [
       mockPermission

@@ -7,13 +7,17 @@ import { RoleEntity } from '../../roles/entities/role.entity';
 export class PermissionEntity extends CustomBaseEntity {
   @Column('varchar', { length: 100 })
   resource: string;
+
   @Column()
   @Index({ unique: true })
   description: string;
+
   @Column()
   path: string;
+
   @Column('varchar', { default: 'get', length: 20 })
   method: string;
+
   @Column()
   isDefault: boolean;
 

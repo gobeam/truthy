@@ -1,7 +1,8 @@
 import { MigrationInterface, QueryRunner, Table, TableIndex } from 'typeorm';
 
-export class RoleTable1614275766942 implements MigrationInterface {
-  tableName = 'role';
+export class EmailTemplate1622305543735 implements MigrationInterface {
+  tableName = 'email_templates';
+  index = 'IDX_EMAIL_TEMPLATES_TITLE';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.createTable(
@@ -16,16 +17,32 @@ export class RoleTable1614275766942 implements MigrationInterface {
             generationStrategy: 'increment'
           },
           {
-            name: 'name',
+            name: 'title',
             type: 'varchar',
             isNullable: false,
             isUnique: true,
             length: '100'
           },
           {
-            name: 'description',
+            name: 'sender',
+            type: 'varchar',
+            isNullable: false,
+            length: '100'
+          },
+          {
+            name: 'subject',
             type: 'text',
             isNullable: true
+          },
+          {
+            name: 'body',
+            type: 'text',
+            isNullable: true
+          },
+          {
+            name: 'isDefault',
+            type: 'boolean',
+            default: false
           },
           {
             name: 'createdAt',
@@ -45,16 +62,17 @@ export class RoleTable1614275766942 implements MigrationInterface {
     await queryRunner.createIndex(
       this.tableName,
       new TableIndex({
-        name: `IDX_ROLE_NAME`,
-        columnNames: ['name']
+        name: `${this.index}`,
+        columnNames: ['title']
       })
     );
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
     const table = await queryRunner.getTable(this.tableName);
-    const index = `IDX_ROLE_NAME`;
-    const nameIndex = table.indices.find((fk) => fk.name.indexOf(index) !== -1);
+    const nameIndex = table.indices.find(
+      (ik) => ik.name.indexOf(this.index) !== -1
+    );
     if (nameIndex) {
       await queryRunner.dropIndex(this.tableName, nameIndex);
     }
