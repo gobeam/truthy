@@ -60,22 +60,20 @@ describe('User Repository', () => {
           { email: userLoginDto.username }
         ]
       });
-      expect(result).toEqual(user);
+      expect(result).toEqual([user, null]);
     });
 
-    it('throw error if username and password doesnot matches', async () => {
+    it('throw error if username and password does not matches', async () => {
       userRepository.findOne.mockResolvedValue(user);
       user.validatePassword.mockResolvedValue(false);
-      await expect(userRepository.login(userLoginDto)).rejects.toThrow(
-        UnauthorizedException
-      );
+      const result = await userRepository.login(userLoginDto);
+      expect(result).toEqual([null, 'Unauthorized']);
     });
 
     it('check if user is null', async () => {
       userRepository.findOne.mockResolvedValue(null);
-      await expect(userRepository.login(userLoginDto)).rejects.toThrow(
-        UnauthorizedException
-      );
+      const result = await userRepository.login(userLoginDto);
+      expect(result).toEqual([null, 'Unauthorized']);
     });
   });
 });

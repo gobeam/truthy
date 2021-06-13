@@ -7,6 +7,7 @@ import { UserLoginDto } from './dto/user-login.dto';
 import { UserEntity } from './entity/user.entity';
 import { UpdateUserProfileDto } from './dto/update-user-profile.dto';
 import {
+  HttpException,
   NotFoundException,
   UnauthorizedException,
   UnprocessableEntityException
@@ -44,12 +45,21 @@ const jwtServiceMock = () => ({
   sign: jest.fn()
 });
 
+const throttleMock = () => ({
+  get: jest.fn(),
+  delete: jest.fn()
+});
+
 const mailServiceMock = () => ({
   sendMail: jest.fn()
 });
 
 describe('AuthService', () => {
-  let service: AuthService, userRepository, jwtService, mailService;
+  let service: AuthService,
+    userRepository,
+    jwtService,
+    mailService,
+    throttleService;
 
   beforeEach(async () => {
     jest.clearAllMocks();
@@ -58,7 +68,8 @@ describe('AuthService', () => {
         AuthService,
         { provide: UserRepository, useFactory: mockUserRepository },
         { provide: JwtService, useFactory: jwtServiceMock },
-        { provide: MailService, useFactory: mailServiceMock }
+        { provide: MailService, useFactory: mailServiceMock },
+        { provide: 'LOGIN_THROTTLE', useFactory: throttleMock }
       ]
     }).compile();
 
@@ -66,6 +77,7 @@ describe('AuthService', () => {
     userRepository = await module.get<UserRepository>(UserRepository);
     jwtService = await module.get<JwtService>(JwtService);
     mailService = await module.get<MailService>(MailService);
+    throttleService = await module.get<'LOGIN_THROTTLE'>('LOGIN_THROTTLE');
   });
 
   describe('change or forgot password', () => {
@@ -201,7 +213,7 @@ describe('AuthService', () => {
   });
 
   describe('logged in user functionality', () => {
-    let userLoginDto: UserLoginDto, user;
+    let userLoginDto: UserLoginDto, user, ip: string;
     beforeEach(() => {
       userLoginDto = {
         password: mockUser.password,
@@ -212,14 +224,30 @@ describe('AuthService', () => {
       user.email = mockUser.email;
       user.username = mockUser.username;
       user.password = mockUser.password;
+      ip = '::1';
     });
 
-    it('login user', async () => {
+    it('check if throttle error occurs if user tries to login multiple times', async () => {
+      throttleService.get.mockResolvedValue({
+        consumedPoints: 6,
+        msBeforeNext: 3000
+      });
       userRepository.login.mockResolvedValue(user);
+      await expect(service.login(userLoginDto, ip)).rejects.toThrowError(
+        HttpException
+      );
+    });
+
+    it('login user successfully', async () => {
+      throttleService.get.mockResolvedValue(null);
+      userRepository.login.mockResolvedValue([user, null]);
       jwtService.sign.mockResolvedValue('hash');
-      const result = await service.login(userLoginDto);
+      const result = await service.login(userLoginDto, ip);
       expect(userRepository.login).toHaveBeenCalledWith(userLoginDto);
       expect(result).toEqual({ accessToken: 'hash' });
+      expect(throttleService.delete).toHaveBeenCalledWith(
+        `${user.username}_${ip}`
+      );
     });
 
     it('get profile', async () => {

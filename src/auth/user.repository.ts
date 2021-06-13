@@ -46,9 +46,8 @@ export class UserRepository extends BaseRepository<UserEntity, UserSerializer> {
     if (user && (await user.validatePassword(password))) {
       if (user.status !== UserStatusEnum.ACTIVE) {
         return [null, 'InactiveUser'];
-        throw new HttpException('InactiveUser', HttpStatus.FORBIDDEN);
       }
-      return [user, ''];
+      return [user, null];
     }
     return [null, 'Unauthorized'];
     // throw new UnauthorizedException();
