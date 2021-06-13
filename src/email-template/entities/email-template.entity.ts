@@ -8,6 +8,9 @@ export class EmailTemplateEntity extends CustomBaseEntity {
   title: string;
 
   @Column()
+  slug: string;
+
+  @Column()
   sender: string;
 
   @Column()

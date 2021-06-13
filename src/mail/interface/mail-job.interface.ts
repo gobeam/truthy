@@ -1,6 +1,6 @@
 export interface MailJobInterface {
   to: string;
-  template: string;
+  slug: string;
   subject: string;
   context: any;
 }

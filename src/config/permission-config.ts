@@ -308,6 +308,6 @@ export const PermissionConfiguration: PermissionConfigInterface = {
           ]
         }
       ]
-    },
+    }
   ]
 };

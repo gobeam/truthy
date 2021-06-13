@@ -4,6 +4,7 @@ import { EmailTemplateRepository } from './email-template.repository';
 import { EmailTemplatesSearchFilterDto } from './dto/email-templates-search-filter.dto';
 import { CreateEmailTemplateDto } from './dto/create-email-template.dto';
 import {
+  ForbiddenException,
   NotFoundException,
   UnprocessableEntityException
 } from '@nestjs/common';
@@ -21,6 +22,7 @@ const emailTemplateRepositoryMock = () => ({
 
 const mockTemplate = {
   title: 'string',
+  slug: 'string',
   sender: 'string',
   subject: 'string',
   body: 'string',
@@ -47,6 +49,11 @@ describe('EmailTemplateService', () => {
 
   afterEach(() => {
     jest.restoreAllMocks();
+  });
+
+  it('test slugify', () => {
+    const result = service.slugify('Test Email');
+    expect(result).toEqual('test-email');
   });
 
   it('get all email-templates', async () => {
@@ -137,6 +144,14 @@ describe('EmailTemplateService', () => {
         throw NotFoundException;
       });
       await expect(service.remove(1)).rejects.toThrow();
+      expect(service.findOne).toHaveBeenCalledTimes(1);
+    });
+
+    it('delete default template test if throws error', async () => {
+      service.findOne = jest
+        .fn()
+        .mockResolvedValue({ ...mockTemplate, isDefault: true });
+      await expect(service.remove(1)).rejects.toThrowError(ForbiddenException);
       expect(service.findOne).toHaveBeenCalledTimes(1);
     });
   });

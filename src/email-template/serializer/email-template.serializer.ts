@@ -8,6 +8,9 @@ export class EmailTemplate extends ModelSerializer {
   title: string;
 
   @ApiProperty()
+  slug: string;
+
+  @ApiProperty()
   sender: string;
 
   @ApiProperty()

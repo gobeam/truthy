@@ -38,18 +38,20 @@ export class UserRepository extends BaseRepository<UserEntity, UserSerializer> {
    * login user
    * @param userLoginDto
    */
-  async login(userLoginDto: UserLoginDto): Promise<UserEntity> {
+  async login(userLoginDto: UserLoginDto): Promise<[UserEntity, string]> {
     const { username, password } = userLoginDto;
     const user = await this.findOne({
       where: [{ username: username }, { email: username }]
     });
     if (user && (await user.validatePassword(password))) {
       if (user.status !== UserStatusEnum.ACTIVE) {
+        return [null, 'InactiveUser'];
         throw new HttpException('InactiveUser', HttpStatus.FORBIDDEN);
       }
-      return user;
+      return [user, ''];
     }
-    throw new UnauthorizedException();
+    return [null, 'Unauthorized'];
+    // throw new UnauthorizedException();
   }
 
   /**

@@ -1,4 +1,4 @@
-import { Injectable, UnprocessableEntityException } from '@nestjs/common';
+import { ForbiddenException, Injectable, UnprocessableEntityException } from '@nestjs/common';
 import { CreateEmailTemplateDto } from './dto/create-email-template.dto';
 import { UpdateEmailTemplateDto } from './dto/update-email-template.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -18,13 +18,38 @@ export class EmailTemplateService
   ) {}
 
   /**
+   * convert string to slug
+   * @param text
+   */
+  slugify(text: string) {
+    return text
+      .toLowerCase()
+      .replace(/\s+/g, '-')
+      .replace(/[^\w\-]+/g, '')
+      .replace(/\-\-+/g, '-')
+      .replace(/^-+/, '')
+      .replace(/-+$/, '');
+  }
+
+  /**
+   * Find Email Template By Slug
+   * @param slug
+   */
+  async findBySlug(slug) {
+    return await this.repository.findOne({ select: ['body'], where: { slug } });
+  }
+
+  /**
    * Create new Email Template
    * @param createEmailTemplateDto
    */
   create(
     createEmailTemplateDto: CreateEmailTemplateDto
   ): Promise<EmailTemplate> {
-    return this.repository.createEntity(createEmailTemplateDto);
+    return this.repository.createEntity({
+      ...createEmailTemplateDto,
+      slug: this.slugify(createEmailTemplateDto.title)
+    });
   }
 
   /**
@@ -71,7 +96,10 @@ export class EmailTemplateService
         title: 'already taken'
       });
     }
-    return this.repository.updateEntity(template, updateEmailTemplateDto);
+    return this.repository.updateEntity(template, {
+      ...updateEmailTemplateDto,
+      slug: this.slugify(updateEmailTemplateDto.title)
+    });
   }
 
   /**
@@ -79,7 +107,10 @@ export class EmailTemplateService
    * @param id
    */
   async remove(id: number): Promise<void> {
-    await this.findOne(id);
+    const template = await this.findOne(id);
+    if (template.isDefault) {
+      throw new ForbiddenException();
+    }
     await this.repository.delete({ id });
   }
 }

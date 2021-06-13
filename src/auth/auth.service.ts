@@ -1,6 +1,7 @@
 import {
   HttpException,
   HttpStatus,
+  Inject,
   Injectable,
   NotFoundException,
   UnauthorizedException,
@@ -28,13 +29,21 @@ import { MailService } from '../mail/mail.service';
 import { MailJobInterface } from '../mail/interface/mail-job.interface';
 import { Pagination } from '../paginate';
 import { UserSearchFilterDto } from './dto/user-search-filter.dto';
+import {
+  RateLimiterRes,
+  RateLimiterStoreAbstract
+} from 'rate-limiter-flexible';
+const throttleConfig = config.get('throttle.login');
 
 @Injectable()
 export class AuthService {
   constructor(
-    @InjectRepository(UserRepository) private userRepository: UserRepository,
-    private jwtService: JwtService,
-    private mailService: MailService
+    @InjectRepository(UserRepository)
+    private readonly userRepository: UserRepository,
+    private readonly jwtService: JwtService,
+    private readonly mailService: MailService,
+    @Inject('LOGIN_THROTTLE')
+    private readonly rateLimiter: RateLimiterStoreAbstract
   ) {}
 
   /**
@@ -42,22 +51,24 @@ export class AuthService {
    * @param user
    * @param subject
    * @param url
-   * @param templatePath
+   * @param slug
+   * @param linkLabel
    */
   async sendMailToUser(
     user: UserSerializer,
     subject: string,
     url: string,
-    templatePath: string
+    slug: string,
+    linkLabel: string
   ) {
     const appConfig = config.get('app');
     const mailData: MailJobInterface = {
       to: user.email,
       subject,
-      template: __dirname + `/../mail/templates/email/${templatePath}`,
+      slug,
       context: {
         email: user.email,
-        link: `${appConfig.frontendUrl}/${url}`,
+        link: `<a href="${appConfig.frontendUrl}/${url}">${linkLabel} →</a>`,
         username: user.username,
         subject
       }
@@ -83,10 +94,9 @@ export class AuthService {
     const user = await this.userRepository.store(createUserDto, token);
     const subject = registerProcess ? 'Account created' : 'Set Password';
     const link = registerProcess ? `verify/${token}` : `reset/${token}`;
-    const templatePath = registerProcess
-      ? 'activate-account'
-      : 'password-reset';
-    await this.sendMailToUser(user, subject, link, templatePath);
+    const slug = registerProcess ? 'activate-account' : 'new-user-set-password';
+    const linkLabel = registerProcess ? 'Activate Account' : 'Set Password';
+    await this.sendMailToUser(user, subject, link, slug, linkLabel);
     return user;
   }
 
@@ -100,17 +110,74 @@ export class AuthService {
   }
 
   /**
-   * login user
+   *
    * @param userLoginDto
+   * @param ip
    */
-  async login(userLoginDto: UserLoginDto): Promise<{ accessToken: string }> {
-    const user = await this.userRepository.login(userLoginDto);
+  async login(
+    userLoginDto: UserLoginDto,
+    ip: string
+  ): Promise<{ accessToken: string }> {
+    const usernameIPkey = `${userLoginDto.username}_${ip}`;
+    const resUsernameAndIP = await this.rateLimiter.get(usernameIPkey);
+    let retrySecs = 0;
+    // Check if user is already blocked
+    if (
+      resUsernameAndIP !== null &&
+      resUsernameAndIP.consumedPoints > throttleConfig.limit
+    ) {
+      retrySecs = Math.round(resUsernameAndIP.msBeforeNext / 1000) || 1;
+    }
+    if (retrySecs > 0) {
+      throw new HttpException(
+        `Too many tries, retry after ${String(retrySecs)} seconds.`,
+        HttpStatus.TOO_MANY_REQUESTS
+      );
+    }
+
+    const [user, error] = await this.userRepository.login(userLoginDto);
+    if (!user) {
+      const [result, throttleError] = await this.limitConsumerPromiseHandler(
+        usernameIPkey
+      );
+      if (!result) {
+        throw new HttpException(
+          `Too many tries, retry after ${String(
+            Math.round(throttleError.msBeforeNext / 1000) || 1
+          )} seconds.`,
+          HttpStatus.TOO_MANY_REQUESTS
+        );
+      }
+
+      throw new UnauthorizedException(error);
+    }
     const payload: JwtPayloadDto = {
       username: user.username,
       name: user.name
     };
     const accessToken = await this.jwtService.sign(payload);
+    await this.rateLimiter.delete(usernameIPkey);
     return { accessToken };
+  }
+
+  /**
+   * promise handler to handle result and error for login
+   * throttle by user
+   * @param usernameIPkey
+   */
+  async limitConsumerPromiseHandler(
+    usernameIPkey: string
+  ): Promise<[RateLimiterRes, RateLimiterRes]> {
+    return new Promise((resolve) => {
+      this.rateLimiter
+        .consume(usernameIPkey)
+        .then((rateLimiterRes) => {
+          resolve([rateLimiterRes, null]);
+        })
+        .catch((rateLimiterError) => {
+          resolve([null, rateLimiterError]);
+        });
+    });
   }
 
   /**
@@ -232,7 +299,8 @@ export class AuthService {
       user,
       subject,
       `reset/${token}`,
-      'password-reset'
+      'reset-password',
+      subject
     );
   }
 

@@ -54,7 +54,7 @@ export class MailProcessor {
         to: job.data.payload.to,
         from: mailConfig.fromMail,
         subject: job.data.payload.subject,
-        template: job.data.payload.template,
+        template: __dirname + `/../mail/templates/email/layouts/email-layout`,
         context: job.data.payload.context
       });
     } catch (error) {

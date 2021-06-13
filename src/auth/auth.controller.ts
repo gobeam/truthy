@@ -7,7 +7,7 @@ import {
   Param,
   Post,
   Put,
-  Query,
+  Query, Req,
   UseGuards,
   ValidationPipe
 } from '@nestjs/common';
@@ -28,6 +28,7 @@ import { Pagination } from '../paginate';
 import { UserSearchFilterDto } from './dto/user-search-filter.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { RegisterUserDto } from './dto/register-user.dto';
+import { RequestIpDto } from './dto/request-ip.dto';
 
 @ApiTags('user')
 @Controller()
@@ -43,8 +44,8 @@ export class AuthController {
 
   @Post('/auth/login')
   @HttpCode(HttpStatus.OK)
-  login(@Body() userLoginDto: UserLoginDto) {
-    return this.authService.login(userLoginDto);
+  login(@Req() req: RequestIpDto, @Body() userLoginDto: UserLoginDto) {
+    return this.authService.login(userLoginDto, req.ip);
   }
 
   @UseGuards(AuthGuard(), PermissionGuard)

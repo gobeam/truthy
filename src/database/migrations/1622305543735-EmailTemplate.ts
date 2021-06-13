@@ -21,13 +21,20 @@ export class EmailTemplate1622305543735 implements MigrationInterface {
             type: 'varchar',
             isNullable: false,
             isUnique: true,
-            length: '100'
+            length: '200'
+          },
+          {
+            name: 'slug',
+            type: 'varchar',
+            isNullable: false,
+            isUnique: true,
+            length: '200'
           },
           {
             name: 'sender',
             type: 'varchar',
             isNullable: false,
-            length: '100'
+            length: '200'
           },
           {
             name: 'subject',
