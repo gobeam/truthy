@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   HttpException,
   HttpStatus,
   Inject,
@@ -393,13 +394,20 @@ export class AuthService {
     return token;
   }
 
+  /**
+   * Get cookie for logout action
+   */
   getCookieForLogOut(): string[] {
     return [
       'Authentication=; HttpOnly; Path=/; Max-Age=0',
-      'Refresh=; HttpOnly; Path=/; Max-Age=0'
     ];
   }
 
+  /**
+   * build response payload
+   * @param accessToken
+   * @param refreshToken
+   */
   buildResponsePayload(accessToken: string, refreshToken?: string): string[] {
     const jwtConfig = config.get('jwt');
     const tokenCookies: Array<string> = [
@@ -413,12 +421,29 @@ export class AuthService {
     return tokenCookies;
   }
 
+  /**
+   * Create access token from refresh token
+   * @param refreshToken
+   */
   async createAccessTokenFromRefreshToken(refreshToken: string) {
     const { token } =
       await this.refreshTokenService.createAccessTokenFromRefreshToken(
         refreshToken
       );
-
     return this.buildResponsePayload(token);
+  }
+
+  /**
+   * revoke refresh token for logout action
+   * @param encoded
+   */
+  async revokeRefreshToken(encoded: string): Promise<void> {
+    const { token } = await this.refreshTokenService.resolveRefreshToken(
+      encoded
+    );
+    if (token) {
+      token.isRevoked = true;
+      await token.save();
+    }
   }
 }

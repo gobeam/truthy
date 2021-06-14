@@ -150,7 +150,8 @@ export class AuthController {
   @UseGuards(AuthGuard(), PermissionGuard)
   @ApiBearerAuth()
   @Post('/logout')
-  async logOut(@Res() response: Response) {
+  async logOut(@Req() req: Request, @Res() response: Response) {
+    await this.authService.revokeRefreshToken(req.cookies['Refresh']);
     response.setHeader('Set-Cookie', this.authService.getCookieForLogOut());
     return response.sendStatus(204);
   }

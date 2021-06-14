@@ -1,8 +1,8 @@
 import {
+  BadRequestException,
   forwardRef,
   Inject,
-  Injectable,
-  UnprocessableEntityException
+  Injectable
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { SignOptions, TokenExpiredError } from 'jsonwebtoken';
@@ -76,17 +76,17 @@ export class RefreshTokenService {
     const token = await this.getStoredTokenFromRefreshTokenPayload(payload);
 
     if (!token) {
-      throw new UnprocessableEntityException('Refresh token not found');
+      throw new BadRequestException('Refresh token not found');
     }
 
     if (token.isRevoked) {
-      throw new UnprocessableEntityException('Refresh token revoked');
+      throw new BadRequestException('Refresh token revoked');
     }
 
     const user = await this.getUserFromRefreshTokenPayload(payload);
 
     if (!user) {
-      throw new UnprocessableEntityException('Refresh token malformed');
+      throw new BadRequestException('Refresh token malformed');
     }
 
     return { user, token };
@@ -115,9 +115,9 @@ export class RefreshTokenService {
       return await this.jwt.verifyAsync(token);
     } catch (e) {
       if (e instanceof TokenExpiredError) {
-        throw new UnprocessableEntityException('Refresh token expired');
+        throw new BadRequestException('Refresh token expired');
       } else {
-        throw new UnprocessableEntityException('Refresh token malformed');
+        throw new BadRequestException('Refresh token malformed');
       }
     }
   }
@@ -132,7 +132,7 @@ export class RefreshTokenService {
     const subId = payload.sub;
 
     if (!subId) {
-      throw new UnprocessableEntityException('Refresh token malformed');
+      throw new BadRequestException('Refresh token malformed');
     }
 
     return this.authService.findById(subId);
@@ -148,7 +148,7 @@ export class RefreshTokenService {
     const tokenId = payload.jti;
 
     if (!tokenId) {
-      throw new UnprocessableEntityException('Refresh token malformed');
+      throw new BadRequestException('Refresh token malformed');
     }
 
     return this.repository.findTokenById(tokenId);

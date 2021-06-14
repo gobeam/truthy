@@ -2,7 +2,6 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { AuthService } from './auth.service';
 import { UserRepository } from './user.repository';
 import { CreateUserDto } from './dto/create-user.dto';
-import { JwtService } from '@nestjs/jwt';
 import { UserLoginDto } from './dto/user-login.dto';
 import { UserEntity } from './entity/user.entity';
 import { UpdateUserProfileDto } from './dto/update-user-profile.dto';
@@ -19,7 +18,7 @@ import { ChangePasswordDto } from './dto/change-password.dto';
 import * as bcrypt from 'bcrypt';
 import { MailService } from '../mail/mail.service';
 import { RefreshTokenService } from '../refresh-token/refresh-token.service';
-import { Repository } from 'typeorm';
+import { RefreshToken } from '../refresh-token/entities/refresh-token.entity';
 
 const mockUserRepository = () => ({
   findOne: jest.fn(),
@@ -45,7 +44,8 @@ const mockUser = {
 
 const refreshTokenServiceMock = () => ({
   generateRefreshToken: jest.fn(),
-  generateAccessToken: jest.fn()
+  generateAccessToken: jest.fn(),
+  resolveRefreshToken: jest.fn()
 });
 
 const throttleMock = () => ({
@@ -308,6 +308,23 @@ describe('AuthService', () => {
         UnprocessableEntityException
       );
       expect(userRepository.countEntityByCondition).toHaveBeenCalledTimes(2);
+    });
+
+    it('logout user', async () => {
+      const mockToken = {
+        id: 1,
+        userId: 1,
+        save: jest.fn()
+      };
+      refreshTokenService.resolveRefreshToken.mockResolvedValue({
+        user: mockUser,
+        token: mockToken
+      });
+      await service.revokeRefreshToken('refresh_token');
+      expect(refreshTokenService.resolveRefreshToken).toHaveBeenCalledTimes(1);
+      expect(refreshTokenService.resolveRefreshToken).toHaveBeenCalledWith(
+        'refresh_token'
+      );
     });
   });
 });
