@@ -11,8 +11,6 @@ import { UserRepository } from './user.repository';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from './entity/user.entity';
 import { UserLoginDto } from './dto/user-login.dto';
-import { JwtService } from '@nestjs/jwt';
-import { JwtPayloadDto } from './dto/jwt-payload.dto';
 import {
   adminUserGroupsForSerializing,
   defaultUserGroupsForSerializing,
@@ -33,15 +31,17 @@ import {
   RateLimiterRes,
   RateLimiterStoreAbstract
 } from 'rate-limiter-flexible';
+import { RefreshTokenService } from '../refresh-token/refresh-token.service';
 const throttleConfig = config.get('throttle.login');
+const tokenConfig = config.get('jwt');
 
 @Injectable()
 export class AuthService {
   constructor(
     @InjectRepository(UserRepository)
     private readonly userRepository: UserRepository,
-    private readonly jwtService: JwtService,
     private readonly mailService: MailService,
+    private readonly refreshTokenService: RefreshTokenService,
     @Inject('LOGIN_THROTTLE')
     private readonly rateLimiter: RateLimiterStoreAbstract
   ) {}
@@ -114,10 +114,7 @@ export class AuthService {
    * @param userLoginDto
    * @param ip
    */
-  async login(
-    userLoginDto: UserLoginDto,
-    ip: string
-  ): Promise<{ accessToken: string }> {
+  async login(userLoginDto: UserLoginDto, ip: string): Promise<string[]> {
     const usernameIPkey = `${userLoginDto.username}_${ip}`;
     const resUsernameAndIP = await this.rateLimiter.get(usernameIPkey);
     let retrySecs = 0;
@@ -151,13 +148,18 @@ export class AuthService {
 
       throw new UnauthorizedException(error);
     }
-    const payload: JwtPayloadDto = {
-      username: user.username,
-      name: user.name
-    };
-    const accessToken = await this.jwtService.sign(payload);
+    const accessTokenPromise =
+      this.refreshTokenService.generateAccessToken(user);
+    const refreshTokenPromise = this.refreshTokenService.generateRefreshToken(
+      user,
+      tokenConfig.refreshExpiresIn
+    );
+    const [accessToken, refreshToken] = await Promise.all([
+      accessTokenPromise,
+      refreshTokenPromise
+    ]);
     await this.rateLimiter.delete(usernameIPkey);
-    return { accessToken };
+    return this.buildResponsePayload(accessToken, refreshToken);
   }
 
   /**
@@ -389,5 +391,34 @@ export class AuthService {
       await this.generateUniqueToken(length);
     }
     return token;
+  }
+
+  getCookieForLogOut(): string[] {
+    return [
+      'Authentication=; HttpOnly; Path=/; Max-Age=0',
+      'Refresh=; HttpOnly; Path=/; Max-Age=0'
+    ];
+  }
+
+  buildResponsePayload(accessToken: string, refreshToken?: string): string[] {
+    const jwtConfig = config.get('jwt');
+    const tokenCookies: Array<string> = [
+      `Authentication=${accessToken}; HttpOnly; Path=/; Max-Age=${jwtConfig.expiresIn}`
+    ];
+    if (refreshToken) {
+      tokenCookies.push(
+        `Refresh=${refreshToken}; HttpOnly; Path=/; Max-Age=${jwtConfig.refreshExpiresIn}`
+      );
+    }
+    return tokenCookies;
+  }
+
+  async createAccessTokenFromRefreshToken(refreshToken: string) {
+    const { token } =
+      await this.refreshTokenService.createAccessTokenFromRefreshToken(
+        refreshToken
+      );
+
+    return this.buildResponsePayload(token);
   }
 }

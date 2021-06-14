@@ -3,7 +3,6 @@ import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserRepository } from './user.repository';
-import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { JwtStrategy } from './jwt.strategy';
 import * as config from 'config';
@@ -11,8 +10,8 @@ import { UniqueValidatorPipe } from '../common/pipes/unique-validator.pipe';
 import { MailModule } from '../mail/mail.module';
 import * as Redis from 'ioredis';
 import { RateLimiterRedis } from 'rate-limiter-flexible';
+import { RefreshTokenModule } from '../refresh-token/refresh-token.module';
 
-const jwtConfig = config.get('jwt');
 const throttleConfig = config.get('throttle.login');
 const redisConfig = config.get('queue');
 
@@ -38,14 +37,9 @@ const LoginThrottleFactory = {
 @Module({
   imports: [
     PassportModule.register({ defaultStrategy: 'jwt' }),
-    JwtModule.register({
-      secret: process.env.JWT_SECRET || jwtConfig.secret,
-      signOptions: {
-        expiresIn: jwtConfig.expiresIn
-      }
-    }),
     TypeOrmModule.forFeature([UserRepository]),
-    MailModule
+    MailModule,
+    RefreshTokenModule
   ],
   controllers: [AuthController],
   providers: [
@@ -54,6 +48,6 @@ const LoginThrottleFactory = {
     UniqueValidatorPipe,
     LoginThrottleFactory
   ],
-  exports: [JwtStrategy, PassportModule]
+  exports: [AuthService, JwtStrategy, PassportModule]
 })
 export class AuthModule {}

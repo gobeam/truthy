@@ -18,6 +18,8 @@ import { UserStatusEnum } from './user-status.enum';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import * as bcrypt from 'bcrypt';
 import { MailService } from '../mail/mail.service';
+import { RefreshTokenService } from '../refresh-token/refresh-token.service';
+import { Repository } from 'typeorm';
 
 const mockUserRepository = () => ({
   findOne: jest.fn(),
@@ -41,8 +43,9 @@ const mockUser = {
   save: jest.fn()
 };
 
-const jwtServiceMock = () => ({
-  sign: jest.fn()
+const refreshTokenServiceMock = () => ({
+  generateRefreshToken: jest.fn(),
+  generateAccessToken: jest.fn()
 });
 
 const throttleMock = () => ({
@@ -57,17 +60,16 @@ const mailServiceMock = () => ({
 describe('AuthService', () => {
   let service: AuthService,
     userRepository,
-    jwtService,
+    refreshTokenService,
     mailService,
     throttleService;
 
   beforeEach(async () => {
-    jest.clearAllMocks();
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         AuthService,
         { provide: UserRepository, useFactory: mockUserRepository },
-        { provide: JwtService, useFactory: jwtServiceMock },
+        { provide: RefreshTokenService, useFactory: refreshTokenServiceMock },
         { provide: MailService, useFactory: mailServiceMock },
         { provide: 'LOGIN_THROTTLE', useFactory: throttleMock }
       ]
@@ -75,9 +77,15 @@ describe('AuthService', () => {
 
     service = await module.get<AuthService>(AuthService);
     userRepository = await module.get<UserRepository>(UserRepository);
-    jwtService = await module.get<JwtService>(JwtService);
+    refreshTokenService = await module.get<RefreshTokenService>(
+      RefreshTokenService
+    );
     mailService = await module.get<MailService>(MailService);
     throttleService = await module.get<'LOGIN_THROTTLE'>('LOGIN_THROTTLE');
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
   });
 
   describe('change or forgot password', () => {
@@ -241,13 +249,18 @@ describe('AuthService', () => {
     it('login user successfully', async () => {
       throttleService.get.mockResolvedValue(null);
       userRepository.login.mockResolvedValue([user, null]);
-      jwtService.sign.mockResolvedValue('hash');
-      const result = await service.login(userLoginDto, ip);
+      refreshTokenService.generateAccessToken.mockResolvedValue(user);
+
+      jest.spyOn(service, 'buildResponsePayload').mockReturnValue(['result']);
+
+      await service.login(userLoginDto, ip);
       expect(userRepository.login).toHaveBeenCalledWith(userLoginDto);
-      expect(result).toEqual({ accessToken: 'hash' });
       expect(throttleService.delete).toHaveBeenCalledWith(
         `${user.username}_${ip}`
       );
+      expect(refreshTokenService.generateAccessToken).toHaveBeenCalledTimes(1);
+      expect(refreshTokenService.generateRefreshToken).toHaveBeenCalledTimes(1);
+      expect(service.buildResponsePayload).toHaveBeenCalledTimes(1);
     });
 
     it('get profile', async () => {

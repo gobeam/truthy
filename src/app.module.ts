@@ -9,6 +9,7 @@ import { MailModule } from './mail/mail.module';
 import { EmailTemplateModule } from './email-template/email-template.module';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
+import { RefreshTokenModule } from './refresh-token/refresh-token.module';
 
 @Module({
   imports: [
@@ -20,7 +21,8 @@ import { APP_GUARD } from '@nestjs/core';
     RolesModule,
     PermissionsModule,
     MailModule,
-    EmailTemplateModule
+    EmailTemplateModule,
+    RefreshTokenModule
   ],
   providers: [
     {

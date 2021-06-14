@@ -3,7 +3,6 @@ import { UserRepository } from './user.repository';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UserLoginDto } from './dto/user-login.dto';
 import { UserEntity } from './entity/user.entity';
-import { UnauthorizedException } from '@nestjs/common';
 import { UserStatusEnum } from './user-status.enum';
 
 const mockUser = {

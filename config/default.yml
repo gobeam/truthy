@@ -10,6 +10,7 @@ db:
 
 jwt:
   expiresIn: 3600
+  refreshExpiresIn: 604800
 
 app:
   name: 'Truthy'
@@ -45,5 +46,5 @@ throttle:
   login:
     prefix: 'login_fail_throttle'
     limit: 5
-    duration: 60 * 60 * 24 * 90
+    duration: 2592000
     blockDuration: 3000

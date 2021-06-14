@@ -76,7 +76,9 @@ export class PermissionTable1614275788549 implements MigrationInterface {
       const keyIndex = table.indices.find(
         (fk) => fk.name.indexOf(index) !== -1
       );
-      await queryRunner.dropIndex(this.tableName, keyIndex);
+      if (keyIndex) {
+        await queryRunner.dropIndex(this.tableName, keyIndex);
+      }
     }
     await queryRunner.dropTable(this.tableName);
   }

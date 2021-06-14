@@ -50,7 +50,6 @@ export class UserRepository extends BaseRepository<UserEntity, UserSerializer> {
       return [user, null];
     }
     return [null, 'Unauthorized'];
-    // throw new UnauthorizedException();
   }
 
   /**

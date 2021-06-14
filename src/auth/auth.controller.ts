@@ -7,7 +7,9 @@ import {
   Param,
   Post,
   Put,
-  Query, Req,
+  Query,
+  Req,
+  Res,
   UseGuards,
   ValidationPipe
 } from '@nestjs/common';
@@ -25,6 +27,7 @@ import { ForgetPasswordDto } from './dto/forget-password.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { PermissionGuard } from '../common/guard/permission.guard';
 import { Pagination } from '../paginate';
+import { Response, Request } from 'express';
 import { UserSearchFilterDto } from './dto/user-search-filter.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { RegisterUserDto } from './dto/register-user.dto';
@@ -44,8 +47,14 @@ export class AuthController {
 
   @Post('/auth/login')
   @HttpCode(HttpStatus.OK)
-  login(@Req() req: RequestIpDto, @Body() userLoginDto: UserLoginDto) {
-    return this.authService.login(userLoginDto, req.ip);
+  async login(
+    @Req() req: RequestIpDto,
+    @Res() response: Response,
+    @Body() userLoginDto: UserLoginDto
+  ) {
+    const cookiePayload = await this.authService.login(userLoginDto, req.ip);
+    response.setHeader('Set-Cookie', cookiePayload);
+    response.json({});
   }
 
   @UseGuards(AuthGuard(), PermissionGuard)
@@ -94,14 +103,16 @@ export class AuthController {
   }
 
   @UseGuards(AuthGuard(), PermissionGuard)
-  @Get('/users')
   @ApiBearerAuth()
+  @Get('/users')
   findAll(
     @Query() userSearchFilterDto: UserSearchFilterDto
   ): Promise<Pagination<UserSerializer>> {
     return this.authService.findAll(userSearchFilterDto);
   }
 
+  @UseGuards(AuthGuard(), PermissionGuard)
+  @ApiBearerAuth()
   @Post('/users')
   create(
     @Body(ValidationPipe) createUserDto: CreateUserDto
@@ -109,6 +120,7 @@ export class AuthController {
     return this.authService.create(createUserDto);
   }
 
+  @UseGuards(AuthGuard(), PermissionGuard)
   @ApiBearerAuth()
   @Put('/users/:id')
   update(
@@ -118,9 +130,28 @@ export class AuthController {
     return this.authService.update(+id, updateUserDto);
   }
 
+  @UseGuards(AuthGuard(), PermissionGuard)
   @ApiBearerAuth()
   @Get('/users/:id')
   findOne(@Param('id') id: string): Promise<UserSerializer> {
     return this.authService.findById(+id);
+  }
+
+  @Post('/refresh')
+  async refresh(@Req() req: Request, @Res() response: Response) {
+    const cookiePayload =
+      await this.authService.createAccessTokenFromRefreshToken(
+        req.cookies['Refresh']
+      );
+    response.setHeader('Set-Cookie', cookiePayload);
+    response.json({});
+  }
+
+  @UseGuards(AuthGuard(), PermissionGuard)
+  @ApiBearerAuth()
+  @Post('/logout')
+  async logOut(@Res() response: Response) {
+    response.setHeader('Set-Cookie', this.authService.getCookieForLogOut());
+    return response.sendStatus(204);
   }
 }

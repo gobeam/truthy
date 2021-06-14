@@ -19,7 +19,8 @@ import { LoadPermissionMisc } from './misc/load-permission.misc';
 @Injectable()
 export class PermissionsService
   extends LoadPermissionMisc
-  implements CommonServiceInterface<Permission> {
+  implements CommonServiceInterface<Permission>
+{
   constructor(
     @InjectRepository(PermissionRepository)
     private repository: PermissionRepository

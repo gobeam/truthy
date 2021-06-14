@@ -55,5 +55,4 @@ const queueConfig = config.get('queue');
   providers: [MailService, MailProcessor],
   exports: [MailService]
 })
-export class MailModule {
-}
+export class MailModule {}

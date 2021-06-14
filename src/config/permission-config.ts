@@ -98,6 +98,10 @@ export const PermissionConfiguration: PermissionConfigInterface = {
     {
       path: '/auth/profile',
       method: MethodList.PUT
+    },
+    {
+      path: '/logout',
+      method: MethodList.POST
     }
   ],
   modules: [

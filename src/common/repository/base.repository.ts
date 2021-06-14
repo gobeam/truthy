@@ -160,9 +160,8 @@ export class BaseRepository<
         });
       }
     }
-    const paginationInfo: PaginationInfoInterface = this.getPaginationInfo(
-      searchFilter
-    );
+    const paginationInfo: PaginationInfoInterface =
+      this.getPaginationInfo(searchFilter);
     findOptions.relations = relations;
     findOptions.take = paginationInfo.limit;
     findOptions.skip = paginationInfo.skip;

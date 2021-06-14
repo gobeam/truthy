@@ -7,13 +7,21 @@ import { UserRepository } from './user.repository';
 import { UserEntity } from './entity/user.entity';
 import * as config from 'config';
 
+const cookieExtractor = (req) => {
+  let token = null;
+  if (req && req.cookies) {
+    token = req.cookies['Authentication'];
+  }
+  return token;
+};
+
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(
     @InjectRepository(UserRepository) private userRepository: UserRepository
   ) {
     super({
-      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+      jwtFromRequest: ExtractJwt.fromExtractors([cookieExtractor]),
       secretOrKey: process.env.JWT_SECRET || config.get('jwt.secret')
     });
   }
@@ -23,11 +31,10 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
    * @param payload
    */
   async validate(payload: JwtPayloadDto): Promise<UserEntity> {
-    const { username } = payload;
-    const user = await this.userRepository.findOne(
-      { username },
-      { relations: ['role', 'role.permission'] }
-    );
+    const { subject } = payload;
+    const user = await this.userRepository.findOne(subject, {
+      relations: ['role', 'role.permission']
+    });
     if (!user) {
       throw new UnauthorizedException();
     }

@@ -84,7 +84,7 @@ describe('test base repository', () => {
         .spyOn(Repository.prototype, 'findAndCount')
         .mockResolvedValue([[], 10]);
       baseRepository.transformMany = jest.fn().mockResolvedValue([]);
-      await baseRepository.paginate(entity, [],{ page: 1, limit: 10 });
+      await baseRepository.paginate(entity, [], { page: 1, limit: 10 });
       expect(findAndCountSpy).toHaveBeenCalledTimes(1);
       expect(baseRepository.transformMany).toHaveBeenCalledTimes(1);
     });

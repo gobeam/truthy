@@ -1,4 +1,8 @@
-import { ForbiddenException, Injectable, UnprocessableEntityException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  UnprocessableEntityException
+} from '@nestjs/common';
 import { CreateEmailTemplateDto } from './dto/create-email-template.dto';
 import { UpdateEmailTemplateDto } from './dto/update-email-template.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -11,7 +15,8 @@ import { Not, ObjectLiteral } from 'typeorm';
 
 @Injectable()
 export class EmailTemplateService
-  implements CommonServiceInterface<EmailTemplate> {
+  implements CommonServiceInterface<EmailTemplate>
+{
   constructor(
     @InjectRepository(EmailTemplateRepository)
     private readonly repository: EmailTemplateRepository
