@@ -2,7 +2,8 @@ import {
   BadRequestException,
   forwardRef,
   Inject,
-  Injectable
+  Injectable,
+  NotFoundException
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { SignOptions, TokenExpiredError } from 'jsonwebtoken';
@@ -15,7 +16,7 @@ import { UserSerializer } from '../auth/serializer/user.serializer';
 import { InjectRepository } from '@nestjs/typeorm';
 
 const appConfig = config.get('app');
-
+const tokenConfig = config.get('jwt');
 const BASE_OPTIONS: SignOptions = {
   issuer: appConfig.appUrl,
   audience: appConfig.frontendUrl
@@ -47,17 +48,16 @@ export class RefreshTokenService {
   /**
    * Generate refresh token
    * @param user
-   * @param expiresIn
+   * @param refreshToken
    */
   public async generateRefreshToken(
     user: UserSerializer,
-    expiresIn: number
+    refreshToken: Partial<RefreshToken>
   ): Promise<string> {
-    const token = await this.repository.createRefreshToken(user, expiresIn);
-
+    const token = await this.repository.createRefreshToken(user, refreshToken);
     const opts: SignOptions = {
       ...BASE_OPTIONS,
-      expiresIn,
+      expiresIn: tokenConfig.refreshExpiresIn,
       subject: String(user.id),
       jwtid: String(token.id)
     };
@@ -152,5 +152,32 @@ export class RefreshTokenService {
     }
 
     return this.repository.findTokenById(tokenId);
+  }
+
+  /**
+   * Get active refresh token list of user
+   * @param userId
+   */
+  getRefreshTokenByUserId(userId: number): Promise<Array<RefreshToken>> {
+    return this.repository.find({
+      where: {
+        userId,
+        isRevoked: false
+      }
+    });
+  }
+
+  /**
+   * Revoke refresh token by id
+   * @param id
+   */
+  async revokeRefreshTokenById(id: number): Promise<RefreshToken> {
+    const token = await this.repository.findTokenById(id);
+    if (!token) {
+      throw new NotFoundException();
+    }
+    token.isRevoked = true;
+    await token.save();
+    return token;
   }
 }

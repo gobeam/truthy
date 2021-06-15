@@ -20,7 +20,7 @@ import { GetUser } from '../common/decorators/get-user.decorator';
 import { UserEntity } from './entity/user.entity';
 import { UserSerializer } from './serializer/user.serializer';
 import { UpdateUserProfileDto } from './dto/update-user-profile.dto';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ApiTags } from '@nestjs/swagger';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { ForgetPasswordDto } from './dto/forget-password.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
@@ -30,8 +30,8 @@ import { Response, Request } from 'express';
 import { UserSearchFilterDto } from './dto/user-search-filter.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { RegisterUserDto } from './dto/register-user.dto';
-import { RequestIpDto } from './dto/request-ip.dto';
 import { JwtAuthGuard } from 'src/common/guard/jwt-auth.guard';
+import { RefreshToken } from '../refresh-token/entities/refresh-token.entity';
 
 @ApiTags('user')
 @Controller()
@@ -46,27 +46,31 @@ export class AuthController {
   }
 
   @Post('/auth/login')
-  @HttpCode(HttpStatus.OK)
   async login(
-    @Req() req: RequestIpDto,
+    @Req() req: Request,
     @Res() response: Response,
     @Body() userLoginDto: UserLoginDto
   ) {
-    const cookiePayload = await this.authService.login(userLoginDto, req.ip);
+    const refreshTokenPayload: Partial<RefreshToken> = {
+      ip: req.ip,
+      userAgent: req.get('user-agent')
+    };
+    const cookiePayload = await this.authService.login(
+      userLoginDto,
+      refreshTokenPayload
+    );
     response.setHeader('Set-Cookie', cookiePayload);
-    return response.sendStatus(204);
+    return response.sendStatus(HttpStatus.NO_CONTENT);
   }
 
   @UseGuards(JwtAuthGuard, PermissionGuard)
   @Get('/auth/profile')
-  @ApiBearerAuth()
   profile(@GetUser() user: UserEntity): Promise<UserSerializer> {
     return this.authService.get(user);
   }
 
   @UseGuards(JwtAuthGuard, PermissionGuard)
   @Put('/auth/profile')
-  @ApiBearerAuth()
   updateProfile(
     @GetUser() user: UserEntity,
     @Body() updateUserDto: UpdateUserProfileDto
@@ -93,7 +97,6 @@ export class AuthController {
   }
 
   @UseGuards(JwtAuthGuard, PermissionGuard)
-  @ApiBearerAuth()
   @Put('/auth/change-password')
   changePassword(
     @GetUser() user: UserEntity,
@@ -103,7 +106,6 @@ export class AuthController {
   }
 
   @UseGuards(JwtAuthGuard, PermissionGuard)
-  @ApiBearerAuth()
   @Get('/users')
   findAll(
     @Query() userSearchFilterDto: UserSearchFilterDto
@@ -112,7 +114,6 @@ export class AuthController {
   }
 
   @UseGuards(JwtAuthGuard, PermissionGuard)
-  @ApiBearerAuth()
   @Post('/users')
   create(
     @Body(ValidationPipe) createUserDto: CreateUserDto
@@ -121,7 +122,6 @@ export class AuthController {
   }
 
   @UseGuards(JwtAuthGuard, PermissionGuard)
-  @ApiBearerAuth()
   @Put('/users/:id')
   update(
     @Param('id') id: string,
@@ -131,7 +131,6 @@ export class AuthController {
   }
 
   @UseGuards(JwtAuthGuard, PermissionGuard)
-  @ApiBearerAuth()
   @Get('/users/:id')
   findOne(@Param('id') id: string): Promise<UserSerializer> {
     return this.authService.findById(+id);
@@ -145,19 +144,29 @@ export class AuthController {
           req.cookies['Refresh']
         );
       response.setHeader('Set-Cookie', cookiePayload);
-      return response.sendStatus(204);
+      return response.sendStatus(HttpStatus.NO_CONTENT);
     } catch (e) {
       response.setHeader('Set-Cookie', this.authService.getCookieForLogOut());
-      return response.status(400).json();
+      return response.sendStatus(HttpStatus.BAD_REQUEST);
     }
   }
 
   @UseGuards(JwtAuthGuard, PermissionGuard)
-  @ApiBearerAuth()
   @Post('/logout')
   async logOut(@Req() req: Request, @Res() response: Response) {
     await this.authService.revokeRefreshToken(req.cookies['Refresh']);
     response.setHeader('Set-Cookie', this.authService.getCookieForLogOut());
-    return response.sendStatus(204);
+    return response.sendStatus(HttpStatus.NO_CONTENT);
+  }
+
+  @UseGuards(JwtAuthGuard, PermissionGuard)
+  @Get('/auth/token-info')
+  getRefreshToken(@GetUser() user: UserEntity): Promise<Array<RefreshToken>> {
+    return this.authService.activeRevokeTokenList(+user.id);
+  }
+
+  @UseGuards(JwtAuthGuard, PermissionGuard)
+  revokeToken() {
+    return this.authService.revokeTokenById(+user.id);
   }
 }

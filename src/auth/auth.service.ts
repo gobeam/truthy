@@ -32,6 +32,7 @@ import {
   RateLimiterStoreAbstract
 } from 'rate-limiter-flexible';
 import { RefreshTokenService } from '../refresh-token/refresh-token.service';
+import { RefreshToken } from '../refresh-token/entities/refresh-token.entity';
 
 const throttleConfig = config.get('throttle.login');
 const tokenConfig = config.get('jwt');
@@ -111,12 +112,16 @@ export class AuthService {
   }
 
   /**
-   *
+   * Login user by username and password
    * @param userLoginDto
    * @param ip
+   * @param userAgent
    */
-  async login(userLoginDto: UserLoginDto, ip: string): Promise<string[]> {
-    const usernameIPkey = `${userLoginDto.username}_${ip}`;
+  async login(
+    userLoginDto: UserLoginDto,
+    refreshTokenPayload: Partial<RefreshToken>
+  ): Promise<string[]> {
+    const usernameIPkey = `${userLoginDto.username}_${refreshTokenPayload.ip}`;
     const resUsernameAndIP = await this.rateLimiter.get(usernameIPkey);
     let retrySecs = 0;
     // Check if user is already blocked
@@ -153,7 +158,7 @@ export class AuthService {
       this.refreshTokenService.generateAccessToken(user);
     const refreshTokenPromise = this.refreshTokenService.generateRefreshToken(
       user,
-      tokenConfig.refreshExpiresIn
+      refreshTokenPayload
     );
     const [accessToken, refreshToken] = await Promise.all([
       accessTokenPromise,
@@ -439,12 +444,24 @@ export class AuthService {
    * @param encoded
    */
   async revokeRefreshToken(encoded: string): Promise<void> {
-    const { token } = await this.refreshTokenService.resolveRefreshToken(
-      encoded
-    );
-    if (token) {
-      token.isRevoked = true;
-      await token.save();
-    }
+    // ignore exception because anyway we are going invalidate cookies
+    try {
+      const { token } = await this.refreshTokenService.resolveRefreshToken(
+        encoded
+      );
+      if (token) {
+        token.isRevoked = true;
+        await token.save();
+      }
+    } catch (e) {}
   }
+
+  activeRevokeTokenList(userId: number): Promise<Array<RefreshToken>> {
+    return this.refreshTokenService.getRefreshTokenByUserId(userId);
+  }
+
+  revokeTokenById(id: number): Promise<RefreshToken> {
+    return this.refreshTokenService.revokeRefreshTokenById(id);
+  }
+
 }

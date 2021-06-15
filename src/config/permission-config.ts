@@ -100,6 +100,10 @@ export const PermissionConfiguration: PermissionConfigInterface = {
       method: MethodList.PUT
     },
     {
+      path: '/auth/token-info',
+      method: MethodList.GET
+    },
+    {
       path: '/logout',
       method: MethodList.POST
     }

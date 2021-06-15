@@ -18,11 +18,11 @@ import { RoleFilterDto } from './dto/role-filter.dto';
 import { RoleSerializer } from './serializer/role.serializer';
 import { Pagination } from '../paginate';
 import { ApiBearerAuth, ApiQuery, ApiTags } from '@nestjs/swagger';
-import { AuthGuard } from '@nestjs/passport';
 import { PermissionGuard } from '../common/guard/permission.guard';
+import { JwtAuthGuard } from '../common/guard/jwt-auth.guard';
 
 @ApiTags('roles')
-@UseGuards(AuthGuard(), PermissionGuard)
+@UseGuards(JwtAuthGuard, PermissionGuard)
 @Controller('roles')
 @ApiBearerAuth()
 export class RolesController {

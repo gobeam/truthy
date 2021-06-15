@@ -9,6 +9,12 @@ export class RefreshToken extends BaseEntity {
   userId: number;
 
   @Column()
+  ip: string;
+
+  @Column()
+  userAgent: string;
+
+  @Column()
   isRevoked: boolean;
 
   @Column()

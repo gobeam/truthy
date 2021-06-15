@@ -1,23 +1,27 @@
 import { RefreshToken } from './entities/refresh-token.entity';
 import { UserSerializer } from '../auth/serializer/user.serializer';
 import { EntityRepository, Repository } from 'typeorm';
+import * as config from 'config';
 
+const tokenConfig = config.get('jwt');
 @EntityRepository(RefreshToken)
 export class RefreshTokenRepository extends Repository<RefreshToken> {
   /**
-   * create refresh token
+   * Create refresh token
    * @param user
-   * @param ttl
+   * @param tokenPayload
    */
   public async createRefreshToken(
     user: UserSerializer,
-    ttl: number
+    tokenPayload: Partial<RefreshToken>
   ): Promise<RefreshToken> {
     const token = this.create();
     token.userId = user.id;
     token.isRevoked = false;
+    token.ip = tokenPayload.ip;
+    token.userAgent = tokenPayload.userAgent;
     const expiration = new Date();
-    expiration.setTime(expiration.getTime() + ttl);
+    expiration.setTime(expiration.getTime() + tokenConfig.refreshExpiresIn);
     token.expires = expiration;
     return token.save();
   }

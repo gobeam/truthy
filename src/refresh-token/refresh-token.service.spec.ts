@@ -5,8 +5,9 @@ import { AuthService } from '../auth/auth.service';
 import { RefreshTokenRepository } from './refresh-token.repository';
 import { UserSerializer } from '../auth/serializer/user.serializer';
 import { RefreshToken } from './entities/refresh-token.entity';
-import { BadRequestException } from '@nestjs/common';
+import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { TokenExpiredError } from 'jsonwebtoken';
+import exp from 'constants';
 
 const jwtServiceMock = () => ({
   signAsync: jest.fn(),
@@ -19,7 +20,8 @@ const authServiceMock = () => ({
 
 const repositoryMock = () => ({
   createRefreshToken: jest.fn(),
-  findTokenById: jest.fn()
+  findTokenById: jest.fn(),
+  find: jest.fn()
 });
 
 describe('RefreshTokenService', () => {
@@ -53,6 +55,7 @@ describe('RefreshTokenService', () => {
     refreshToken.id = 1;
     refreshToken.userId = 1;
     refreshToken.isRevoked = false;
+    refreshToken.save = jest.fn();
   });
 
   afterEach(() => {
@@ -66,7 +69,11 @@ describe('RefreshTokenService', () => {
 
   it('generate refresh token', async () => {
     repository.createRefreshToken.mockResolvedValue(refreshToken);
-    await service.generateRefreshToken(user, 60 * 60);
+    const tokenPayload = {
+      ip: '::1',
+      userAgent: 'mozilla'
+    };
+    await service.generateRefreshToken(user, tokenPayload);
     expect(repository.createRefreshToken).toHaveBeenCalledTimes(1);
     expect(jwtService.signAsync).toHaveBeenCalledTimes(1);
   });
@@ -185,6 +192,37 @@ describe('RefreshTokenService', () => {
         service.getStoredTokenFromRefreshTokenPayload({ jti: 1, sub: 1 })
       ).resolves.not.toThrow();
       expect(repository.findTokenById).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  it('getRefreshTokenByUserId', async () => {
+    const userId = 1;
+    await service.getRefreshTokenByUserId(userId);
+    expect(repository.find).toHaveBeenCalledTimes(1);
+    expect(repository.find).toHaveBeenCalledWith({
+      where: {
+        userId,
+        isRevoked: false
+      }
+    });
+  });
+
+  describe('revokeRefreshTokenById', () => {
+    it('revoke refresh token error for invalid id', async () => {
+      repository.findTokenById.mockResolvedValue(null);
+      await expect(service.revokeRefreshTokenById(1)).rejects.toThrowError(
+        NotFoundException
+      );
+      expect(repository.findTokenById).toHaveBeenCalledTimes(1);
+    });
+
+    it('revoke refresh token for valid id', async () => {
+      jest.spyOn(repository, 'findTokenById').mockResolvedValue({
+        save: jest.fn()
+      });
+      const result = await service.revokeRefreshTokenById(1);
+      expect(repository.findTokenById).toHaveBeenCalledTimes(1);
+      expect(result.save).toHaveBeenCalledTimes(1);
     });
   });
 });

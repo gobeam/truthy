@@ -15,14 +15,14 @@ import { EmailTemplateService } from './email-template.service';
 import { CreateEmailTemplateDto } from './dto/create-email-template.dto';
 import { UpdateEmailTemplateDto } from './dto/update-email-template.dto';
 import { ApiTags } from '@nestjs/swagger';
-import { AuthGuard } from '@nestjs/passport';
 import { PermissionGuard } from '../common/guard/permission.guard';
 import { Pagination } from '../paginate';
 import { EmailTemplate } from './serializer/email-template.serializer';
 import { EmailTemplatesSearchFilterDto } from './dto/email-templates-search-filter.dto';
+import { JwtAuthGuard } from '../common/guard/jwt-auth.guard';
 
 @ApiTags('email-templates')
-@UseGuards(AuthGuard(), PermissionGuard)
+@UseGuards(JwtAuthGuard, PermissionGuard)
 @Controller('email-templates')
 export class EmailTemplateController {
   constructor(private readonly emailTemplateService: EmailTemplateService) {}

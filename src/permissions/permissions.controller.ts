@@ -17,12 +17,12 @@ import { UpdatePermissionDto } from './dto/update-permission.dto';
 import { PermissionFilterDto } from './dto/permission-filter.dto';
 import { Permission } from './serializer/permission.serializer';
 import { ApiBearerAuth, ApiQuery, ApiTags } from '@nestjs/swagger';
-import { AuthGuard } from '@nestjs/passport';
 import { PermissionGuard } from '../common/guard/permission.guard';
 import { Pagination } from '../paginate';
+import { JwtAuthGuard } from '../common/guard/jwt-auth.guard';
 
 @ApiTags('permissions')
-@UseGuards(AuthGuard(), PermissionGuard)
+@UseGuards(JwtAuthGuard, PermissionGuard)
 @Controller('permissions')
 @ApiBearerAuth()
 export class PermissionsController {

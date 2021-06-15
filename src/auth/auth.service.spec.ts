@@ -18,7 +18,6 @@ import { ChangePasswordDto } from './dto/change-password.dto';
 import * as bcrypt from 'bcrypt';
 import { MailService } from '../mail/mail.service';
 import { RefreshTokenService } from '../refresh-token/refresh-token.service';
-import { RefreshToken } from '../refresh-token/entities/refresh-token.entity';
 
 const mockUserRepository = () => ({
   findOne: jest.fn(),
@@ -45,7 +44,9 @@ const mockUser = {
 const refreshTokenServiceMock = () => ({
   generateRefreshToken: jest.fn(),
   generateAccessToken: jest.fn(),
-  resolveRefreshToken: jest.fn()
+  resolveRefreshToken: jest.fn(),
+  getRefreshTokenByUserId: jest.fn(),
+  revokeRefreshTokenById: jest.fn()
 });
 
 const throttleMock = () => ({
@@ -221,7 +222,7 @@ describe('AuthService', () => {
   });
 
   describe('logged in user functionality', () => {
-    let userLoginDto: UserLoginDto, user, ip: string;
+    let userLoginDto: UserLoginDto, user, ip: string, refreshTokenPayload;
     beforeEach(() => {
       userLoginDto = {
         password: mockUser.password,
@@ -233,6 +234,10 @@ describe('AuthService', () => {
       user.username = mockUser.username;
       user.password = mockUser.password;
       ip = '::1';
+      refreshTokenPayload = {
+        ip: '::1',
+        userAgent: 'mozilla'
+      };
     });
 
     it('check if throttle error occurs if user tries to login multiple times', async () => {
@@ -241,9 +246,9 @@ describe('AuthService', () => {
         msBeforeNext: 3000
       });
       userRepository.login.mockResolvedValue(user);
-      await expect(service.login(userLoginDto, ip)).rejects.toThrowError(
-        HttpException
-      );
+      await expect(
+        service.login(userLoginDto, refreshTokenPayload)
+      ).rejects.toThrowError(HttpException);
     });
 
     it('login user successfully', async () => {
@@ -253,7 +258,7 @@ describe('AuthService', () => {
 
       jest.spyOn(service, 'buildResponsePayload').mockReturnValue(['result']);
 
-      await service.login(userLoginDto, ip);
+      await service.login(userLoginDto, refreshTokenPayload);
       expect(userRepository.login).toHaveBeenCalledWith(userLoginDto);
       expect(throttleService.delete).toHaveBeenCalledWith(
         `${user.username}_${ip}`
@@ -326,5 +331,28 @@ describe('AuthService', () => {
         'refresh_token'
       );
     });
+  });
+
+  it('get user token list', async () => {
+    const userId = 1;
+    await service.activeRevokeTokenList(userId);
+    expect(refreshTokenService.getRefreshTokenByUserId).toHaveBeenCalledWith(
+      userId
+    );
+    expect(refreshTokenService.getRefreshTokenByUserId).toHaveBeenCalledTimes(
+      1
+    );
+  });
+
+  it('revokeTokenById', async () => {
+    const mockRefreshToken = {
+      ip: '::1',
+      userAgent: 'mozilla'
+    };
+    refreshTokenService.revokeRefreshTokenById.mockResolvedValue(
+      mockRefreshToken
+    );
+    await expect(service.revokeTokenById(1)).resolves.not.toThrow();
+    expect(refreshTokenService.revokeRefreshTokenById).toHaveBeenCalledTimes(1);
   });
 });

@@ -9,7 +9,7 @@ db:
   database: 'truthy'
 
 jwt:
-  expiresIn: 5
+  expiresIn: 900
   refreshExpiresIn: 604800
   cookieExpiresIn: 604800
 
