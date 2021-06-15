@@ -460,8 +460,7 @@ export class AuthService {
     return this.refreshTokenService.getRefreshTokenByUserId(userId);
   }
 
-  revokeTokenById(id: number): Promise<RefreshToken> {
-    return this.refreshTokenService.revokeRefreshTokenById(id);
+  revokeTokenById(id: number, userId: number): Promise<RefreshToken> {
+    return this.refreshTokenService.revokeRefreshTokenById(id, userId);
   }
-
 }

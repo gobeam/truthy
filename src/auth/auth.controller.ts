@@ -166,7 +166,7 @@ export class AuthController {
   }
 
   @UseGuards(JwtAuthGuard, PermissionGuard)
-  revokeToken() {
-    return this.authService.revokeTokenById(+user.id);
+  revokeToken(@Param('id') id: string, @GetUser() user: UserEntity) {
+    return this.authService.revokeTokenById(+id, user.id);
   }
 }

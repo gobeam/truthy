@@ -352,7 +352,7 @@ describe('AuthService', () => {
     refreshTokenService.revokeRefreshTokenById.mockResolvedValue(
       mockRefreshToken
     );
-    await expect(service.revokeTokenById(1)).resolves.not.toThrow();
+    await expect(service.revokeTokenById(1, 1)).resolves.not.toThrow();
     expect(refreshTokenService.revokeRefreshTokenById).toHaveBeenCalledTimes(1);
   });
 });

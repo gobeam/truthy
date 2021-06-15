@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ForbiddenException,
   forwardRef,
   Inject,
   Injectable,
@@ -170,11 +171,18 @@ export class RefreshTokenService {
   /**
    * Revoke refresh token by id
    * @param id
+   * @param userId
    */
-  async revokeRefreshTokenById(id: number): Promise<RefreshToken> {
+  async revokeRefreshTokenById(
+    id: number,
+    userId: number
+  ): Promise<RefreshToken> {
     const token = await this.repository.findTokenById(id);
     if (!token) {
       throw new NotFoundException();
+    }
+    if (token.userId !== userId) {
+      throw new ForbiddenException();
     }
     token.isRevoked = true;
     await token.save();

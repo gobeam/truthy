@@ -5,7 +5,11 @@ import { AuthService } from '../auth/auth.service';
 import { RefreshTokenRepository } from './refresh-token.repository';
 import { UserSerializer } from '../auth/serializer/user.serializer';
 import { RefreshToken } from './entities/refresh-token.entity';
-import { BadRequestException, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  NotFoundException
+} from '@nestjs/common';
 import { TokenExpiredError } from 'jsonwebtoken';
 import exp from 'constants';
 
@@ -210,17 +214,29 @@ describe('RefreshTokenService', () => {
   describe('revokeRefreshTokenById', () => {
     it('revoke refresh token error for invalid id', async () => {
       repository.findTokenById.mockResolvedValue(null);
-      await expect(service.revokeRefreshTokenById(1)).rejects.toThrowError(
+      await expect(service.revokeRefreshTokenById(1, 1)).rejects.toThrowError(
         NotFoundException
+      );
+      expect(repository.findTokenById).toHaveBeenCalledTimes(1);
+    });
+
+    it('revoke refresh token of another user', async () => {
+      jest.spyOn(repository, 'findTokenById').mockResolvedValue({
+        userId: 2,
+        save: jest.fn()
+      });
+      await expect(service.revokeRefreshTokenById(1, 1)).rejects.toThrowError(
+        ForbiddenException
       );
       expect(repository.findTokenById).toHaveBeenCalledTimes(1);
     });
 
     it('revoke refresh token for valid id', async () => {
       jest.spyOn(repository, 'findTokenById').mockResolvedValue({
+        userId: 1,
         save: jest.fn()
       });
-      const result = await service.revokeRefreshTokenById(1);
+      const result = await service.revokeRefreshTokenById(1, 1);
       expect(repository.findTokenById).toHaveBeenCalledTimes(1);
       expect(result.save).toHaveBeenCalledTimes(1);
     });
