@@ -18,7 +18,6 @@ import { AuthService } from './auth.service';
 import { UserLoginDto } from './dto/user-login.dto';
 import { GetUser } from '../common/decorators/get-user.decorator';
 import { UserEntity } from './entity/user.entity';
-import { AuthGuard } from '@nestjs/passport';
 import { UserSerializer } from './serializer/user.serializer';
 import { UpdateUserProfileDto } from './dto/update-user-profile.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
@@ -32,6 +31,7 @@ import { UserSearchFilterDto } from './dto/user-search-filter.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { RegisterUserDto } from './dto/register-user.dto';
 import { RequestIpDto } from './dto/request-ip.dto';
+import { JwtAuthGuard } from 'src/common/guard/jwt-auth.guard';
 
 @ApiTags('user')
 @Controller()
@@ -54,17 +54,17 @@ export class AuthController {
   ) {
     const cookiePayload = await this.authService.login(userLoginDto, req.ip);
     response.setHeader('Set-Cookie', cookiePayload);
-    response.json({});
+    return response.sendStatus(204);
   }
 
-  @UseGuards(AuthGuard(), PermissionGuard)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
   @Get('/auth/profile')
   @ApiBearerAuth()
   profile(@GetUser() user: UserEntity): Promise<UserSerializer> {
     return this.authService.get(user);
   }
 
-  @UseGuards(AuthGuard(), PermissionGuard)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
   @Put('/auth/profile')
   @ApiBearerAuth()
   updateProfile(
@@ -92,7 +92,7 @@ export class AuthController {
     return this.authService.resetPassword(resetPasswordDto);
   }
 
-  @UseGuards(AuthGuard(), PermissionGuard)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
   @ApiBearerAuth()
   @Put('/auth/change-password')
   changePassword(
@@ -102,7 +102,7 @@ export class AuthController {
     return this.authService.changePassword(user, changePasswordDto);
   }
 
-  @UseGuards(AuthGuard(), PermissionGuard)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
   @ApiBearerAuth()
   @Get('/users')
   findAll(
@@ -111,7 +111,7 @@ export class AuthController {
     return this.authService.findAll(userSearchFilterDto);
   }
 
-  @UseGuards(AuthGuard(), PermissionGuard)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
   @ApiBearerAuth()
   @Post('/users')
   create(
@@ -120,7 +120,7 @@ export class AuthController {
     return this.authService.create(createUserDto);
   }
 
-  @UseGuards(AuthGuard(), PermissionGuard)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
   @ApiBearerAuth()
   @Put('/users/:id')
   update(
@@ -130,7 +130,7 @@ export class AuthController {
     return this.authService.update(+id, updateUserDto);
   }
 
-  @UseGuards(AuthGuard(), PermissionGuard)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
   @ApiBearerAuth()
   @Get('/users/:id')
   findOne(@Param('id') id: string): Promise<UserSerializer> {
@@ -139,15 +139,20 @@ export class AuthController {
 
   @Post('/refresh')
   async refresh(@Req() req: Request, @Res() response: Response) {
-    const cookiePayload =
-      await this.authService.createAccessTokenFromRefreshToken(
-        req.cookies['Refresh']
-      );
-    response.setHeader('Set-Cookie', cookiePayload);
-    response.json({});
+    try {
+      const cookiePayload =
+        await this.authService.createAccessTokenFromRefreshToken(
+          req.cookies['Refresh']
+        );
+      response.setHeader('Set-Cookie', cookiePayload);
+      return response.sendStatus(204);
+    } catch (e) {
+      response.setHeader('Set-Cookie', this.authService.getCookieForLogOut());
+      return response.status(400).json();
+    }
   }
 
-  @UseGuards(AuthGuard(), PermissionGuard)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
   @ApiBearerAuth()
   @Post('/logout')
   async logOut(@Req() req: Request, @Res() response: Response) {

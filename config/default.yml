@@ -9,8 +9,9 @@ db:
   database: 'truthy'
 
 jwt:
-  expiresIn: 3600
+  expiresIn: 5
   refreshExpiresIn: 604800
+  cookieExpiresIn: 604800
 
 app:
   name: 'Truthy'

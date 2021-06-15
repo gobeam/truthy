@@ -1,5 +1,4 @@
 import {
-  BadRequestException,
   HttpException,
   HttpStatus,
   Inject,
@@ -33,6 +32,7 @@ import {
   RateLimiterStoreAbstract
 } from 'rate-limiter-flexible';
 import { RefreshTokenService } from '../refresh-token/refresh-token.service';
+
 const throttleConfig = config.get('throttle.login');
 const tokenConfig = config.get('jwt');
 
@@ -400,6 +400,7 @@ export class AuthService {
   getCookieForLogOut(): string[] {
     return [
       'Authentication=; HttpOnly; Path=/; Max-Age=0',
+      'Refresh=; HttpOnly; Path=/; Max-Age=0'
     ];
   }
 
@@ -410,12 +411,12 @@ export class AuthService {
    */
   buildResponsePayload(accessToken: string, refreshToken?: string): string[] {
     const jwtConfig = config.get('jwt');
-    const tokenCookies: Array<string> = [
-      `Authentication=${accessToken}; HttpOnly; Path=/; Max-Age=${jwtConfig.expiresIn}`
+    const tokenCookies = [
+      `Authentication=${accessToken}; HttpOnly; Path=/; Max-Age=${jwtConfig.cookieExpiresIn}`
     ];
     if (refreshToken) {
       tokenCookies.push(
-        `Refresh=${refreshToken}; HttpOnly; Path=/; Max-Age=${jwtConfig.refreshExpiresIn}`
+        `Refresh=${refreshToken}; HttpOnly; Path=/; Max-Age=${jwtConfig.cookieExpiresIn}`
       );
     }
     return tokenCookies;
