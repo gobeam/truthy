@@ -52,7 +52,7 @@ export class MailProcessor {
     try {
       return await this.mailerService.sendMail({
         to: job.data.payload.to,
-        from: mailConfig.fromMail,
+        from: process.env.MAIL_FROM || mailConfig.fromMail,
         subject: job.data.payload.subject,
         template: __dirname + `/../mail/templates/email/layouts/email-layout`,
         context: job.data.payload.context

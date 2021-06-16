@@ -39,7 +39,9 @@ const queueConfig = config.get('queue');
           }
         },
         defaults: {
-          from: `"${mailConfig.from}" <${mailConfig.fromMail}>`
+          from: `"${process.env.MAIL_FROM || mailConfig.from}" <${
+            process.env.MAIL_FROM || mailConfig.fromMail
+          }>`
         },
         preview: mailConfig.preview,
         template: {
