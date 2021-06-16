@@ -51,6 +51,7 @@ export class AuthController {
     @Res() response: Response,
     @Body() userLoginDto: UserLoginDto
   ) {
+    console.log("userLoginDtouserLoginDto", userLoginDto)
     const refreshTokenPayload: Partial<RefreshToken> = {
       ip: req.ip,
       userAgent: req.get('user-agent')

@@ -4,6 +4,7 @@
   "compilerOptions": {
     "plugins": ["@nestjs/swagger"],
     "assets": [
+      { "include": "i18n/**/*", "watchAssets": true },
       { "include": "**/*.pug", "watchAssets": true },
       { "include": "**/*.css", "watchAssets": true }
     ]

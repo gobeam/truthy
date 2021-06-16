@@ -41,19 +41,19 @@ async function bootstrap() {
     new ValidationPipe({
       transform: true,
       whitelist: true,
-      forbidNonWhitelisted: true,
-      exceptionFactory: (errors) => {
-        const errorMessages = { error: {} };
-        errors.forEach(
-          (error) =>
-            (errorMessages.error[error.property] = Object.values(
-              error.constraints
-            )
-              .join('. ')
-              .trim())
-        );
-        return new UnprocessableEntityException(errorMessages);
-      }
+      forbidNonWhitelisted: true
+      // exceptionFactory: (errors) => {
+      //   const errorMessages = { error: {} };
+      //   errors.forEach(
+      //     (error) =>
+      //       (errorMessages.error[error.property] = Object.values(
+      //         error.constraints
+      //       )
+      //         .join('. ')
+      //         .trim())
+      //   );
+      //   return new UnprocessableEntityException(errorMessages);
+      // }
     })
   );
   const apiConfig = config.get('app');
