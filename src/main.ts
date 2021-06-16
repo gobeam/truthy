@@ -26,7 +26,10 @@ async function bootstrap() {
       credentials: true
     });
   } else {
-    app.enableCors({ origin: process.env.ORIGIN || serverConfig.origin });
+    app.enableCors({
+      origin: process.env.ORIGIN || serverConfig.origin,
+      credentials: true
+    });
     logger.log(
       `Accepting request only from: ${
         process.env.ORIGIN || serverConfig.origin
