@@ -29,13 +29,13 @@ const queueConfig = config.get('queue');
     MailerModule.forRootAsync({
       useFactory: () => ({
         transport: {
-          host: mailConfig.host,
-          port: mailConfig.port,
+          host: process.env.MAIL_HOST || mailConfig.host,
+          port: process.env.MAIL_PORT || mailConfig.port,
           secure: mailConfig.secure,
           ignoreTLS: mailConfig.ignoreTLS,
           auth: {
-            user: mailConfig.user,
-            pass: mailConfig.pass
+            user: process.env.MAIL_USER || mailConfig.user,
+            pass: process.env.MAIL_PASS || mailConfig.pass
           }
         },
         defaults: {
