@@ -19,14 +19,14 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
-    "test:debug": "node --inspect-brk -r ./node_modules/tsconfig-paths/register -r ./node_modules/ts-node/register node_modules/.bin/jest --runInBand",
+    "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
-    "typeorm": "./node_modules/ts-node -r ./node_modules/tsconfig-paths/register ./node_modules/typeorm/cli.js --config src/config/ormconfig.ts",
+    "typeorm": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js --config src/config/ormconfig.ts",
     "generate": "npm run typeorm migration:generate -- -n",
     "orm-create": "npm run typeorm migration:create -- -n",
     "migrate": "npm run typeorm migration:run",
     "migration:rollback": "npm run typeorm migration:revert",
-    "seed:run": "./node_modules/ts-node ./node_modules/typeorm-seeding/dist/cli.js seed -n ./src/config/ormconfig.ts"
+    "seed:run": "ts-node ./node_modules/typeorm-seeding/dist/cli.js seed -n ./src/config/ormconfig.ts"
   },
   "dependencies": {
     "@nestjs-modules/mailer": "^1.5.1",
