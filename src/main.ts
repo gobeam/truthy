@@ -26,8 +26,12 @@ async function bootstrap() {
       credentials: true
     });
   } else {
-    app.enableCors({ origin: serverConfig.origin });
-    logger.log(`Accepting request only from: ${serverConfig.origin}`);
+    app.enableCors({ origin: process.env.ORIGIN || serverConfig.origin });
+    logger.log(
+      `Accepting request only from: ${
+        process.env.ORIGIN || serverConfig.origin
+      }`
+    );
   }
   useContainer(app.select(AppModule), { fallbackOnErrors: true });
   app.useGlobalPipes(
