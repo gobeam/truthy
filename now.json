@@ -1,10 +1,4 @@
 {
-  "builds": [
-    {
-      "src": "dist/main.js",
-      "use": "@now/node-server"
-    }
-  ],
   "routes": [
     {
       "src": "/(.*)",
