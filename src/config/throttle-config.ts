@@ -8,8 +8,9 @@ const throttleConfig: ThrottlerModuleOptions = {
   ttl: process.env.THROTTLE_TTL || throttleConfigVariables.get('ttl'),
   limit: process.env.THROTTLE_LIMIT || throttleConfigVariables.get('limit'),
   storage: new ThrottlerStorageRedisService({
-    host: redisConfig.host,
-    port: redisConfig.port
+    host: process.env.REDIS_HOST || redisConfig.host,
+    port: process.env.REDIS_PORT || redisConfig.port,
+    password: process.env.REDIS_PASSWORD || redisConfig.password
   })
 };
 

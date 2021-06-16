@@ -17,8 +17,9 @@ const queueConfig = config.get('queue');
       name: config.get('mail.queueName'),
       useFactory: () => ({
         redis: {
-          host: queueConfig.host,
-          port: queueConfig.port,
+          host: process.env.REDIS_HOST || queueConfig.host,
+          port: process.env.REDIS_PORT || queueConfig.port,
+          password: process.env.REDIS_PASSWORD || queueConfig.password,
           retryStrategy(times) {
             return Math.min(times * 50, 2000);
           }

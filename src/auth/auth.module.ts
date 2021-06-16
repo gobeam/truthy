@@ -21,8 +21,9 @@ const LoginThrottleFactory = {
   useFactory: () => {
     const redisClient = new Redis({
       enableOfflineQueue: false,
-      host: redisConfig.host,
-      port: redisConfig.port
+      host: process.env.REDIS_HOST || redisConfig.host,
+      port: process.env.REDIS_PORT || redisConfig.port,
+      password: process.env.REDIS_PASSWORD || redisConfig.password
     });
 
     return new RateLimiterRedis({
