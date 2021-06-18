@@ -404,8 +404,8 @@ export class AuthService {
    */
   getCookieForLogOut(): string[] {
     return [
-      'Authentication=; HttpOnly; Path=/; Max-Age=0',
-      'Refresh=; HttpOnly; Path=/; Max-Age=0'
+      'Authentication=; HttpOnly; Path=/; Max-Age=0; SameSite=None; Secure',
+      'Refresh=; HttpOnly; Path=/; Max-Age=0; SameSite=None; Secure'
     ];
   }
 
@@ -417,11 +417,11 @@ export class AuthService {
   buildResponsePayload(accessToken: string, refreshToken?: string): string[] {
     const jwtConfig = config.get('jwt');
     const tokenCookies = [
-      `Authentication=${accessToken}; HttpOnly; Path=/; Max-Age=${jwtConfig.cookieExpiresIn}`
+      `Authentication=${accessToken}; HttpOnly; Path=/; SameSite=None; Secure; Max-Age=${jwtConfig.cookieExpiresIn}`
     ];
     if (refreshToken) {
       tokenCookies.push(
-        `Refresh=${refreshToken}; HttpOnly; Path=/; Max-Age=${jwtConfig.cookieExpiresIn}`
+        `Refresh=${refreshToken}; HttpOnly; Path=/; SameSite=None; Secure; Max-Age=${jwtConfig.cookieExpiresIn}`
       );
     }
     return tokenCookies;
