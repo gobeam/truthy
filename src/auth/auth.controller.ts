@@ -51,7 +51,6 @@ export class AuthController {
     @Res() response: Response,
     @Body() userLoginDto: UserLoginDto
   ) {
-    console.log("userLoginDtouserLoginDto", userLoginDto)
     const refreshTokenPayload: Partial<RefreshToken> = {
       ip: req.ip,
       userAgent: req.get('user-agent')
@@ -61,7 +60,7 @@ export class AuthController {
       refreshTokenPayload
     );
     response.setHeader('Set-Cookie', cookiePayload);
-    return response.sendStatus(HttpStatus.NO_CONTENT);
+    return response.json({});
   }
 
   @UseGuards(JwtAuthGuard, PermissionGuard)
@@ -145,7 +144,7 @@ export class AuthController {
           req.cookies['Refresh']
         );
       response.setHeader('Set-Cookie', cookiePayload);
-      return response.sendStatus(HttpStatus.NO_CONTENT);
+      return response.json({});
     } catch (e) {
       response.setHeader('Set-Cookie', this.authService.getCookieForLogOut());
       return response.sendStatus(HttpStatus.BAD_REQUEST);
