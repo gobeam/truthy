@@ -1,3 +1,25 @@
 {
-  "isLowercase": "{property} should be in lowercase"
+  "character": {
+    "one": "character",
+    "other": "characters",
+    "zero": "character"
+  },
+  "Unauthorized": "Invalid email/password",
+  "isNotEmpty": "$t(app.{property}) should not be empty",
+  "maxLength": "$t(app.{property}) can only have maximum length of {ln} $t(validation.character, {{\"count\": {count} }})",
+  "minLength": "$t(app.{property}) must have minimum length of {ln} $t(validation.character, {{\"count\": {count} }})",
+  "max": "$t(app.{property}) can be less than or equal to {ln}",
+  "min": "$t(app.{property}) must have greater than or equal to {ln}",
+  "password should contain at least one lowercase letter, one uppercase letter, one numeric digit, and one special character": "password should contain at least one lowercase letter, one uppercase letter, one numeric digit, and one special character",
+  "isIn": "$t(app.{property}) must be one of {items}",
+  "isEnum": "$t(app.{property}) must be one of {items}",
+  "isNumberString": "$t(app.{property}) must be number",
+  "isNumber": "$t(app.{property}) must be number",
+  "isEqualTo": "$t(app.{property}) must be same as $t(app.{field})",
+  "isLowercase": "$t(app.{property}) should be in lowercase",
+  "isEmail": "$t(app.{property}) must be valid email",
+  "isString": "$t(app.{property}) must be string",
+  "isBoolean": "field must be selected between true or false",
+  "already taken": "$t(app.{property}) is already taken",
+  "unique": "$t(app.{property}) is already taken"
 }

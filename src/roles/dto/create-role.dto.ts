@@ -13,8 +13,8 @@ import { RoleEntity } from '../entities/role.entity';
 export class CreateRoleDto {
   @IsNotEmpty()
   @IsString()
-  @MinLength(2)
-  @MaxLength(100)
+  @MinLength(2, { message: 'minLength-{"ln":2,"count":2}' })
+  @MaxLength(100, { message: 'maxLength-{"ln":100,"count":100}' })
   @Validate(UniqueValidatorPipe, [RoleEntity], { message: 'already taken' })
   name: string;
 

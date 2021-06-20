@@ -14,7 +14,7 @@ import { EmailTemplateEntity } from '../entities/email-template.entity';
 export class CreateEmailTemplateDto {
   @IsNotEmpty()
   @IsString()
-  @MaxLength(100)
+  @MaxLength(100, { message: 'maxLength-{"ln":100,"count":100}' })
   @Validate(UniqueValidatorPipe, [EmailTemplateEntity], {
     message: 'already taken'
   })
@@ -31,7 +31,7 @@ export class CreateEmailTemplateDto {
 
   @IsNotEmpty()
   @IsString()
-  @MinLength(50)
+  @MinLength(50, { message: 'minLength-{"ln":50,"count":50}' })
   body: string;
 
   @IsOptional()

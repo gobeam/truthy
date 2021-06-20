@@ -41,7 +41,7 @@ async function bootstrap() {
     new ValidationPipe({
       transform: true,
       whitelist: true,
-      forbidNonWhitelisted: true
+      forbidNonWhitelisted: true,
       // exceptionFactory: (errors) => {
       //   const errorMessages = { error: {} };
       //   errors.forEach(

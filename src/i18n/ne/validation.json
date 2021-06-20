@@ -1,3 +1,26 @@
 {
-  "isLowercase": "{property} लोअरकेसमा हुनुपर्छ"
+  "character": {
+    "one": "character",
+    "other": "characters",
+    "zero": "character"
+  },
+  "Unauthorized": "अवैध ईमेल/पासवर्ड",
+  "Not Found": "डाटा भेटिएन",
+  "isNotEmpty": "$t(app.{property}) खाली हुनु हुँदैन",
+  "maxLength": "$t(app.{property})को अधिकतम शब्द गणना {ln} मात्र हुनुपर्छ",
+  "minLength": "$t(app.{property})क न्यूनतम शब्द गणना {ln} हुनुपर्छ",
+  "max": "$t(app.{property}) {ln} भन्दा कम वा बराबर हुन सक्छ",
+  "min": "$t(app.{property}) {ln} भन्दा ठूलो वा बराबर हुनै पर्छ",
+  "password should contain at least one lowercase letter, one uppercase letter, one numeric digit, and one special character": "पासवर्ड कम्तिमा एउटा सानो अक्षर, एक ठूलो अक्षर, एक संख्यात्मक अंक, र एक विशेष वर्ण हुनु पर्छ",
+  "isEqualTo": "$t(app.{property}) $t(app.{field}) जस्तै हुनु पर्छ",
+  "isLowercase": "$t(app.{property}) लोअरकेसमा हुनुपर्छ",
+  "isIn": "$t(app.{property}) {items} मध्ये एक हुनुपर्दछ",
+  "isEnum": "$t(app.{property}) {items} मध्ये एक हुनुपर्दछ",
+  "isNumberString": "$t(app.{property}) नम्बर हुनुपर्दछ",
+  "isNumber": "$t(app.{property}) नम्बर हुनुपर्दछ",
+  "isEmail": "क्षेत्र मान्य ईमेल हुनुपर्दछ",
+  "isString": "क्षेत्र शब्दहरू हुनुपर्दछ",
+  "isBoolean": "क्षेत्र सही वा गलत बीचमा चयन गरिएको हुनुपर्दछ",
+  "already taken": "$t(app.{property}) पहिले नै अर्को प्रयोगकर्ता द्वारा प्रयोग गरीएको छ",
+  "unique": "$t(app.{property}) पहिले नै अर्को प्रयोगकर्ता द्वारा प्रयोग गरीएको छ"
 }

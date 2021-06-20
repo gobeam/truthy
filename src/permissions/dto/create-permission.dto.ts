@@ -1,5 +1,5 @@
 import {
-  IsEnum,
+  IsIn,
   IsNotEmpty,
   IsString,
   MaxLength,
@@ -9,10 +9,19 @@ import { MethodList } from '../../config/permission-config';
 import { UniqueValidatorPipe } from '../../common/pipes/unique-validator.pipe';
 import { PermissionEntity } from '../entities/permission.entity';
 
+const methodListArray = [
+  MethodList.GET,
+  MethodList.POST,
+  MethodList.ANY,
+  MethodList.DELETE,
+  MethodList.OPTIONS,
+  MethodList.OPTIONS
+];
+
 export class CreatePermissionDto {
   @IsNotEmpty()
   @IsString()
-  @MaxLength(50)
+  @MaxLength(50, { message: 'maxLength-{"ln":50,"count":50}' })
   resource: string;
 
   @IsNotEmpty()
@@ -24,10 +33,12 @@ export class CreatePermissionDto {
 
   @IsNotEmpty()
   @IsString()
-  @MaxLength(50)
+  @MaxLength(50, { message: 'maxLength-{"ln":50,"count":50}' })
   path: string;
 
   @IsNotEmpty()
-  @IsEnum(MethodList)
+  @IsIn(methodListArray, {
+    message: `isIn-{"items":"${methodListArray.join(',')}"}`
+  })
   method: MethodList;
 }

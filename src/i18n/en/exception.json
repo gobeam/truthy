@@ -1,0 +1,5 @@
+{
+  "Unauthorized": "Invalid email/password",
+  "Not Found": "Data not found",
+  "token expired": "Your session has expired"
+}

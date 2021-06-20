@@ -26,17 +26,23 @@ import { ForgetPasswordDto } from './dto/forget-password.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { PermissionGuard } from '../common/guard/permission.guard';
 import { Pagination } from '../paginate';
-import { Response, Request } from 'express';
+import { Request, Response } from 'express';
 import { UserSearchFilterDto } from './dto/user-search-filter.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { RegisterUserDto } from './dto/register-user.dto';
 import { JwtAuthGuard } from 'src/common/guard/jwt-auth.guard';
 import { RefreshToken } from '../refresh-token/entities/refresh-token.entity';
+import { I18nLang } from 'nestjs-i18n';
 
 @ApiTags('user')
 @Controller()
 export class AuthController {
   constructor(private authService: AuthService) {}
+
+  @Get('/lang')
+  sample(@I18nLang() lang: string) {
+    return { lang };
+  }
 
   @Post('/auth/register')
   register(
@@ -60,7 +66,7 @@ export class AuthController {
       refreshTokenPayload
     );
     response.setHeader('Set-Cookie', cookiePayload);
-    return response.json({});
+    return response.status(HttpStatus.NO_CONTENT).json({});
   }
 
   @UseGuards(JwtAuthGuard, PermissionGuard)
@@ -144,7 +150,7 @@ export class AuthController {
           req.cookies['Refresh']
         );
       response.setHeader('Set-Cookie', cookiePayload);
-      return response.json({});
+      return response.status(HttpStatus.NO_CONTENT).json({});
     } catch (e) {
       response.setHeader('Set-Cookie', this.authService.getCookieForLogOut());
       return response.sendStatus(HttpStatus.BAD_REQUEST);

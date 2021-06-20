@@ -13,15 +13,15 @@ import { RefreshTokenModule } from './refresh-token/refresh-token.module';
 import * as path from 'path';
 import * as config from 'config';
 import {
-  I18nModule,
-  I18nJsonParser,
-  QueryResolver,
+  CookieResolver,
   HeaderResolver,
-  AcceptLanguageResolver,
-  CookieResolver
+  I18nJsonParser,
+  I18nModule,
+  QueryResolver
 } from 'nestjs-i18n';
-import { CommonExceptionFilter } from './common/exception/exception-filter';
-import { I18nValidationPipe } from './common/pipes/i18n-validation.pipe';
+import { I18nExceptionFilterPipe } from './common/pipes/i18n-exception-filter.pipe';
+import { CustomValidationPipe } from './common/pipes/custom-validation.pipe';
+
 const appConfig = config.get('app');
 
 @Module({
@@ -34,14 +34,14 @@ const appConfig = config.get('app');
       useFactory: () => ({
         fallbackLanguage: appConfig.fallbackLanguage,
         parserOptions: {
-          path: path.join(__dirname, '/i18n/')
+          path: path.join(__dirname, '/i18n/'),
+          watch: true
         }
       }),
       parser: I18nJsonParser,
       resolvers: [
         { use: QueryResolver, options: ['lang', 'locale', 'l'] },
         new HeaderResolver(['x-custom-lang']),
-        AcceptLanguageResolver,
         new CookieResolver(['lang', 'locale', 'l'])
       ]
     }),
@@ -53,11 +53,15 @@ const appConfig = config.get('app');
     RefreshTokenModule
   ],
   providers: [
-    { provide: APP_PIPE, useClass: I18nValidationPipe },
+    { provide: APP_PIPE, useClass: CustomValidationPipe },
     {
       provide: APP_GUARD,
       useClass: ThrottlerGuard
     },
+    {
+      provide: APP_FILTER,
+      useClass: I18nExceptionFilterPipe
+    }
     // {
     //   provide: APP_FILTER,
     //   useClass: CommonExceptionFilter
