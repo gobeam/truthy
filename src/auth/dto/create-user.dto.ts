@@ -1,4 +1,4 @@
-import { IsIn, IsNumberString } from 'class-validator';
+import { IsIn, IsNumber } from 'class-validator';
 import { UserStatusEnum } from '../user-status.enum';
 import { OmitType } from '@nestjs/swagger';
 import { RegisterUserDto } from './register-user.dto';
@@ -8,6 +8,7 @@ const statusEnumArray = [
   UserStatusEnum.INACTIVE,
   UserStatusEnum.BLOCKED
 ];
+
 /**
  * create user data transform object
  */
@@ -19,6 +20,6 @@ export class CreateUserDto extends OmitType(RegisterUserDto, [
   })
   status: UserStatusEnum;
 
-  @IsNumberString()
+  @IsNumber()
   roleId: number;
 }

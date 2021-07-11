@@ -35,7 +35,6 @@ import { RefreshTokenService } from '../refresh-token/refresh-token.service';
 import { RefreshToken } from '../refresh-token/entities/refresh-token.entity';
 
 const throttleConfig = config.get('throttle.login');
-const tokenConfig = config.get('jwt');
 
 @Injectable()
 export class AuthService {
@@ -114,8 +113,7 @@ export class AuthService {
   /**
    * Login user by username and password
    * @param userLoginDto
-   * @param ip
-   * @param userAgent
+   * @param refreshTokenPayload
    */
   async login(
     userLoginDto: UserLoginDto,
@@ -133,7 +131,9 @@ export class AuthService {
     }
     if (retrySecs > 0) {
       throw new HttpException(
-        `Too many tries, retry after ${String(retrySecs)} seconds.`,
+        this.tooManyRequestExceptionPayload(
+          `tooManyRequest-{"second":"${String(retrySecs)}"}`
+        ),
         HttpStatus.TOO_MANY_REQUESTS
       );
     }
@@ -145,9 +145,11 @@ export class AuthService {
       );
       if (!result) {
         throw new HttpException(
-          `Too many tries, retry after ${String(
-            Math.round(throttleError.msBeforeNext / 1000) || 1
-          )} seconds.`,
+          this.tooManyRequestExceptionPayload(
+            `tooManyRequest-{"second":${String(
+              Math.round(throttleError.msBeforeNext / 1000) || 1
+            )}}`
+          ),
           HttpStatus.TOO_MANY_REQUESTS
         );
       }
@@ -166,6 +168,14 @@ export class AuthService {
     ]);
     await this.rateLimiter.delete(usernameIPkey);
     return this.buildResponsePayload(accessToken, refreshToken);
+  }
+
+  private tooManyRequestExceptionPayload(message): Record<string, any> {
+    return {
+      message,
+      statusCode: HttpStatus.TOO_MANY_REQUESTS,
+      error: true
+    };
   }
 
   /**
@@ -241,6 +251,8 @@ export class AuthService {
     id: number,
     updateUserDto: DeepPartial<UserEntity>
   ): Promise<UserSerializer> {
+    console.log(updateUserDto, 'idididid');
+    console.log(typeof id, 'idididid');
     const user = await this.userRepository.get(id, [], {
       groups: [
         ...ownerUserGroupsForSerializing,

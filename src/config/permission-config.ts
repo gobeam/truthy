@@ -154,7 +154,7 @@ export const PermissionConfiguration: PermissionConfigInterface = {
     },
     {
       name: 'Role management',
-      resource: 'role',
+      resource: 'authorization',
       hasSubmodules: false,
       permissions: [
         {

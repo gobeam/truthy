@@ -2,11 +2,6 @@ import { DeepPartial, EntityRepository } from 'typeorm';
 import { UserEntity } from './entity/user.entity';
 import * as bcrypt from 'bcrypt';
 import { UserLoginDto } from './dto/user-login.dto';
-import {
-  HttpException,
-  HttpStatus,
-  UnauthorizedException
-} from '@nestjs/common';
 import { BaseRepository } from '../common/repository/base.repository';
 import { UserSerializer } from './serializer/user.serializer';
 import { classToPlain, plainToClass } from 'class-transformer';
@@ -45,7 +40,7 @@ export class UserRepository extends BaseRepository<UserEntity, UserSerializer> {
     });
     if (user && (await user.validatePassword(password))) {
       if (user.status !== UserStatusEnum.ACTIVE) {
-        return [null, 'InactiveUser'];
+        return [null, 'inactiveUser'];
       }
       return [user, null];
     }

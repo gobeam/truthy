@@ -62,10 +62,6 @@ const appConfig = config.get('app');
       provide: APP_FILTER,
       useClass: I18nExceptionFilterPipe
     }
-    // {
-    //   provide: APP_FILTER,
-    //   useClass: CommonExceptionFilter
-    // }
   ]
 })
 export class AppModule {}

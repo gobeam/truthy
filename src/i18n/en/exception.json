@@ -1,5 +1,12 @@
 {
-  "Unauthorized": "Invalid email/password",
+  "sec": {
+    "one": "second",
+    "other": "seconds",
+    "zero": "second"
+  },
+  "Unauthorized": "Unauthorized",
+  "inactiveUser": "You account has not been activated yet.",
   "Not Found": "Data not found",
-  "token expired": "Your session has expired"
+  "tokenExpired": "Your session has expired",
+  "tooManyRequest": "Too many tries, retry after {second} $t(exception.sec, {{\"count\": {second} }})."
 }

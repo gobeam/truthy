@@ -1,10 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import {
-  Logger,
-  UnprocessableEntityException,
-  ValidationPipe
-} from '@nestjs/common';
+import { Logger, ValidationPipe } from '@nestjs/common';
 import { useContainer } from 'class-validator';
 import * as config from 'config';
 import {
@@ -41,19 +37,7 @@ async function bootstrap() {
     new ValidationPipe({
       transform: true,
       whitelist: true,
-      forbidNonWhitelisted: true,
-      // exceptionFactory: (errors) => {
-      //   const errorMessages = { error: {} };
-      //   errors.forEach(
-      //     (error) =>
-      //       (errorMessages.error[error.property] = Object.values(
-      //         error.constraints
-      //       )
-      //         .join('. ')
-      //         .trim())
-      //   );
-      //   return new UnprocessableEntityException(errorMessages);
-      // }
+      forbidNonWhitelisted: true
     })
   );
   const apiConfig = config.get('app');

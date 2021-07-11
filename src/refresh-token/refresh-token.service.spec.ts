@@ -149,7 +149,7 @@ describe('RefreshTokenService', () => {
   describe('decodeRefreshToken', () => {
     it('check token expired error', async () => {
       jwtService.verifyAsync.mockImplementation(() => {
-        throw new TokenExpiredError('token expired', new Date());
+        throw new TokenExpiredError('tokenExpired', new Date());
       });
 
       await expect(

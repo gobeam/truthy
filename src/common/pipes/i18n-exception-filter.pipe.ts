@@ -15,7 +15,12 @@ export class I18nExceptionFilterPipe implements ExceptionFilter {
     const response = ctx.getResponse();
     return response
       .status(exception.getStatus())
-      .json(await this.getMessage(exception, ctx.getRequest().i18nLang));
+      .json(
+        await this.getMessage(
+          exception,
+          ctx.getRequest().i18nLang || ctx.getRequest().headers['x-custom-lang']
+        )
+      );
   }
 
   async getMessage(exception: HttpException, lang: string) {
@@ -27,9 +32,12 @@ export class I18nExceptionFilterPipe implements ExceptionFilter {
           lang
         );
       } else if (typeof exceptionResponse.message === 'string') {
+        const { title, argument } = this.checkIfConstraintAvailable(
+          exceptionResponse.message
+        );
         exceptionResponse.message = await this.i18n.translate(
-          `exception.${exceptionResponse.message}`,
-          { lang }
+          `exception.${title}`,
+          { lang, args: { ...argument } }
         );
       }
     }
@@ -57,7 +65,7 @@ export class I18nExceptionFilterPipe implements ExceptionFilter {
   async translateArray(errors: any[], lang: string) {
     const data = {};
     for (let i = 0; i < errors.length; i++) {
-      const notHandleValidators = [
+      const constraintsValidator = [
         'validate',
         'isEqualTo',
         'isIn',
@@ -66,12 +74,11 @@ export class I18nExceptionFilterPipe implements ExceptionFilter {
         'minLength'
       ];
       const item = errors[i];
-      // console.log(item);
       const message = await Promise.all(
         Object.keys(item.constraints).map(async (key: string) => {
           let validationKey: string = key,
             validationArgument: Record<string, any> = {};
-          if (notHandleValidators.includes(key)) {
+          if (constraintsValidator.includes(key)) {
             const { title, argument } = this.checkIfConstraintAvailable(
               item.constraints[key]
             );

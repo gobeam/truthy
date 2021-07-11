@@ -116,9 +116,9 @@ export class RefreshTokenService {
       return await this.jwt.verifyAsync(token);
     } catch (e) {
       if (e instanceof TokenExpiredError) {
-        throw new BadRequestException('Refresh token expired');
+        throw new BadRequestException('refreshTokenExpired');
       } else {
-        throw new BadRequestException('Refresh token malformed');
+        throw new BadRequestException('refreshTokenMalformed');
       }
     }
   }
