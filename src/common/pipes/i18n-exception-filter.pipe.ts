@@ -5,6 +5,7 @@ import {
   HttpException
 } from '@nestjs/common';
 import { I18nService } from 'nestjs-i18n';
+import { ValidationErrorInterface } from '../interfaces/validation-error.interface';
 
 @Catch(HttpException)
 export class I18nExceptionFilterPipe implements ExceptionFilter {
@@ -44,7 +45,9 @@ export class I18nExceptionFilterPipe implements ExceptionFilter {
     return exceptionResponse;
   }
 
-  checkIfConstraintAvailable(message: string): {
+  checkIfConstraintAvailable(
+    message: string
+  ): {
     title: string;
     argument: Record<string, any>;
   } {
@@ -63,7 +66,7 @@ export class I18nExceptionFilterPipe implements ExceptionFilter {
   }
 
   async translateArray(errors: any[], lang: string) {
-    const data = {};
+    const validationData: Array<ValidationErrorInterface> = [];
     for (let i = 0; i < errors.length; i++) {
       const constraintsValidator = [
         'validate',
@@ -94,8 +97,13 @@ export class I18nExceptionFilterPipe implements ExceptionFilter {
           });
         })
       );
-      data[item.property] = message.join('. ').trim();
+      validationData.push({
+        name: item.property,
+        value: item.value,
+        errors: message
+      });
+      // data[item.property] = message.join('. ').trim();
     }
-    return data;
+    return validationData;
   }
 }

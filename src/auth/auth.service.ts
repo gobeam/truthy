@@ -251,8 +251,6 @@ export class AuthService {
     id: number,
     updateUserDto: DeepPartial<UserEntity>
   ): Promise<UserSerializer> {
-    console.log(updateUserDto, 'idididid');
-    console.log(typeof id, 'idididid');
     const user = await this.userRepository.get(id, [], {
       groups: [
         ...ownerUserGroupsForSerializing,
