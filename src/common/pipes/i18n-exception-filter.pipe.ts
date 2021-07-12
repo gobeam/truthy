@@ -45,9 +45,7 @@ export class I18nExceptionFilterPipe implements ExceptionFilter {
     return exceptionResponse;
   }
 
-  checkIfConstraintAvailable(
-    message: string
-  ): {
+  checkIfConstraintAvailable(message: string): {
     title: string;
     argument: Record<string, any>;
   } {
@@ -99,10 +97,8 @@ export class I18nExceptionFilterPipe implements ExceptionFilter {
       );
       validationData.push({
         name: item.property,
-        value: item.value,
         errors: message
       });
-      // data[item.property] = message.join('. ').trim();
     }
     return validationData;
   }

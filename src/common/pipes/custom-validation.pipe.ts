@@ -26,7 +26,6 @@ export class CustomValidationPipe implements PipeTransform<any> {
     const data = [];
     for (const error of errors) {
       data.push({
-        value: error.value,
         property: error.property,
         constraints: error.constraints
       });
