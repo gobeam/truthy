@@ -170,6 +170,11 @@ export class AuthService {
     return this.buildResponsePayload(accessToken, refreshToken);
   }
 
+  /**
+   * Throw too many request exception
+   * @param message
+   * @private
+   */
   private tooManyRequestExceptionPayload(message): Record<string, any> {
     return {
       message,
@@ -231,7 +236,7 @@ export class AuthService {
     return this.userRepository.paginate(
       userSearchFilterDto,
       ['role'],
-      ['username', 'email', 'name'],
+      ['username', 'email', 'name', 'contact', 'address'],
       {
         groups: [
           ...adminUserGroupsForSerializing,

@@ -28,6 +28,16 @@ export class UpdateUserDto {
 
   @ApiPropertyOptional()
   @ValidateIf((object, value) => value)
+  @IsString()
+  address: string;
+
+  @ApiPropertyOptional()
+  @ValidateIf((object, value) => value)
+  @IsString()
+  contact: string;
+
+  @ApiPropertyOptional()
+  @ValidateIf((object, value) => value)
   @IsIn(statusEnumArray, {
     message: `isIn-{"items":"${statusEnumArray.join(',')}"}`
   })

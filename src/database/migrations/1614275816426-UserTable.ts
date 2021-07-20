@@ -48,6 +48,16 @@ export class UserTable1614275816426 implements MigrationInterface {
             isNullable: true
           },
           {
+            name: 'address',
+            type: 'varchar',
+            isNullable: true
+          },
+          {
+            name: 'contact',
+            type: 'varchar',
+            isNullable: true
+          },
+          {
             name: 'salt',
             type: 'varchar',
             isNullable: true

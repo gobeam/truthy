@@ -30,6 +30,12 @@ export class UserSerializer extends ModelSerializer {
   @ApiProperty()
   name: string;
 
+  @ApiProperty()
+  address: string;
+
+  @ApiProperty()
+  contact: string;
+
   @ApiPropertyOptional()
   @Expose({ groups: adminUserGroupsForSerializing })
   status: UserStatusEnum;
