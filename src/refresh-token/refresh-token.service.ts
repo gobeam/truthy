@@ -15,6 +15,7 @@ import { RefreshToken } from './entities/refresh-token.entity';
 import { AuthService } from '../auth/auth.service';
 import { UserSerializer } from '../auth/serializer/user.serializer';
 import { InjectRepository } from '@nestjs/typeorm';
+import { MoreThanOrEqual } from 'typeorm';
 
 const appConfig = config.get('app');
 const tokenConfig = config.get('jwt');
@@ -163,7 +164,8 @@ export class RefreshTokenService {
     return this.repository.find({
       where: {
         userId,
-        isRevoked: false
+        isRevoked: false,
+        expires: MoreThanOrEqual(new Date())
       }
     });
   }

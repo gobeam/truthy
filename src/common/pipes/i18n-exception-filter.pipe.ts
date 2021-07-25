@@ -75,26 +75,30 @@ export class I18nExceptionFilterPipe implements ExceptionFilter {
         'minLength'
       ];
       const item = errors[i];
-      const message = await Promise.all(
-        Object.keys(item.constraints).map(async (key: string) => {
-          let validationKey: string = key,
-            validationArgument: Record<string, any> = {};
-          if (constraintsValidator.includes(key)) {
-            const { title, argument } = this.checkIfConstraintAvailable(
-              item.constraints[key]
-            );
-            validationKey = title;
-            validationArgument = argument;
-          }
-          return this.i18n.translate(`validation.${validationKey}`, {
-            lang,
-            args: {
-              ...validationArgument,
-              property: item.property
+      let message = [];
+      if (item.constraints) {
+        message = await Promise.all(
+          Object.keys(item.constraints).map(async (key: string) => {
+            let validationKey: string = key,
+              validationArgument: Record<string, any> = {};
+            if (constraintsValidator.includes(key)) {
+              const { title, argument } = this.checkIfConstraintAvailable(
+                item.constraints[key]
+              );
+              validationKey = title;
+              validationArgument = argument;
             }
-          });
-        })
-      );
+            return this.i18n.translate(`validation.${validationKey}`, {
+              lang,
+              args: {
+                ...validationArgument,
+                property: item.property
+              }
+            });
+          })
+        );
+      }
+
       validationData.push({
         name: item.property,
         errors: message

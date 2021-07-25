@@ -42,6 +42,9 @@ export class UserEntity extends CustomBaseEntity {
   contact: string;
 
   @Column()
+  avatar: string;
+
+  @Column()
   status: UserStatusEnum;
 
   @Column()

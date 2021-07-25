@@ -100,6 +100,10 @@ export const PermissionConfiguration: PermissionConfigInterface = {
       method: MethodList.PUT
     },
     {
+      path: '/revoke/:id',
+      method: MethodList.PUT
+    },
+    {
       path: '/auth/token-info',
       method: MethodList.GET
     },

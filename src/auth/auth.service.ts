@@ -22,6 +22,7 @@ import { ResetPasswordDto } from './dto/reset-password.dto';
 import * as config from 'config';
 import { ForgetPasswordDto } from './dto/forget-password.dto';
 import { UserStatusEnum } from './user-status.enum';
+import { unlinkSync, existsSync } from 'fs';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { MailService } from '../mail/mail.service';
 import { MailJobInterface } from '../mail/interface/mail-job.interface';
@@ -153,7 +154,6 @@ export class AuthService {
           HttpStatus.TOO_MANY_REQUESTS
         );
       }
-
       throw new UnauthorizedException(error);
     }
     const accessTokenPromise =
@@ -279,6 +279,12 @@ export class AuthService {
     if (Object.keys(error).length > 0) {
       throw new UnprocessableEntityException(error);
     }
+    if (updateUserDto.avatar && user.avatar) {
+      const path = `images/profile/${user.avatar}`;
+      if (existsSync(path)) {
+        unlinkSync(`images/profile/${user.avatar}`);
+      }
+    }
     return this.userRepository.updateEntity(user, updateUserDto);
   }
 
@@ -356,7 +362,14 @@ export class AuthService {
     const { oldPassword, password } = changePasswordDto;
     const checkOldPwdMatches = await user.validatePassword(oldPassword);
     if (!checkOldPwdMatches) {
-      throw new UnauthorizedException();
+      throw new HttpException(
+        {
+          message: 'incorrectOldPassword',
+          statusCode: HttpStatus.PRECONDITION_FAILED,
+          error: true
+        },
+        HttpStatus.PRECONDITION_FAILED
+      );
     }
     user.password = password;
     await user.save();
@@ -432,13 +445,13 @@ export class AuthService {
   buildResponsePayload(accessToken: string, refreshToken?: string): string[] {
     const jwtConfig = config.get('jwt');
     const tokenCookies = [
-      `Authentication=${accessToken}; HttpOnly; Path=/; SameSite=None; Secure; Max-Age=${jwtConfig.cookieExpiresIn}`
-      // `Authentication=${accessToken}; HttpOnly; Path=/; Max-Age=${jwtConfig.cookieExpiresIn}`
+      // `Authentication=${accessToken}; HttpOnly; Path=/; SameSite=None; Secure; Max-Age=${jwtConfig.cookieExpiresIn}`
+      `Authentication=${accessToken}; HttpOnly; Path=/; Max-Age=${jwtConfig.cookieExpiresIn}`
     ];
     if (refreshToken) {
       tokenCookies.push(
-        `Refresh=${refreshToken}; HttpOnly; Path=/; SameSite=None; Secure; Max-Age=${jwtConfig.cookieExpiresIn}`
-        // `Refresh=${refreshToken}; HttpOnly; Path=/; Max-Age=${jwtConfig.cookieExpiresIn}`
+        // `Refresh=${refreshToken}; HttpOnly; Path=/; SameSite=None; Secure; Max-Age=${jwtConfig.cookieExpiresIn}`
+        `Refresh=${refreshToken}; HttpOnly; Path=/; Max-Age=${jwtConfig.cookieExpiresIn}`
       );
     }
     return tokenCookies;
@@ -473,7 +486,7 @@ export class AuthService {
     } catch (e) {}
   }
 
-  activeRevokeTokenList(userId: number): Promise<Array<RefreshToken>> {
+  activeRefreshTokenList(userId: number): Promise<Array<RefreshToken>> {
     return this.refreshTokenService.getRefreshTokenByUserId(userId);
   }
 

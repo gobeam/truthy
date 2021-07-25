@@ -8,5 +8,6 @@
   "inactiveUser": "You account has not been activated yet.",
   "Not Found": "Data not found",
   "tokenExpired": "Your session has expired",
+  "incorrectOldPassword": "Incorrect old password!",
   "tooManyRequest": "Too many tries, retry after {second} $t(exception.sec, {{\"count\": {second} }})."
 }

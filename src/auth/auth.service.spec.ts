@@ -8,7 +8,6 @@ import { UpdateUserProfileDto } from './dto/update-user-profile.dto';
 import {
   HttpException,
   NotFoundException,
-  UnauthorizedException,
   UnprocessableEntityException
 } from '@nestjs/common';
 import { ResetPasswordDto } from './dto/reset-password.dto';
@@ -169,7 +168,7 @@ describe('AuthService', () => {
           user.validatePassword = jest.fn().mockResolvedValue(false);
           await expect(
             service.changePassword(user, changePasswordDto)
-          ).rejects.toThrowError(UnauthorizedException);
+          ).rejects.toThrowError(HttpException);
           expect(user.validatePassword).toHaveBeenCalledTimes(1);
           expect(user.save).toHaveBeenCalledTimes(0);
         });
@@ -280,39 +279,42 @@ describe('AuthService', () => {
       expect(userRepository.get).toHaveBeenCalledTimes(1);
     });
 
-    it('update user with non duplicate username & email', async () => {
-      userRepository.updateEntity.mockResolvedValue(mockUser);
-      userRepository.get.mockResolvedValue(mockUser);
-      userRepository.countEntityByCondition.mockResolvedValue(0);
-      const updateUserDto: UpdateUserProfileDto = {
-        email: 'test@test.com',
-        username: 'tester123',
-        name: 'tester',
-        roleId: 2
-      };
-      await service.update(user.id, updateUserDto);
-      expect(userRepository.countEntityByCondition).toHaveBeenCalledTimes(2);
-      expect(userRepository.updateEntity).toHaveBeenCalledTimes(1);
-      expect(userRepository.updateEntity).toHaveBeenCalledWith(
-        mockUser,
-        updateUserDto
-      );
-      expect(userRepository.updateEntity).not.toThrow();
-    });
+    describe('update user', () => {
+      let updateUserDto: UpdateUserProfileDto;
+      beforeEach(() => {
+        updateUserDto = {
+          email: 'test@test.com',
+          username: 'tester123',
+          name: 'tester',
+          avatar: 'test.jpg',
+          address: 'test',
+          contact: 'test'
+        };
+      });
 
-    it('update user with duplicate username & email', async () => {
-      userRepository.countEntityByCondition.mockResolvedValue(1);
-      const updateUserDto: UpdateUserProfileDto = {
-        email: 'test@test.com',
-        username: 'tester123',
-        name: 'tester',
-        roleId: 2
-      };
-      userRepository.get.mockResolvedValue(mockUser);
-      await expect(service.update(user, updateUserDto)).rejects.toThrowError(
-        UnprocessableEntityException
-      );
-      expect(userRepository.countEntityByCondition).toHaveBeenCalledTimes(2);
+      it('update user with duplicate username & email', async () => {
+        userRepository.countEntityByCondition.mockResolvedValue(1);
+
+        userRepository.get.mockResolvedValue(mockUser);
+        await expect(service.update(user, updateUserDto)).rejects.toThrowError(
+          UnprocessableEntityException
+        );
+        expect(userRepository.countEntityByCondition).toHaveBeenCalledTimes(2);
+      });
+
+      it('update user with non duplicate username & email', async () => {
+        userRepository.updateEntity.mockResolvedValue(mockUser);
+        userRepository.get.mockResolvedValue(mockUser);
+        userRepository.countEntityByCondition.mockResolvedValue(0);
+        await service.update(user.id, updateUserDto);
+        expect(userRepository.countEntityByCondition).toHaveBeenCalledTimes(2);
+        expect(userRepository.updateEntity).toHaveBeenCalledTimes(1);
+        expect(userRepository.updateEntity).toHaveBeenCalledWith(
+          mockUser,
+          updateUserDto
+        );
+        expect(userRepository.updateEntity).not.toThrow();
+      });
     });
 
     it('logout user', async () => {
@@ -335,7 +337,7 @@ describe('AuthService', () => {
 
   it('get user token list', async () => {
     const userId = 1;
-    await service.activeRevokeTokenList(userId);
+    await service.activeRefreshTokenList(userId);
     expect(refreshTokenService.getRefreshTokenByUserId).toHaveBeenCalledWith(
       userId
     );

@@ -11,7 +11,6 @@ import {
   NotFoundException
 } from '@nestjs/common';
 import { TokenExpiredError } from 'jsonwebtoken';
-import exp from 'constants';
 
 const jwtServiceMock = () => ({
   signAsync: jest.fn(),
@@ -203,12 +202,6 @@ describe('RefreshTokenService', () => {
     const userId = 1;
     await service.getRefreshTokenByUserId(userId);
     expect(repository.find).toHaveBeenCalledTimes(1);
-    expect(repository.find).toHaveBeenCalledWith({
-      where: {
-        userId,
-        isRevoked: false
-      }
-    });
   });
 
   describe('revokeRefreshTokenById', () => {

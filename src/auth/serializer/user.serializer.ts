@@ -1,6 +1,6 @@
 import { ModelSerializer } from '../../common/serializer/model.serializer';
 import { UserStatusEnum } from '../user-status.enum';
-import { Exclude, Expose, Type } from 'class-transformer';
+import { Exclude, Expose, Transform, Type } from 'class-transformer';
 import { RoleSerializer } from '../../roles/serializer/role.serializer';
 import {
   ApiHideProperty,
@@ -31,10 +31,16 @@ export class UserSerializer extends ModelSerializer {
   name: string;
 
   @ApiProperty()
+  @Transform(({ value }) => (value !== 'null' ? value : ''))
   address: string;
 
   @ApiProperty()
+  @Transform(({ value }) => (value !== 'null' ? value : ''))
   contact: string;
+
+  @ApiProperty()
+  @Transform(({ value }) => (value !== 'null' ? value : ''))
+  avatar: string;
 
   @ApiPropertyOptional()
   @Expose({ groups: adminUserGroupsForSerializing })

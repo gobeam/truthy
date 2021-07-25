@@ -10,6 +10,7 @@ import {
   Query,
   Req,
   Res,
+  UploadedFile,
   UseGuards,
   ValidationPipe
 } from '@nestjs/common';
@@ -32,17 +33,15 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { RegisterUserDto } from './dto/register-user.dto';
 import { JwtAuthGuard } from 'src/common/guard/jwt-auth.guard';
 import { RefreshToken } from '../refresh-token/entities/refresh-token.entity';
-import { I18nLang } from 'nestjs-i18n';
+import { UseInterceptors } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { multerOptionsHelper } from '../common/helper/multer-options.helper';
+import { UAParser } from 'ua-parser-js';
 
 @ApiTags('user')
 @Controller()
 export class AuthController {
   constructor(private authService: AuthService) {}
-
-  @Get('/lang')
-  sample(@I18nLang() lang: string) {
-    return { lang };
-  }
 
   @Post('/auth/register')
   register(
@@ -57,9 +56,10 @@ export class AuthController {
     @Res() response: Response,
     @Body() userLoginDto: UserLoginDto
   ) {
+    const ua = UAParser(req.headers['user-agent']);
     const refreshTokenPayload: Partial<RefreshToken> = {
       ip: req.ip,
-      userAgent: req.get('user-agent')
+      userAgent: JSON.stringify(ua)
     };
     const cookiePayload = await this.authService.login(
       userLoginDto,
@@ -77,10 +77,17 @@ export class AuthController {
 
   @UseGuards(JwtAuthGuard, PermissionGuard)
   @Put('/auth/profile')
+  @UseInterceptors(
+    FileInterceptor('avatar', multerOptionsHelper('images/profile', 1000000))
+  )
   updateProfile(
     @GetUser() user: UserEntity,
+    @UploadedFile() file: Express.Multer.File,
     @Body() updateUserDto: UpdateUserProfileDto
   ): Promise<UserSerializer> {
+    if (file) {
+      updateUserDto.avatar = file.filename;
+    }
     return this.authService.update(user.id, updateUserDto);
   }
 
@@ -168,10 +175,11 @@ export class AuthController {
   @UseGuards(JwtAuthGuard, PermissionGuard)
   @Get('/auth/token-info')
   getRefreshToken(@GetUser() user: UserEntity): Promise<Array<RefreshToken>> {
-    return this.authService.activeRevokeTokenList(+user.id);
+    return this.authService.activeRefreshTokenList(+user.id);
   }
 
   @UseGuards(JwtAuthGuard, PermissionGuard)
+  @Put('/revoke/:id')
   revokeToken(@Param('id') id: string, @GetUser() user: UserEntity) {
     return this.authService.revokeTokenById(+id, user.id);
   }
