@@ -31,6 +31,14 @@ export class UserEntity extends CustomBaseEntity {
   @Exclude({ toPlainOnly: true })
   password: string;
 
+  @Column({ nullable: true })
+  @Exclude({ toPlainOnly: true })
+  public twoFASecret?: string;
+
+  @Column({ default: false })
+  @Exclude({ toPlainOnly: true })
+  public isTwoFAEnabled: boolean;
+
   @Index()
   @Column()
   name: string;

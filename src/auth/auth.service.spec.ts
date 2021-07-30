@@ -17,9 +17,12 @@ import { ChangePasswordDto } from './dto/change-password.dto';
 import * as bcrypt from 'bcrypt';
 import { MailService } from '../mail/mail.service';
 import { RefreshTokenService } from '../refresh-token/refresh-token.service';
+import { JwtService } from '@nestjs/jwt';
+import { UserSerializer } from './serializer/user.serializer';
 
 const mockUserRepository = () => ({
   findOne: jest.fn(),
+  update: jest.fn(),
   get: jest.fn(),
   store: jest.fn(),
   login: jest.fn(),
@@ -42,7 +45,6 @@ const mockUser = {
 
 const refreshTokenServiceMock = () => ({
   generateRefreshToken: jest.fn(),
-  generateAccessToken: jest.fn(),
   resolveRefreshToken: jest.fn(),
   getRefreshTokenByUserId: jest.fn(),
   revokeRefreshTokenById: jest.fn()
@@ -57,17 +59,24 @@ const mailServiceMock = () => ({
   sendMail: jest.fn()
 });
 
+const jwtServiceMock = () => ({
+  signAsync: jest.fn(),
+  verifyAsync: jest.fn()
+});
+
 describe('AuthService', () => {
   let service: AuthService,
     userRepository,
     refreshTokenService,
     mailService,
-    throttleService;
+    throttleService,
+    jwtService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         AuthService,
+        { provide: JwtService, useFactory: jwtServiceMock },
         { provide: UserRepository, useFactory: mockUserRepository },
         { provide: RefreshTokenService, useFactory: refreshTokenServiceMock },
         { provide: MailService, useFactory: mailServiceMock },
@@ -82,6 +91,7 @@ describe('AuthService', () => {
     );
     mailService = await module.get<MailService>(MailService);
     throttleService = await module.get<'LOGIN_THROTTLE'>('LOGIN_THROTTLE');
+    jwtService = await module.get<JwtService>(JwtService);
   });
 
   afterEach(() => {
@@ -176,6 +186,14 @@ describe('AuthService', () => {
     });
   });
 
+  it('generate access token', async () => {
+    const user = new UserSerializer();
+    user.id = 1;
+    user.email = 'test@mail.com';
+    await service.generateAccessToken(user);
+    expect(jwtService.signAsync).toHaveBeenCalledTimes(1);
+  });
+
   describe('addUser', () => {
     it('add new user test', async () => {
       const token = 'Adf2vBnVV';
@@ -252,18 +270,18 @@ describe('AuthService', () => {
 
     it('login user successfully', async () => {
       throttleService.get.mockResolvedValue(null);
-      userRepository.login.mockResolvedValue([user, null]);
-      refreshTokenService.generateAccessToken.mockResolvedValue(user);
-
       jest.spyOn(service, 'buildResponsePayload').mockReturnValue(['result']);
-
+      userRepository.login.mockResolvedValue([user, null]);
+      jest
+        .spyOn(service, 'generateAccessToken')
+        .mockResolvedValue('access_token');
       await service.login(userLoginDto, refreshTokenPayload);
       expect(userRepository.login).toHaveBeenCalledWith(userLoginDto);
       expect(throttleService.delete).toHaveBeenCalledWith(
         `${user.username}_${ip}`
       );
-      expect(refreshTokenService.generateAccessToken).toHaveBeenCalledTimes(1);
       expect(refreshTokenService.generateRefreshToken).toHaveBeenCalledTimes(1);
+      expect(service.generateAccessToken).toHaveBeenCalledTimes(1);
       expect(service.buildResponsePayload).toHaveBeenCalledTimes(1);
     });
 
@@ -356,5 +374,18 @@ describe('AuthService', () => {
     );
     await expect(service.revokeTokenById(1, 1)).resolves.not.toThrow();
     expect(refreshTokenService.revokeRefreshTokenById).toHaveBeenCalledTimes(1);
+  });
+
+  it('should update user twofa secret', async () => {
+    await service.setTwoFactorAuthenticationSecret('secret', 1);
+    expect(userRepository.update).toHaveBeenCalledTimes(1);
+  });
+
+  it('should update user twofa enable status', async () => {
+    await service.turnOnTwoFactorAuthentication(1);
+    expect(userRepository.update).toHaveBeenCalledTimes(1);
+    expect(userRepository.update).toHaveBeenCalledWith(1, {
+      isTwoFAEnabled: true
+    });
   });
 });

@@ -19,10 +19,10 @@ import { PermissionGuard } from '../common/guard/permission.guard';
 import { Pagination } from '../paginate';
 import { EmailTemplate } from './serializer/email-template.serializer';
 import { EmailTemplatesSearchFilterDto } from './dto/email-templates-search-filter.dto';
-import { JwtAuthGuard } from '../common/guard/jwt-auth.guard';
+import JwtTwoFactorGuard from '../common/guard/jwt-two-factor.guard';
 
 @ApiTags('email-templates')
-@UseGuards(JwtAuthGuard, PermissionGuard)
+@UseGuards(JwtTwoFactorGuard, PermissionGuard)
 @Controller('email-templates')
 export class EmailTemplateController {
   constructor(private readonly emailTemplateService: EmailTemplateService) {}

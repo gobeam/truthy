@@ -1,9 +1,9 @@
-import { UserEntity } from './entity/user.entity';
-import { JwtPayloadDto } from './dto/jwt-payload.dto';
 import { Test } from '@nestjs/testing';
-import { UserRepository } from './user.repository';
 import { JwtStrategy } from './jwt.strategy';
 import { UnauthorizedException } from '@nestjs/common';
+import { UserRepository } from '../../auth/user.repository';
+import { UserEntity } from '../../auth/entity/user.entity';
+import { JwtPayloadDto } from '../../auth/dto/jwt-payload.dto';
 
 const mockUserRepository = () => ({
   findOne: jest.fn()
@@ -33,11 +33,11 @@ describe('Test JWT strategy', () => {
       user.name = 'test';
       user.username = 'tester';
       const payload: JwtPayloadDto = {
-        subject: '1'
+        sub: '1'
       };
       userRepository.findOne.mockResolvedValue(user);
       const result = await jwtStrategy.validate(payload);
-      expect(userRepository.findOne).toHaveBeenCalledWith(payload.subject, {
+      expect(userRepository.findOne).toHaveBeenCalledWith(Number(payload.sub), {
         relations: ['role', 'role.permission']
       });
       expect(result).toEqual(user);
@@ -45,7 +45,7 @@ describe('Test JWT strategy', () => {
 
     it('should throw error if subject is not found on database', async () => {
       const payload: JwtPayloadDto = {
-        subject: '1'
+        sub: '1'
       };
       userRepository.findOne.mockResolvedValue(null);
       await expect(jwtStrategy.validate(payload)).rejects.toThrow(

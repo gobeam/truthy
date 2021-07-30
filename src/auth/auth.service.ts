@@ -34,14 +34,23 @@ import {
 } from 'rate-limiter-flexible';
 import { RefreshTokenService } from '../refresh-token/refresh-token.service';
 import { RefreshToken } from '../refresh-token/entities/refresh-token.entity';
+import { JwtService } from '@nestjs/jwt';
+import { SignOptions } from 'jsonwebtoken';
 
 const throttleConfig = config.get('throttle.login');
+const jwtConfig = config.get('jwt');
+const appConfig = config.get('app');
+const BASE_OPTIONS: SignOptions = {
+  issuer: appConfig.appUrl,
+  audience: appConfig.frontendUrl
+};
 
 @Injectable()
 export class AuthService {
   constructor(
     @InjectRepository(UserRepository)
     private readonly userRepository: UserRepository,
+    private readonly jwt: JwtService,
     private readonly mailService: MailService,
     private readonly refreshTokenService: RefreshTokenService,
     @Inject('LOGIN_THROTTLE')
@@ -156,8 +165,7 @@ export class AuthService {
       }
       throw new UnauthorizedException(error);
     }
-    const accessTokenPromise =
-      this.refreshTokenService.generateAccessToken(user);
+    const accessTokenPromise = this.generateAccessToken(user);
     const refreshTokenPromise = this.refreshTokenService.generateRefreshToken(
       user,
       refreshTokenPayload
@@ -168,6 +176,22 @@ export class AuthService {
     ]);
     await this.rateLimiter.delete(usernameIPkey);
     return this.buildResponsePayload(accessToken, refreshToken);
+  }
+
+  /**
+   * Generate access token
+   * @param user
+   * @param isTwoFAAuthenticated
+   */
+  public async generateAccessToken(
+    user: UserSerializer,
+    isTwoFAAuthenticated = false
+  ): Promise<string> {
+    const opts: SignOptions = {
+      ...BASE_OPTIONS,
+      subject: String(user.id)
+    };
+    return this.jwt.signAsync({ isTwoFAAuthenticated }, opts);
   }
 
   /**
@@ -432,8 +456,12 @@ export class AuthService {
    */
   getCookieForLogOut(): string[] {
     return [
-      'Authentication=; HttpOnly; Path=/; Max-Age=0; SameSite=None; Secure',
-      'Refresh=; HttpOnly; Path=/; Max-Age=0; SameSite=None; Secure'
+      `Authentication=; HttpOnly; Path=/; Max-Age=0; ${
+        !appConfig.sameSite ? 'SameSite=None; Secure;' : ''
+      }`,
+      `Refresh=; HttpOnly; Path=/; Max-Age=0; ${
+        !appConfig.sameSite ? 'SameSite=None; Secure;' : ''
+      }`
     ];
   }
 
@@ -443,15 +471,21 @@ export class AuthService {
    * @param refreshToken
    */
   buildResponsePayload(accessToken: string, refreshToken?: string): string[] {
-    const jwtConfig = config.get('jwt');
+    const expiration = new Date();
+    expiration.setSeconds(expiration.getSeconds() + jwtConfig.expiresIn);
     const tokenCookies = [
-      // `Authentication=${accessToken}; HttpOnly; Path=/; SameSite=None; Secure; Max-Age=${jwtConfig.cookieExpiresIn}`
-      `Authentication=${accessToken}; HttpOnly; Path=/; Max-Age=${jwtConfig.cookieExpiresIn}`
+      `Authentication=${accessToken}; HttpOnly; Path=/; ${
+        !appConfig.sameSite ? 'SameSite=None; Secure;' : ''
+      } Max-Age=${jwtConfig.cookieExpiresIn}`,
+      `ExpiresIn=${expiration}; Path=/; ${
+        !appConfig.sameSite ? 'SameSite=None; Secure;' : ''
+      } Max-Age=${jwtConfig.cookieExpiresIn}`
     ];
     if (refreshToken) {
       tokenCookies.push(
-        // `Refresh=${refreshToken}; HttpOnly; Path=/; SameSite=None; Secure; Max-Age=${jwtConfig.cookieExpiresIn}`
-        `Refresh=${refreshToken}; HttpOnly; Path=/; Max-Age=${jwtConfig.cookieExpiresIn}`
+        `Refresh=${refreshToken}; HttpOnly; Path=/; ${
+          !appConfig.sameSite ? 'SameSite=None; Secure;' : ''
+        } Max-Age=${jwtConfig.cookieExpiresIn}`
       );
     }
     return tokenCookies;
@@ -492,5 +526,17 @@ export class AuthService {
 
   revokeTokenById(id: number, userId: number): Promise<RefreshToken> {
     return this.refreshTokenService.revokeRefreshTokenById(id, userId);
+  }
+
+  async setTwoFactorAuthenticationSecret(secret: string, userId: number) {
+    return this.userRepository.update(userId, {
+      twoFASecret: secret
+    });
+  }
+
+  async turnOnTwoFactorAuthentication(userId: number) {
+    return this.userRepository.update(userId, {
+      isTwoFAEnabled: true
+    });
   }
 }

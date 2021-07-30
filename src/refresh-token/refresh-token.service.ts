@@ -35,19 +35,6 @@ export class RefreshTokenService {
   ) {}
 
   /**
-   * Generate access token
-   * @param user
-   */
-  public async generateAccessToken(user: UserSerializer): Promise<string> {
-    const opts: SignOptions = {
-      ...BASE_OPTIONS,
-      subject: String(user.id)
-    };
-
-    return this.jwt.signAsync({}, opts);
-  }
-
-  /**
    * Generate refresh token
    * @param user
    * @param refreshToken
@@ -103,7 +90,7 @@ export class RefreshTokenService {
   ): Promise<{ token: string; user: UserSerializer }> {
     const { user } = await this.resolveRefreshToken(refresh);
 
-    const token = await this.generateAccessToken(user);
+    const token = await this.authService.generateAccessToken(user);
 
     return { user, token };
   }

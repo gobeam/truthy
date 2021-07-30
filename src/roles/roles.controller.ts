@@ -19,10 +19,10 @@ import { RoleSerializer } from './serializer/role.serializer';
 import { Pagination } from '../paginate';
 import { ApiBearerAuth, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { PermissionGuard } from '../common/guard/permission.guard';
-import { JwtAuthGuard } from '../common/guard/jwt-auth.guard';
+import JwtTwoFactorGuard from '../common/guard/jwt-two-factor.guard';
 
 @ApiTags('roles')
-@UseGuards(JwtAuthGuard, PermissionGuard)
+@UseGuards(JwtTwoFactorGuard, PermissionGuard)
 @Controller('roles')
 @ApiBearerAuth()
 export class RolesController {

@@ -19,10 +19,10 @@ import { Permission } from './serializer/permission.serializer';
 import { ApiBearerAuth, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { PermissionGuard } from '../common/guard/permission.guard';
 import { Pagination } from '../paginate';
-import { JwtAuthGuard } from '../common/guard/jwt-auth.guard';
+import JwtTwoFactorGuard from '../common/guard/jwt-two-factor.guard';
 
 @ApiTags('permissions')
-@UseGuards(JwtAuthGuard, PermissionGuard)
+@UseGuards(JwtTwoFactorGuard, PermissionGuard)
 @Controller('permissions')
 @ApiBearerAuth()
 export class PermissionsController {

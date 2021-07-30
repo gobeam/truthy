@@ -21,6 +21,7 @@ import {
 } from 'nestjs-i18n';
 import { I18nExceptionFilterPipe } from './common/pipes/i18n-exception-filter.pipe';
 import { CustomValidationPipe } from './common/pipes/custom-validation.pipe';
+import { TwofaModule } from './twofa/twofa.module';
 
 const appConfig = config.get('app');
 
@@ -50,7 +51,8 @@ const appConfig = config.get('app');
     PermissionsModule,
     MailModule,
     EmailTemplateModule,
-    RefreshTokenModule
+    RefreshTokenModule,
+    TwofaModule
   ],
   providers: [
     { provide: APP_PIPE, useClass: CustomValidationPipe },

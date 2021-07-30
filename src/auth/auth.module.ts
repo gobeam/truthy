@@ -4,7 +4,6 @@ import { AuthService } from './auth.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserRepository } from './user.repository';
 import { PassportModule } from '@nestjs/passport';
-import { JwtStrategy } from './jwt.strategy';
 import * as config from 'config';
 import { UniqueValidatorPipe } from '../common/pipes/unique-validator.pipe';
 import { MailModule } from '../mail/mail.module';
@@ -12,6 +11,8 @@ import * as Redis from 'ioredis';
 import { RateLimiterRedis } from 'rate-limiter-flexible';
 import { RefreshTokenModule } from '../refresh-token/refresh-token.module';
 import { JwtModule } from '@nestjs/jwt';
+import { JwtTwoFactorStrategy } from '../common/strategy/jwt-two-factor.strategy';
+import { JwtStrategy } from '../common/strategy/jwt.strategy';
 
 const throttleConfig = config.get('throttle.login');
 const redisConfig = config.get('queue');
@@ -52,10 +53,17 @@ const LoginThrottleFactory = {
   controllers: [AuthController],
   providers: [
     AuthService,
+    JwtTwoFactorStrategy,
     JwtStrategy,
     UniqueValidatorPipe,
     LoginThrottleFactory
   ],
-  exports: [AuthService, JwtStrategy, PassportModule, JwtModule]
+  exports: [
+    AuthService,
+    JwtTwoFactorStrategy,
+    JwtStrategy,
+    PassportModule,
+    JwtModule
+  ]
 })
 export class AuthModule {}

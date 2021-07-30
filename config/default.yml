@@ -20,6 +20,7 @@ app:
   description: 'Official Truthy API'
   appUrl: 'http://localhost:7777'
   frontendUrl: 'http://localhost:3000'
+  sameSite: true
 
 mail:
   host: 'smtp.mailtrap.io'
@@ -50,3 +51,6 @@ throttle:
     limit: 5
     duration: 2592000
     blockDuration: 3000
+
+twofa:
+  authenticationAppNAme: 'truthy'

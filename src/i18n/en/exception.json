@@ -5,9 +5,10 @@
     "zero": "second"
   },
   "Unauthorized": "Unauthorized",
-  "inactiveUser": "You account has not been activated yet.",
-  "Not Found": "Data not found",
-  "tokenExpired": "Your session has expired",
+  "otpRequired": "OTP required",
+  "inactiveUser": "You account has not been activated yet!",
+  "Not Found": "Data not found!",
+  "tokenExpired": "Your session has expired!",
   "incorrectOldPassword": "Incorrect old password!",
-  "tooManyRequest": "Too many tries, retry after {second} $t(exception.sec, {{\"count\": {second} }})."
+  "tooManyRequest": "Too many tries, retry after {second} $t(exception.sec, {{\"count\": {second} }})!"
 }

@@ -37,6 +37,7 @@ import { UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { multerOptionsHelper } from '../common/helper/multer-options.helper';
 import { UAParser } from 'ua-parser-js';
+import JwtTwoFactorGuard from '../common/guard/jwt-two-factor.guard';
 
 @ApiTags('user')
 @Controller()
@@ -69,26 +70,19 @@ export class AuthController {
     return response.status(HttpStatus.NO_CONTENT).json({});
   }
 
-  @UseGuards(JwtAuthGuard, PermissionGuard)
-  @Get('/auth/profile')
-  profile(@GetUser() user: UserEntity): Promise<UserSerializer> {
-    return this.authService.get(user);
-  }
-
-  @UseGuards(JwtAuthGuard, PermissionGuard)
-  @Put('/auth/profile')
-  @UseInterceptors(
-    FileInterceptor('avatar', multerOptionsHelper('images/profile', 1000000))
-  )
-  updateProfile(
-    @GetUser() user: UserEntity,
-    @UploadedFile() file: Express.Multer.File,
-    @Body() updateUserDto: UpdateUserProfileDto
-  ): Promise<UserSerializer> {
-    if (file) {
-      updateUserDto.avatar = file.filename;
+  @Post('/refresh')
+  async refresh(@Req() req: Request, @Res() response: Response) {
+    try {
+      const cookiePayload =
+        await this.authService.createAccessTokenFromRefreshToken(
+          req.cookies['Refresh']
+        );
+      response.setHeader('Set-Cookie', cookiePayload);
+      return response.status(HttpStatus.NO_CONTENT).json({});
+    } catch (e) {
+      response.setHeader('Set-Cookie', this.authService.getCookieForLogOut());
+      return response.sendStatus(HttpStatus.BAD_REQUEST);
     }
-    return this.authService.update(user.id, updateUserDto);
   }
 
   @Get('/auth/activate-account')
@@ -109,7 +103,29 @@ export class AuthController {
     return this.authService.resetPassword(resetPasswordDto);
   }
 
-  @UseGuards(JwtAuthGuard, PermissionGuard)
+  @UseGuards(JwtTwoFactorGuard)
+  @Get('/auth/profile')
+  profile(@GetUser() user: UserEntity): Promise<UserSerializer> {
+    return this.authService.get(user);
+  }
+
+  @UseGuards(JwtTwoFactorGuard)
+  @Put('/auth/profile')
+  @UseInterceptors(
+    FileInterceptor('avatar', multerOptionsHelper('images/profile', 1000000))
+  )
+  updateProfile(
+    @GetUser() user: UserEntity,
+    @UploadedFile() file: Express.Multer.File,
+    @Body() updateUserDto: UpdateUserProfileDto
+  ): Promise<UserSerializer> {
+    if (file) {
+      updateUserDto.avatar = file.filename;
+    }
+    return this.authService.update(user.id, updateUserDto);
+  }
+
+  @UseGuards(JwtTwoFactorGuard)
   @Put('/auth/change-password')
   changePassword(
     @GetUser() user: UserEntity,
@@ -118,7 +134,7 @@ export class AuthController {
     return this.authService.changePassword(user, changePasswordDto);
   }
 
-  @UseGuards(JwtAuthGuard, PermissionGuard)
+  @UseGuards(JwtTwoFactorGuard, PermissionGuard)
   @Get('/users')
   findAll(
     @Query() userSearchFilterDto: UserSearchFilterDto
@@ -126,7 +142,7 @@ export class AuthController {
     return this.authService.findAll(userSearchFilterDto);
   }
 
-  @UseGuards(JwtAuthGuard, PermissionGuard)
+  @UseGuards(JwtTwoFactorGuard, PermissionGuard)
   @Post('/users')
   create(
     @Body(ValidationPipe) createUserDto: CreateUserDto
@@ -134,7 +150,7 @@ export class AuthController {
     return this.authService.create(createUserDto);
   }
 
-  @UseGuards(JwtAuthGuard, PermissionGuard)
+  @UseGuards(JwtTwoFactorGuard, PermissionGuard)
   @Put('/users/:id')
   update(
     @Param('id') id: string,
@@ -143,28 +159,13 @@ export class AuthController {
     return this.authService.update(+id, updateUserDto);
   }
 
-  @UseGuards(JwtAuthGuard, PermissionGuard)
+  @UseGuards(JwtTwoFactorGuard, PermissionGuard)
   @Get('/users/:id')
   findOne(@Param('id') id: string): Promise<UserSerializer> {
     return this.authService.findById(+id);
   }
 
-  @Post('/refresh')
-  async refresh(@Req() req: Request, @Res() response: Response) {
-    try {
-      const cookiePayload =
-        await this.authService.createAccessTokenFromRefreshToken(
-          req.cookies['Refresh']
-        );
-      response.setHeader('Set-Cookie', cookiePayload);
-      return response.status(HttpStatus.NO_CONTENT).json({});
-    } catch (e) {
-      response.setHeader('Set-Cookie', this.authService.getCookieForLogOut());
-      return response.sendStatus(HttpStatus.BAD_REQUEST);
-    }
-  }
-
-  @UseGuards(JwtAuthGuard, PermissionGuard)
+  @UseGuards(JwtAuthGuard)
   @Post('/logout')
   async logOut(@Req() req: Request, @Res() response: Response) {
     await this.authService.revokeRefreshToken(req.cookies['Refresh']);
@@ -172,13 +173,13 @@ export class AuthController {
     return response.sendStatus(HttpStatus.NO_CONTENT);
   }
 
-  @UseGuards(JwtAuthGuard, PermissionGuard)
+  @UseGuards(JwtTwoFactorGuard)
   @Get('/auth/token-info')
   getRefreshToken(@GetUser() user: UserEntity): Promise<Array<RefreshToken>> {
     return this.authService.activeRefreshTokenList(+user.id);
   }
 
-  @UseGuards(JwtAuthGuard, PermissionGuard)
+  @UseGuards(JwtTwoFactorGuard)
   @Put('/revoke/:id')
   revokeToken(@Param('id') id: string, @GetUser() user: UserEntity) {
     return this.authService.revokeTokenById(+id, user.id);

@@ -18,7 +18,8 @@ const jwtServiceMock = () => ({
 });
 
 const authServiceMock = () => ({
-  findById: jest.fn()
+  findById: jest.fn(),
+  generateAccessToken: jest.fn()
 });
 
 const repositoryMock = () => ({
@@ -63,11 +64,6 @@ describe('RefreshTokenService', () => {
 
   afterEach(() => {
     jest.clearAllMocks();
-  });
-
-  it('generate access token', async () => {
-    await service.generateAccessToken(user);
-    expect(jwtService.signAsync).toHaveBeenCalledTimes(1);
   });
 
   it('generate refresh token', async () => {
@@ -135,14 +131,14 @@ describe('RefreshTokenService', () => {
     jest
       .spyOn(service, 'resolveRefreshToken')
       .mockResolvedValue({ user, token: refreshToken });
-    jest
-      .spyOn(service, 'generateAccessToken')
-      .mockResolvedValue('refresh_token_hash');
+    // jest
+    //   .spyOn(service, 'generateAccessToken')
+    //   .mockResolvedValue('refresh_token_hash');
     await service.createAccessTokenFromRefreshToken('old_token_hash');
     expect(service.resolveRefreshToken).toHaveBeenCalledWith('old_token_hash');
     expect(service.resolveRefreshToken).toHaveBeenCalledTimes(1);
-    expect(service.generateAccessToken).toHaveBeenCalledTimes(1);
-    expect(service.generateAccessToken).toHaveBeenCalledWith(user);
+    expect(authService.generateAccessToken).toHaveBeenCalledTimes(1);
+    expect(authService.generateAccessToken).toHaveBeenCalledWith(user);
   });
 
   describe('decodeRefreshToken', () => {
