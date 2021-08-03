@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { UserEntity } from '../auth/entity/user.entity';
 import { AuthService } from '../auth/auth.service';
 import { authenticator } from 'otplib';
@@ -13,6 +13,18 @@ export class TwofaService {
   constructor(private readonly usersService: AuthService) {}
 
   public async generateTwoFASecret(user: UserEntity) {
+    if (user.twoFAThrottleTime > new Date()) {
+      throw new HttpException(
+        {
+          message: `tooManyRequest-{"second":"${this.differentBetweenDatesInSec(
+            user.twoFAThrottleTime,
+            new Date()
+          )}"}`,
+          error: true
+        },
+        HttpStatus.TOO_MANY_REQUESTS
+      );
+    }
     const secret = authenticator.generateSecret();
     const otpauthUrl = authenticator.keyuri(
       user.email,
@@ -35,5 +47,10 @@ export class TwofaService {
 
   public async pipeQrCodeStream(stream: Response, otpauthUrl: string) {
     return toFileStream(stream, otpauthUrl);
+  }
+
+  differentBetweenDatesInSec(initialDate: Date, endDate: Date): number {
+    const diffInSeconds = Math.abs(initialDate.getTime() - endDate.getTime());
+    return Math.round(diffInSeconds / 1000);
   }
 }

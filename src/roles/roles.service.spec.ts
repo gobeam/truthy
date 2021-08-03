@@ -3,10 +3,8 @@ import { RolesService } from './roles.service';
 import { RoleRepository } from './role.repository';
 import { RoleFilterDto } from './dto/role-filter.dto';
 import { CreateRoleDto } from './dto/create-role.dto';
-import {
-  NotFoundException,
-  UnprocessableEntityException
-} from '@nestjs/common';
+import { UnprocessableEntityException } from '@nestjs/common';
+import { NotFoundException } from '../exception/not-found.exception';
 import { UpdateRoleDto } from './dto/update-role.dto';
 import { PermissionsService } from '../permissions/permissions.service';
 import { MethodList } from '../config/permission-config';

@@ -7,6 +7,8 @@ import { UserSerializer } from './serializer/user.serializer';
 import { classToPlain, plainToClass } from 'class-transformer';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { UserStatusEnum } from './user-status.enum';
+import { ExceptionTitleList } from 'src/common/constants/exception-title-list.constants';
+import { StatusCodesList } from 'src/common/constants/status-codes-list.constants';
 
 @EntityRepository(UserEntity)
 export class UserRepository extends BaseRepository<UserEntity, UserSerializer> {
@@ -33,18 +35,28 @@ export class UserRepository extends BaseRepository<UserEntity, UserSerializer> {
    * login user
    * @param userLoginDto
    */
-  async login(userLoginDto: UserLoginDto): Promise<[UserEntity, string]> {
+  async login(
+    userLoginDto: UserLoginDto
+  ): Promise<[user: UserEntity, error: string, code: number]> {
     const { username, password } = userLoginDto;
     const user = await this.findOne({
       where: [{ username: username }, { email: username }]
     });
     if (user && (await user.validatePassword(password))) {
       if (user.status !== UserStatusEnum.ACTIVE) {
-        return [null, 'inactiveUser'];
+        return [
+          null,
+          ExceptionTitleList.UserInactive,
+          StatusCodesList.UserInactive
+        ];
       }
-      return [user, null];
+      return [user, null, null];
     }
-    return [null, 'Unauthorized'];
+    return [
+      null,
+      ExceptionTitleList.InvalidCredentials,
+      StatusCodesList.InvalidCredentials
+    ];
   }
 
   /**

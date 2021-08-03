@@ -7,8 +7,11 @@
   "Unauthorized": "Unauthorized",
   "otpRequired": "OTP required",
   "inactiveUser": "You account has not been activated yet!",
+  "Forbidden": "Access to the requested resource is forbidden!",
+  "userInactive": "User is inactive please contact your administrator for further help!",
   "Not Found": "Data not found!",
   "tokenExpired": "Your session has expired!",
   "incorrectOldPassword": "Incorrect old password!",
+  "badRequest": "Bad Request, There was some error please try again later!",
   "tooManyRequest": "Too many tries, retry after {second} $t(exception.sec, {{\"count\": {second} }})!"
 }

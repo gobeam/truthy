@@ -3,6 +3,7 @@ import { TwofaService } from './twofa.service';
 import { AuthService } from '../auth/auth.service';
 import { authenticator } from 'otplib';
 import { UserEntity } from '../auth/entity/user.entity';
+import { HttpException } from '@nestjs/common';
 
 const authServiceMock = () => ({
   setTwoFactorAuthenticationSecret: jest.fn()
@@ -28,15 +29,29 @@ describe('TwofaService', () => {
     user.salt = 'result';
   });
 
-  it('should generate 2fa secret', async () => {
-    jest.spyOn(authenticator, 'generateSecret').mockReturnValue('result');
-    jest.spyOn(authenticator, 'keyuri').mockReturnValue('result');
-    await service.generateTwoFASecret(user);
-    expect(authenticator.generateSecret).toHaveBeenCalledTimes(1);
-    expect(authenticator.keyuri).toHaveBeenCalledTimes(1);
-    expect(authService.setTwoFactorAuthenticationSecret).toHaveBeenCalledTimes(
-      1
-    );
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
+  describe('#generateSecret', () => {
+    it('should throw error if user tries to spam generate OTP', async () => {
+      const twoFAThrottleTime = new Date();
+      twoFAThrottleTime.setSeconds(twoFAThrottleTime.getSeconds() + 60);
+      user.twoFAThrottleTime = twoFAThrottleTime;
+      await expect(service.generateTwoFASecret(user)).rejects.toThrowError(
+        HttpException
+      );
+    });
+    it('should generate 2fa secret', async () => {
+      jest.spyOn(authenticator, 'generateSecret').mockReturnValue('result');
+      jest.spyOn(authenticator, 'keyuri').mockReturnValue('result');
+      await service.generateTwoFASecret(user);
+      expect(authenticator.generateSecret).toHaveBeenCalledTimes(1);
+      expect(authenticator.keyuri).toHaveBeenCalledTimes(1);
+      expect(
+        authService.setTwoFactorAuthenticationSecret
+      ).toHaveBeenCalledTimes(1);
+    });
   });
 
   it('isTwoFACodeValid', async () => {

@@ -1,41 +1,44 @@
 import {
-  HttpException,
   HttpStatus,
   Inject,
   Injectable,
-  NotFoundException,
-  UnauthorizedException,
   UnprocessableEntityException
 } from '@nestjs/common';
-import { UserRepository } from './user.repository';
+import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
-import { UserEntity } from './entity/user.entity';
+import * as config from 'config';
+import { existsSync, unlinkSync } from 'fs';
+import { SignOptions } from 'jsonwebtoken';
+import {
+  RateLimiterRes,
+  RateLimiterStoreAbstract
+} from 'rate-limiter-flexible';
+import { ExceptionTitleList } from '../common/constants/exception-title-list.constants';
+import { StatusCodesList } from '../common/constants/status-codes-list.constants';
+import { ForbiddenException } from '../exception/forbidden.exception';
+import { NotFoundException } from '../exception/not-found.exception';
+import { UnauthorizedException } from '../exception/unauthorized.exception';
+import { DeepPartial, Not, ObjectLiteral } from 'typeorm';
+import { CustomHttpException } from '../exception/custom-http.exception';
+import { MailJobInterface } from '../mail/interface/mail-job.interface';
+import { MailService } from '../mail/mail.service';
+import { Pagination } from '../paginate';
+import { RefreshToken } from '../refresh-token/entities/refresh-token.entity';
+import { RefreshTokenService } from '../refresh-token/refresh-token.service';
+import { ChangePasswordDto } from './dto/change-password.dto';
+import { ForgetPasswordDto } from './dto/forget-password.dto';
+import { ResetPasswordDto } from './dto/reset-password.dto';
 import { UserLoginDto } from './dto/user-login.dto';
+import { UserSearchFilterDto } from './dto/user-search-filter.dto';
+import { UserEntity } from './entity/user.entity';
 import {
   adminUserGroupsForSerializing,
   defaultUserGroupsForSerializing,
   ownerUserGroupsForSerializing,
   UserSerializer
 } from './serializer/user.serializer';
-import { DeepPartial, Not, ObjectLiteral } from 'typeorm';
-import { ResetPasswordDto } from './dto/reset-password.dto';
-import * as config from 'config';
-import { ForgetPasswordDto } from './dto/forget-password.dto';
 import { UserStatusEnum } from './user-status.enum';
-import { unlinkSync, existsSync } from 'fs';
-import { ChangePasswordDto } from './dto/change-password.dto';
-import { MailService } from '../mail/mail.service';
-import { MailJobInterface } from '../mail/interface/mail-job.interface';
-import { Pagination } from '../paginate';
-import { UserSearchFilterDto } from './dto/user-search-filter.dto';
-import {
-  RateLimiterRes,
-  RateLimiterStoreAbstract
-} from 'rate-limiter-flexible';
-import { RefreshTokenService } from '../refresh-token/refresh-token.service';
-import { RefreshToken } from '../refresh-token/entities/refresh-token.entity';
-import { JwtService } from '@nestjs/jwt';
-import { SignOptions } from 'jsonwebtoken';
+import { UserRepository } from './user.repository';
 
 const throttleConfig = config.get('throttle.login');
 const jwtConfig = config.get('jwt');
@@ -140,30 +143,28 @@ export class AuthService {
       retrySecs = Math.round(resUsernameAndIP.msBeforeNext / 1000) || 1;
     }
     if (retrySecs > 0) {
-      throw new HttpException(
-        this.tooManyRequestExceptionPayload(
-          `tooManyRequest-{"second":"${String(retrySecs)}"}`
-        ),
-        HttpStatus.TOO_MANY_REQUESTS
+      throw new CustomHttpException(
+        `tooManyRequest-{"second":"${String(retrySecs)}"}`,
+        HttpStatus.TOO_MANY_REQUESTS,
+        StatusCodesList.TooManyTries
       );
     }
 
-    const [user, error] = await this.userRepository.login(userLoginDto);
+    const [user, error, code] = await this.userRepository.login(userLoginDto);
     if (!user) {
       const [result, throttleError] = await this.limitConsumerPromiseHandler(
         usernameIPkey
       );
       if (!result) {
-        throw new HttpException(
-          this.tooManyRequestExceptionPayload(
-            `tooManyRequest-{"second":${String(
-              Math.round(throttleError.msBeforeNext / 1000) || 1
-            )}}`
-          ),
-          HttpStatus.TOO_MANY_REQUESTS
+        throw new CustomHttpException(
+          `tooManyRequest-{"second":${String(
+            Math.round(throttleError.msBeforeNext / 1000) || 1
+          )}}`,
+          HttpStatus.TOO_MANY_REQUESTS,
+          StatusCodesList.TooManyTries
         );
       }
-      throw new UnauthorizedException(error);
+      throw new UnauthorizedException(error, code);
     }
     const accessTokenPromise = this.generateAccessToken(user);
     const refreshTokenPromise = this.refreshTokenService.generateRefreshToken(
@@ -192,19 +193,6 @@ export class AuthService {
       subject: String(user.id)
     };
     return this.jwt.signAsync({ isTwoFAAuthenticated }, opts);
-  }
-
-  /**
-   * Throw too many request exception
-   * @param message
-   * @private
-   */
-  private tooManyRequestExceptionPayload(message): Record<string, any> {
-    return {
-      message,
-      statusCode: HttpStatus.TOO_MANY_REQUESTS,
-      error: true
-    };
   }
 
   /**
@@ -322,7 +310,10 @@ export class AuthService {
       throw new NotFoundException();
     }
     if (user.status !== UserStatusEnum.INACTIVE) {
-      throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);
+      throw new ForbiddenException(
+        ExceptionTitleList.UserInactive,
+        StatusCodesList.UserInactive
+      );
     }
     user.status = UserStatusEnum.ACTIVE;
     user.token = await this.generateUniqueToken(6);
@@ -386,13 +377,10 @@ export class AuthService {
     const { oldPassword, password } = changePasswordDto;
     const checkOldPwdMatches = await user.validatePassword(oldPassword);
     if (!checkOldPwdMatches) {
-      throw new HttpException(
-        {
-          message: 'incorrectOldPassword',
-          statusCode: HttpStatus.PRECONDITION_FAILED,
-          error: true
-        },
-        HttpStatus.PRECONDITION_FAILED
+      throw new CustomHttpException(
+        ExceptionTitleList.IncorrectOldPassword,
+        HttpStatus.PRECONDITION_FAILED,
+        StatusCodesList.IncorrectOldPassword
       );
     }
     user.password = password;
@@ -529,14 +517,18 @@ export class AuthService {
   }
 
   async setTwoFactorAuthenticationSecret(secret: string, userId: number) {
+    // add one minute throttle to generate next two factor token
+    const twoFAThrottleTime = new Date();
+    twoFAThrottleTime.setSeconds(twoFAThrottleTime.getSeconds() + 60);
     return this.userRepository.update(userId, {
-      twoFASecret: secret
+      twoFASecret: secret,
+      twoFAThrottleTime
     });
   }
 
-  async turnOnTwoFactorAuthentication(userId: number) {
+  async turnOnTwoFactorAuthentication(userId: number, isTwoFAEnabled = true) {
     return this.userRepository.update(userId, {
-      isTwoFAEnabled: true
+      isTwoFAEnabled
     });
   }
 }

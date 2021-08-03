@@ -17,27 +17,27 @@ import { Exclude } from 'class-transformer';
 /**
  * User Entity
  */
-@Entity({ name: 'user' })
+@Entity({
+  name: 'user'
+})
 export class UserEntity extends CustomBaseEntity {
-  @Index({ unique: true })
+  @Index({
+    unique: true
+  })
   @Column()
   username: string;
 
-  @Index({ unique: true })
+  @Index({
+    unique: true
+  })
   @Column()
   email: string;
 
   @Column()
-  @Exclude({ toPlainOnly: true })
+  @Exclude({
+    toPlainOnly: true
+  })
   password: string;
-
-  @Column({ nullable: true })
-  @Exclude({ toPlainOnly: true })
-  public twoFASecret?: string;
-
-  @Column({ default: false })
-  @Exclude({ toPlainOnly: true })
-  public isTwoFAEnabled: boolean;
 
   @Index()
   @Column()
@@ -56,17 +56,48 @@ export class UserEntity extends CustomBaseEntity {
   status: UserStatusEnum;
 
   @Column()
-  @Exclude({ toPlainOnly: true })
+  @Exclude({
+    toPlainOnly: true
+  })
   token: string;
 
-  @CreateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  @CreateDateColumn({
+    type: 'timestamp',
+    default: () => 'CURRENT_TIMESTAMP'
+  })
   tokenValidityDate: Date;
 
   @Column()
-  @Exclude({ toPlainOnly: true })
+  @Exclude({
+    toPlainOnly: true
+  })
   salt: string;
 
-  @Exclude({ toPlainOnly: true })
+  @Column({
+    nullable: true
+  })
+  @Exclude({
+    toPlainOnly: true
+  })
+  twoFASecret?: string;
+
+  @Exclude({
+    toPlainOnly: true
+  })
+  @CreateDateColumn({
+    type: 'timestamp',
+    default: () => 'CURRENT_TIMESTAMP'
+  })
+  twoFAThrottleTime?: Date;
+
+  @Column({
+    default: false
+  })
+  isTwoFAEnabled: boolean;
+
+  @Exclude({
+    toPlainOnly: true
+  })
   skipHashPassword = false;
 
   @OneToOne(() => RoleEntity)

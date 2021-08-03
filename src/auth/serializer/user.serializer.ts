@@ -35,6 +35,10 @@ export class UserSerializer extends ModelSerializer {
   address: string;
 
   @ApiProperty()
+  @Expose({ groups: ownerUserGroupsForSerializing })
+  isTwoFAEnabled: boolean;
+
+  @ApiProperty()
   @Transform(({ value }) => (value !== 'null' ? value : ''))
   contact: string;
 

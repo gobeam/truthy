@@ -4,18 +4,20 @@ import {
   HttpCode,
   HttpStatus,
   Post,
+  Put,
   Req,
   Res,
   UnauthorizedException,
   UseGuards
 } from '@nestjs/common';
-import { TwofaService } from './twofa.service';
-import { AuthService } from '../auth/auth.service';
-import { GetUser } from '../common/decorators/get-user.decorator';
-import { UserEntity } from '../auth/entity/user.entity';
-import { TwofaCodeDto } from './dto/twofa-code.dto';
-import { JwtAuthGuard } from '../common/guard/jwt-auth.guard';
 import { Request, Response } from 'express';
+import { AuthService } from '../auth/auth.service';
+import { UserEntity } from '../auth/entity/user.entity';
+import { GetUser } from '../common/decorators/get-user.decorator';
+import { JwtAuthGuard } from '../common/guard/jwt-auth.guard';
+import { TwofaCodeDto } from './dto/twofa-code.dto';
+import { TwoFaStatusUpdateDto } from './dto/twofa-status-update.dto';
+import { TwofaService } from './twofa.service';
 
 @Controller('twofa')
 export class TwofaController {
@@ -48,8 +50,21 @@ export class TwofaController {
 
   @Post('generate')
   @UseGuards(JwtAuthGuard)
-  async register(@Res() response: Response, @GetUser() user: UserEntity) {
+  async generate(@Res() response: Response, @GetUser() user: UserEntity) {
     const { otpauthUrl } = await this.twofaService.generateTwoFASecret(user);
     return this.twofaService.pipeQrCodeStream(response, otpauthUrl);
+  }
+
+  @Put()
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @UseGuards(JwtAuthGuard)
+  async toggleTwoFa(
+    @Body() twofaStatusUpdateDto: TwoFaStatusUpdateDto,
+    @GetUser() user: UserEntity
+  ) {
+    return this.usersService.turnOnTwoFactorAuthentication(
+      user.id,
+      twofaStatusUpdateDto.isTwoFAEnabled
+    );
   }
 }

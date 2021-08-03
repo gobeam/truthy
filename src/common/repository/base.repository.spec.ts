@@ -1,8 +1,8 @@
 import { BaseRepository } from './base.repository';
 import { ModelSerializer } from '../serializer/model.serializer';
 import { Repository, UpdateResult } from 'typeorm';
-import { NotFoundException } from '@nestjs/common';
 import { Expose } from 'class-transformer';
+import { NotFoundException } from 'src/exception/not-found.exception';
 
 class MockEntity {
   id: number;

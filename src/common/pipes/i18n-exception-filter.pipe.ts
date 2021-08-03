@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common';
 import { I18nService } from 'nestjs-i18n';
 import { ValidationErrorInterface } from '../interfaces/validation-error.interface';
+import { StatusCodesList } from '../constants/status-codes-list.constants';
 
 @Catch(HttpException)
 export class I18nExceptionFilterPipe implements ExceptionFilter {
@@ -28,6 +29,7 @@ export class I18nExceptionFilterPipe implements ExceptionFilter {
     const exceptionResponse = exception.getResponse() as any;
     if (exceptionResponse.hasOwnProperty('message')) {
       if (exceptionResponse.message instanceof Array) {
+        exceptionResponse.code = StatusCodesList.ValidationError;
         exceptionResponse.message = await this.translateArray(
           exceptionResponse.message,
           lang
