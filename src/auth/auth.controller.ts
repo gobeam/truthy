@@ -31,7 +31,7 @@ import { Request, Response } from 'express';
 import { UserSearchFilterDto } from './dto/user-search-filter.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { RegisterUserDto } from './dto/register-user.dto';
-import { JwtAuthGuard } from 'src/common/guard/jwt-auth.guard';
+import { JwtAuthGuard } from '../common/guard/jwt-auth.guard';
 import { RefreshToken } from '../refresh-token/entities/refresh-token.entity';
 import { UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';

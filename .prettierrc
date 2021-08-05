@@ -1,4 +1,22 @@
 {
+  "printWidth": 120,
   "singleQuote": true,
-  "trailingComma": "none"
+  "trailingComma": "es5",
+  "arrowParens": "avoid",
+  "endOfLine": "auto",
+  "overrides": [
+    {
+      "files": "*.json",
+      "options": {
+        "singleQuote": false
+      }
+    },
+    {
+      "files": ".*rc",
+      "options": {
+        "singleQuote": false,
+        "parser": "json"
+      }
+    }
+  ]
 }

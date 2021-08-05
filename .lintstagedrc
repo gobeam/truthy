@@ -1,0 +1,4 @@
+{
+  "{src,apps,libs,test}/**/*.ts": ["npm run lint"],
+  "./**/*.{ts,js,json,*rc}": ["npm run prettier:write"]
+}

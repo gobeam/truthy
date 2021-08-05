@@ -9,6 +9,8 @@
     "prebuild": "rimraf dist",
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
+    "prettier:check": "prettier --check ./**/*.{ts,js,json,*rc}",
+    "prettier:write": "prettier --write ./**/*.{ts,js,json,*rc}",
     "start": "NODE_ENV=development nest start",
     "start:dev": "NODE_ENV=development nest start --watch",
     "start:debug": "nest start --debug --watch",
@@ -26,7 +28,10 @@
     "orm-create": "npm run typeorm migration:create -- -n",
     "migrate": "npm run typeorm migration:run",
     "migration:rollback": "npm run typeorm migration:revert",
-    "seed:run": "ts-node ./node_modules/typeorm-seeding/dist/cli.js seed -n ./src/config/ormconfig.ts"
+    "seed:run": "ts-node ./node_modules/typeorm-seeding/dist/cli.js seed -n ./src/config/ormconfig.ts",
+    "precommit": "lint-staged && npm run lint && npm run test",
+    "prepush": "npm run test",
+    "prepare": "husky install"
   },
   "dependencies": {
     "@nestjs-modules/mailer": "^1.5.1",
@@ -85,7 +90,9 @@
     "eslint": "^7.12.1",
     "eslint-config-prettier": "8.3.0",
     "eslint-plugin-prettier": "^3.1.4",
+    "husky": "^7.0.1",
     "jest": "^27.0.3",
+    "lint-staged": "^11.1.1",
     "prettier": "^2.1.2",
     "supertest": "^6.0.0",
     "ts-jest": "^27.0.2",
