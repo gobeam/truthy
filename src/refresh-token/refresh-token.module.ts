@@ -5,11 +5,8 @@ import { AuthModule } from '../auth/auth.module';
 import { RefreshTokenRepository } from './refresh-token.repository';
 
 @Module({
-  imports: [
-    forwardRef(() => AuthModule),
-    TypeOrmModule.forFeature([RefreshTokenRepository])
-  ],
+  imports: [forwardRef(() => AuthModule), TypeOrmModule.forFeature([RefreshTokenRepository])],
   providers: [RefreshTokenService],
-  exports: [RefreshTokenService]
+  exports: [RefreshTokenService],
 })
 export class RefreshTokenModule {}

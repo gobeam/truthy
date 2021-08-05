@@ -3,9 +3,7 @@ import { ApiPropertyOptional, PartialType } from '@nestjs/swagger';
 import { Optional } from '@nestjs/common';
 import { IsString } from 'class-validator';
 
-export class UpdateEmailTemplateDto extends PartialType(
-  CreateEmailTemplateDto
-) {
+export class UpdateEmailTemplateDto extends PartialType(CreateEmailTemplateDto) {
   @ApiPropertyOptional()
   @Optional()
   @IsString()

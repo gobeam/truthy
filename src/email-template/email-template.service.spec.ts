@@ -15,7 +15,7 @@ const emailTemplateRepositoryMock = () => ({
   updateEntity: jest.fn(),
   get: jest.fn(),
   createEntity: jest.fn(),
-  paginate: jest.fn()
+  paginate: jest.fn(),
 });
 
 const mockTemplate = {
@@ -24,7 +24,7 @@ const mockTemplate = {
   sender: 'string',
   subject: 'string',
   body: 'string',
-  isDefault: false
+  isDefault: false,
 };
 
 describe('EmailTemplateService', () => {
@@ -36,9 +36,9 @@ describe('EmailTemplateService', () => {
         EmailTemplateService,
         {
           provide: EmailTemplateRepository,
-          useFactory: emailTemplateRepositoryMock
-        }
-      ]
+          useFactory: emailTemplateRepositoryMock,
+        },
+      ],
     }).compile();
 
     service = module.get<EmailTemplateService>(EmailTemplateService);
@@ -58,7 +58,7 @@ describe('EmailTemplateService', () => {
     const filter: EmailTemplatesSearchFilterDto = {
       keywords: 'test',
       limit: 10,
-      page: 1
+      page: 1,
     };
     repository.paginate.mockResolvedValue('result');
     const results = await service.findAll(filter);
@@ -69,9 +69,7 @@ describe('EmailTemplateService', () => {
   it('create email template', async () => {
     const createEmailTemplateDto: CreateEmailTemplateDto = mockTemplate;
     await service.create(createEmailTemplateDto);
-    expect(repository.createEntity).toHaveBeenCalledWith(
-      createEmailTemplateDto
-    );
+    expect(repository.createEntity).toHaveBeenCalledWith(createEmailTemplateDto);
     expect(repository.createEntity).not.toThrow();
   });
 
@@ -97,9 +95,7 @@ describe('EmailTemplateService', () => {
     it('try to update using duplicate title', async () => {
       repository.findOne.mockResolvedValue(mockTemplate);
       repository.countEntityByCondition.mockResolvedValue(1);
-      await expect(
-        service.update(1, updateEmailTemplateDto)
-      ).rejects.toThrowError(UnprocessableEntityException);
+      await expect(service.update(1, updateEmailTemplateDto)).rejects.toThrowError(UnprocessableEntityException);
       expect(repository.countEntityByCondition).toHaveBeenCalledTimes(1);
     });
 
@@ -109,19 +105,14 @@ describe('EmailTemplateService', () => {
       repository.get.mockResolvedValue(mockTemplate);
       const role = await service.update(1, updateEmailTemplateDto);
       expect(repository.get).toHaveBeenCalledWith(1);
-      expect(repository.updateEntity).toHaveBeenCalledWith(
-        mockTemplate,
-        updateEmailTemplateDto
-      );
+      expect(repository.updateEntity).toHaveBeenCalledWith(mockTemplate, updateEmailTemplateDto);
       expect(role).toEqual(mockTemplate);
     });
 
     it('trying to update email template that does not exists in database', async () => {
       repository.updateEntity.mockRejectedValue(new NotFoundException());
       repository.get.mockResolvedValue(null);
-      await expect(
-        service.update(1, updateEmailTemplateDto)
-      ).rejects.toThrowError(NotFoundException);
+      await expect(service.update(1, updateEmailTemplateDto)).rejects.toThrowError(NotFoundException);
     });
   });
 
@@ -146,9 +137,7 @@ describe('EmailTemplateService', () => {
     });
 
     it('delete default template test if throws error', async () => {
-      service.findOne = jest
-        .fn()
-        .mockResolvedValue({ ...mockTemplate, isDefault: true });
+      service.findOne = jest.fn().mockResolvedValue({ ...mockTemplate, isDefault: true });
       await expect(service.remove(1)).rejects.toThrowError(ForbiddenException);
       expect(service.findOne).toHaveBeenCalledTimes(1);
     });

@@ -24,7 +24,7 @@ const LoginThrottleFactory = {
       enableOfflineQueue: false,
       host: process.env.REDIS_HOST || redisConfig.host,
       port: process.env.REDIS_PORT || redisConfig.port,
-      password: process.env.REDIS_PASSWORD || redisConfig.password
+      password: process.env.REDIS_PASSWORD || redisConfig.password,
     });
 
     return new RateLimiterRedis({
@@ -32,9 +32,9 @@ const LoginThrottleFactory = {
       keyPrefix: throttleConfig.prefix,
       points: throttleConfig.limit,
       duration: 60 * 60 * 24 * 30, // Store number for 30 days since first fail
-      blockDuration: throttleConfig.blockDuration
+      blockDuration: throttleConfig.blockDuration,
     });
-  }
+  },
 };
 
 @Module({
@@ -42,28 +42,16 @@ const LoginThrottleFactory = {
     JwtModule.register({
       secret: process.env.JWT_SECRET || jwtConfig.secret,
       signOptions: {
-        expiresIn: process.env.JWT_EXPIRES_IN || jwtConfig.expiresIn
-      }
+        expiresIn: process.env.JWT_EXPIRES_IN || jwtConfig.expiresIn,
+      },
     }),
     PassportModule.register({ defaultStrategy: 'jwt' }),
     TypeOrmModule.forFeature([UserRepository]),
     MailModule,
-    RefreshTokenModule
+    RefreshTokenModule,
   ],
   controllers: [AuthController],
-  providers: [
-    AuthService,
-    JwtTwoFactorStrategy,
-    JwtStrategy,
-    UniqueValidatorPipe,
-    LoginThrottleFactory
-  ],
-  exports: [
-    AuthService,
-    JwtTwoFactorStrategy,
-    JwtStrategy,
-    PassportModule,
-    JwtModule
-  ]
+  providers: [AuthService, JwtTwoFactorStrategy, JwtStrategy, UniqueValidatorPipe, LoginThrottleFactory],
+  exports: [AuthService, JwtTwoFactorStrategy, JwtStrategy, PassportModule, JwtModule],
 })
 export class AuthModule {}

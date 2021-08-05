@@ -6,5 +6,5 @@ export const ValidationErrorsList = {
   IsEqualTo: 'IsEqualTo',
   IsString: 'IsString',
   UniqueValidate: 'UniqueValidate',
-  IsEmail: 'IsEmail'
+  IsEmail: 'IsEmail',
 } as const;

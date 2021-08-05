@@ -1,7 +1,4 @@
-import {
-  ValidationArguments,
-  ValidatorConstraintInterface
-} from 'class-validator';
+import { ValidationArguments, ValidatorConstraintInterface } from 'class-validator';
 import { Connection, EntitySchema, FindConditions, ObjectType } from 'typeorm';
 
 /**
@@ -17,8 +14,7 @@ export interface UniqueValidationArguments<E> extends ValidationArguments {
 /**
  * abstract class to validate unique
  */
-export abstract class AbstractUniqueValidator
-  implements ValidatorConstraintInterface {
+export abstract class AbstractUniqueValidator implements ValidatorConstraintInterface {
   protected constructor(protected readonly connection: Connection) {}
 
   /**
@@ -34,8 +30,8 @@ export abstract class AbstractUniqueValidator
           typeof findCondition === 'function'
             ? findCondition(args)
             : {
-                [findCondition || args.property]: value
-              }
+                [findCondition || args.property]: value,
+              },
       })) <= 0
     );
   }

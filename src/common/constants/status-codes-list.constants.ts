@@ -17,5 +17,5 @@ export const StatusCodesList = {
   UnsupportedFileType: 1016,
   OtpRequired: 1017,
   defaultItemDeleteError: 1018,
-  RefreshTokenExpired: 1019
+  RefreshTokenExpired: 1019,
 } as const;

@@ -1,13 +1,4 @@
-import {
-  IsBoolean,
-  IsEmail,
-  IsNotEmpty,
-  IsOptional,
-  IsString,
-  MaxLength,
-  MinLength,
-  Validate
-} from 'class-validator';
+import { IsBoolean, IsEmail, IsNotEmpty, IsOptional, IsString, MaxLength, MinLength, Validate } from 'class-validator';
 import { UniqueValidatorPipe } from '../../common/pipes/unique-validator.pipe';
 import { EmailTemplateEntity } from '../entities/email-template.entity';
 
@@ -16,7 +7,7 @@ export class CreateEmailTemplateDto {
   @IsString()
   @MaxLength(100, { message: 'maxLength-{"ln":100,"count":100}' })
   @Validate(UniqueValidatorPipe, [EmailTemplateEntity], {
-    message: 'already taken'
+    message: 'already taken',
   })
   title: string;
 

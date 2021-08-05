@@ -9,10 +9,7 @@ import { UpdateRoleDto } from './dto/update-role.dto';
 
 @EntityRepository(RoleEntity)
 export class RoleRepository extends BaseRepository<RoleEntity, RoleSerializer> {
-  async store(
-    createRoleDto: CreateRoleDto,
-    permissions: PermissionEntity[]
-  ): Promise<RoleSerializer> {
+  async store(createRoleDto: CreateRoleDto, permissions: PermissionEntity[]): Promise<RoleSerializer> {
     const { name, description } = createRoleDto;
     const role = this.create();
     role.name = name;
@@ -46,11 +43,7 @@ export class RoleRepository extends BaseRepository<RoleEntity, RoleSerializer> {
    * @param transformOption
    */
   transform(model: RoleEntity, transformOption = {}): RoleSerializer {
-    return plainToClass(
-      RoleSerializer,
-      classToPlain(model, transformOption),
-      transformOption
-    );
+    return plainToClass(RoleSerializer, classToPlain(model, transformOption), transformOption);
   }
 
   /**
@@ -59,6 +52,6 @@ export class RoleRepository extends BaseRepository<RoleEntity, RoleSerializer> {
    * @param transformOption
    */
   transformMany(models: RoleEntity[], transformOption = {}): RoleSerializer[] {
-    return models.map((model) => this.transform(model, transformOption));
+    return models.map(model => this.transform(model, transformOption));
   }
 }

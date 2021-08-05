@@ -6,7 +6,7 @@ import { JwtPayloadDto } from '../../auth/dto/jwt-payload.dto';
 import { UnauthorizedException } from '../../exception/unauthorized.exception';
 
 const mockUserRepository = () => ({
-  findOne: jest.fn()
+  findOne: jest.fn(),
 });
 
 describe('Test JWT strategy', () => {
@@ -14,14 +14,11 @@ describe('Test JWT strategy', () => {
   beforeEach(async () => {
     jest.mock('config', () => ({
       default: {
-        get: () => jest.fn().mockImplementation(() => 'hello')
-      }
+        get: () => jest.fn().mockImplementation(() => 'hello'),
+      },
     }));
     const module = await Test.createTestingModule({
-      providers: [
-        JwtStrategy,
-        { provide: UserRepository, useFactory: mockUserRepository }
-      ]
+      providers: [JwtStrategy, { provide: UserRepository, useFactory: mockUserRepository }],
     }).compile();
     jwtStrategy = await module.get<JwtStrategy>(JwtStrategy);
     userRepository = await module.get<UserRepository>(UserRepository);
@@ -33,24 +30,22 @@ describe('Test JWT strategy', () => {
       user.name = 'test';
       user.username = 'tester';
       const payload: JwtPayloadDto = {
-        sub: '1'
+        sub: '1',
       };
       userRepository.findOne.mockResolvedValue(user);
       const result = await jwtStrategy.validate(payload);
       expect(userRepository.findOne).toHaveBeenCalledWith(Number(payload.sub), {
-        relations: ['role', 'role.permission']
+        relations: ['role', 'role.permission'],
       });
       expect(result).toEqual(user);
     });
 
     it('should throw error if subject is not found on database', async () => {
       const payload: JwtPayloadDto = {
-        sub: '1'
+        sub: '1',
       };
       userRepository.findOne.mockResolvedValue(null);
-      await expect(jwtStrategy.validate(payload)).rejects.toThrow(
-        UnauthorizedException
-      );
+      await expect(jwtStrategy.validate(payload)).rejects.toThrow(UnauthorizedException);
     });
   });
 });

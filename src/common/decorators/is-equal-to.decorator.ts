@@ -1,13 +1,6 @@
-import {
-  registerDecorator,
-  ValidationArguments,
-  ValidationOptions
-} from 'class-validator';
+import { registerDecorator, ValidationArguments, ValidationOptions } from 'class-validator';
 
-export function IsEqualTo(
-  property: string,
-  validationOptions?: ValidationOptions
-) {
+export function IsEqualTo(property: string, validationOptions?: ValidationOptions) {
   return (object: any, propertyName: string) => {
     registerDecorator({
       name: 'isEqualTo',
@@ -25,8 +18,8 @@ export function IsEqualTo(
         defaultMessage(args: ValidationArguments) {
           const [relatedPropertyName] = args.constraints;
           return `$property must match ${relatedPropertyName} exactly`;
-        }
-      }
+        },
+      },
     });
   };
 }

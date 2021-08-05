@@ -1,12 +1,6 @@
 import { plainToClass } from 'class-transformer';
 import { NotFoundException } from '../../exception/not-found.exception';
-import {
-  DeepPartial,
-  FindManyOptions,
-  ILike,
-  ObjectLiteral,
-  Repository
-} from 'typeorm';
+import { DeepPartial, FindManyOptions, ILike, ObjectLiteral, Repository } from 'typeorm';
 import { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity';
 import { Pagination } from '../../paginate';
 import { PaginationInfoInterface } from '../../paginate/pagination-info.interface';
@@ -16,34 +10,25 @@ import { ModelSerializer } from '../serializer/model.serializer';
 /**
  * Base Repository for code reuse
  */
-export class BaseRepository<
-  T,
-  K extends ModelSerializer
-> extends Repository<T> {
+export class BaseRepository<T, K extends ModelSerializer> extends Repository<T> {
   /***
    * get entity by id
    * @param id
    * @param relations
    * @param transformOptions
    */
-  async get(
-    id: number,
-    relations: string[] = [],
-    transformOptions = {}
-  ): Promise<K | null> {
+  async get(id: number, relations: string[] = [], transformOptions = {}): Promise<K | null> {
     return await this.findOne({
       where: { id },
-      relations
+      relations,
     })
-      .then((entity) => {
+      .then(entity => {
         if (!entity) {
           return Promise.reject(new NotFoundException());
         }
-        return Promise.resolve(
-          entity ? this.transform(entity, transformOptions) : null
-        );
+        return Promise.resolve(entity ? this.transform(entity, transformOptions) : null);
       })
-      .catch((error) => Promise.reject(error));
+      .catch(error => Promise.reject(error));
   }
 
   /**
@@ -53,41 +38,32 @@ export class BaseRepository<
    * @param relations
    * @param transformOptions
    */
-  async findBy(
-    fieldName: string,
-    value: any,
-    relations: string[] = [],
-    transformOptions = {}
-  ): Promise<K | null> {
+  async findBy(fieldName: string, value: any, relations: string[] = [], transformOptions = {}): Promise<K | null> {
     return await this.findOne({
       where: { [fieldName]: value },
-      relations
+      relations,
     })
-      .then((entity) => {
+      .then(entity => {
         if (!entity) {
           return Promise.reject(new NotFoundException());
         }
-        return Promise.resolve(
-          entity ? this.transform(entity, transformOptions) : null
-        );
+        return Promise.resolve(entity ? this.transform(entity, transformOptions) : null);
       })
-      .catch((error) => Promise.reject(error));
+      .catch(error => Promise.reject(error));
   }
 
   /**
    * get count of entity by condition
    * @param conditions
    */
-  async countEntityByCondition(
-    conditions: ObjectLiteral = {}
-  ): Promise<number> {
+  async countEntityByCondition(conditions: ObjectLiteral = {}): Promise<number> {
     return this.count({
-      where: conditions
+      where: conditions,
     })
-      .then((count) => {
+      .then(count => {
         return Promise.resolve(count);
       })
-      .catch((error) => Promise.reject(error));
+      .catch(error => Promise.reject(error));
   }
 
   /**
@@ -107,13 +83,13 @@ export class BaseRepository<
     if (searchFilter.hasOwnProperty('keywords') && searchFilter.keywords) {
       for (const key of searchCriteria) {
         whereCondition.push({
-          [key]: ILike(`%${searchFilter.keywords}%`)
+          [key]: ILike(`%${searchFilter.keywords}%`),
         });
       }
     }
     const results = await this.find({
       where: whereCondition,
-      relations
+      relations,
     });
     return this.transformMany(results, transformOptions);
   }
@@ -123,18 +99,12 @@ export class BaseRepository<
    * @param options
    */
   getPaginationInfo(options): PaginationInfoInterface {
-    const page =
-      typeof options.page !== 'undefined' && options.page > 0
-        ? options.page
-        : 1;
-    const limit =
-      typeof options.limit !== 'undefined' && options.limit > 0
-        ? options.limit
-        : 10;
+    const page = typeof options.page !== 'undefined' && options.page > 0 ? options.page : 1;
+    const limit = typeof options.limit !== 'undefined' && options.limit > 0 ? options.limit : 10;
     return {
       skip: (page - 1) * limit,
       limit,
-      page
+      page,
     };
   }
 
@@ -156,13 +126,11 @@ export class BaseRepository<
     if (searchFilter.hasOwnProperty('keywords') && searchFilter.keywords) {
       for (const key of searchCriteria) {
         whereCondition.push({
-          [key]: ILike(`%${searchFilter.keywords}%`)
+          [key]: ILike(`%${searchFilter.keywords}%`),
         });
       }
     }
-    const paginationInfo: PaginationInfoInterface = this.getPaginationInfo(
-      searchFilter
-    );
+    const paginationInfo: PaginationInfoInterface = this.getPaginationInfo(searchFilter);
     findOptions.relations = relations;
     findOptions.take = paginationInfo.limit;
     findOptions.skip = paginationInfo.skip;
@@ -177,7 +145,7 @@ export class BaseRepository<
       pageSize: limit,
       currentPage: page,
       previous: page > 1 ? page - 1 : 0,
-      next: total > skip + limit ? page + 1 : 0
+      next: total > skip + limit ? page + 1 : 0,
     });
   }
 
@@ -186,13 +154,10 @@ export class BaseRepository<
    * @param inputs
    * @param relations
    */
-  async createEntity(
-    inputs: DeepPartial<T>,
-    relations: string[] = []
-  ): Promise<K> {
+  async createEntity(inputs: DeepPartial<T>, relations: string[] = []): Promise<K> {
     return this.save(inputs)
-      .then(async (entity) => await this.get((entity as any).id, relations))
-      .catch((error) => Promise.reject(error));
+      .then(async entity => await this.get((entity as any).id, relations))
+      .catch(error => Promise.reject(error));
   }
 
   /**
@@ -201,14 +166,10 @@ export class BaseRepository<
    * @param inputs
    * @param relations
    */
-  async updateEntity(
-    entity: K,
-    inputs: QueryDeepPartialEntity<T>,
-    relations: string[] = []
-  ): Promise<K> {
+  async updateEntity(entity: K, inputs: QueryDeepPartialEntity<T>, relations: string[] = []): Promise<K> {
     return this.update(entity.id, inputs)
       .then(async () => await this.get(entity.id, relations))
-      .catch((error) => Promise.reject(error));
+      .catch(error => Promise.reject(error));
   }
 
   /**
@@ -226,6 +187,6 @@ export class BaseRepository<
    * @param transformOptions
    */
   transformMany(models: T[], transformOptions = {}): K[] {
-    return models.map((model) => this.transform(model, transformOptions));
+    return models.map(model => this.transform(model, transformOptions));
   }
 }

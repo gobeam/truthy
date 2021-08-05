@@ -1,10 +1,5 @@
 import { I18nService } from 'nestjs-i18n';
-import {
-  ArgumentsHost,
-  Catch,
-  ExceptionFilter,
-  HttpException
-} from '@nestjs/common';
+import { ArgumentsHost, Catch, ExceptionFilter, HttpException } from '@nestjs/common';
 import { Response } from 'express';
 
 @Catch(HttpException)
@@ -23,7 +18,7 @@ export class CommonExceptionFilter implements ExceptionFilter {
 
     message = await this.i18n.translate(message.key, {
       lang: ctx.getRequest().i18nLang,
-      args: message.args
+      args: message.args,
     });
 
     response.status(statusCode).json({ statusCode, message });

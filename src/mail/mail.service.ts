@@ -19,7 +19,7 @@ export class MailService {
    */
   stringInject(str = '', obj = {}) {
     let newStr = str;
-    Object.keys(obj).forEach((key) => {
+    Object.keys(obj).forEach(key => {
       const placeHolder = `{{${key}}}`;
       if (newStr.includes(placeHolder)) {
         newStr = newStr.replace(placeHolder, obj[key] || ' ');
@@ -34,7 +34,7 @@ export class MailService {
     if (mailBody) {
       try {
         await this.mailQueue.add(type, {
-          payload
+          payload,
         });
         return true;
       } catch (error) {

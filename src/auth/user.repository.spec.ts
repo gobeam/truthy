@@ -13,13 +13,13 @@ const mockUser = {
   username: 'tester',
   name: 'test',
   status: UserStatusEnum.ACTIVE,
-  password: 'pwd'
+  password: 'pwd',
 };
 describe('User Repository', () => {
   let userRepository;
   beforeEach(async () => {
     const module = await Test.createTestingModule({
-      providers: [UserRepository]
+      providers: [UserRepository],
     }).compile();
     userRepository = await module.get<UserRepository>(UserRepository);
   });
@@ -32,7 +32,7 @@ describe('User Repository', () => {
     });
     it('store new user', async () => {
       const createUserDto: CreateUserDto = {
-        ...mockUser
+        ...mockUser,
       };
       await expect(userRepository.store(createUserDto)).resolves.not.toThrow();
     });
@@ -48,7 +48,7 @@ describe('User Repository', () => {
       user.password = mockUser.password;
       user.validatePassword = jest.fn();
       userLoginDto = {
-        ...mockUser
+        ...mockUser,
       };
     });
     it('check if username and password matches and return user', async () => {
@@ -56,10 +56,7 @@ describe('User Repository', () => {
       user.validatePassword.mockResolvedValue(true);
       const result = await userRepository.login(userLoginDto);
       expect(userRepository.findOne).toHaveBeenCalledWith({
-        where: [
-          { username: userLoginDto.username },
-          { email: userLoginDto.username }
-        ]
+        where: [{ username: userLoginDto.username }, { email: userLoginDto.username }],
       });
       expect(result).toEqual([user, null, null]);
     });
@@ -68,21 +65,13 @@ describe('User Repository', () => {
       userRepository.findOne.mockResolvedValue(user);
       user.validatePassword.mockResolvedValue(false);
       const result = await userRepository.login(userLoginDto);
-      expect(result).toEqual([
-        null,
-        ExceptionTitleList.InvalidCredentials,
-        StatusCodesList.InvalidCredentials
-      ]);
+      expect(result).toEqual([null, ExceptionTitleList.InvalidCredentials, StatusCodesList.InvalidCredentials]);
     });
 
     it('check if user is null', async () => {
       userRepository.findOne.mockResolvedValue(null);
       const result = await userRepository.login(userLoginDto);
-      expect(result).toEqual([
-        null,
-        ExceptionTitleList.InvalidCredentials,
-        StatusCodesList.InvalidCredentials
-      ]);
+      expect(result).toEqual([null, ExceptionTitleList.InvalidCredentials, StatusCodesList.InvalidCredentials]);
     });
   });
 });

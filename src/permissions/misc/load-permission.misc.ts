@@ -2,7 +2,7 @@ import {
   ModulesPayloadInterface,
   PermissionPayload,
   RoutePayloadInterface,
-  SubModulePayloadInterface
+  SubModulePayloadInterface,
 } from '../../config/permission-config';
 
 export class LoadPermissionMisc {
@@ -14,12 +14,7 @@ export class LoadPermissionMisc {
   ) {
     if (modules.permissions) {
       for (const permission of modules.permissions) {
-        permissionsList = this.concatPermissions(
-          permission,
-          permissionsList,
-          resource,
-          isDefault
-        );
+        permissionsList = this.concatPermissions(permission, permissionsList, resource, isDefault);
       }
     }
     return permissionsList;

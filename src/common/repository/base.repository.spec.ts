@@ -19,7 +19,7 @@ class MockSerializer extends ModelSerializer {
 
 const createQueryBuilder: any = {
   getMany: () => [],
-  where: () => createQueryBuilder
+  where: () => createQueryBuilder,
 };
 
 describe('test base repository', () => {
@@ -39,28 +39,22 @@ describe('test base repository', () => {
 
   describe('test get entity by id', () => {
     it('if entity is found', async () => {
-      const findOneSpy = jest
-        .spyOn(Repository.prototype, 'findOne')
-        .mockResolvedValue(entity);
+      const findOneSpy = jest.spyOn(Repository.prototype, 'findOne').mockResolvedValue(entity);
       const result = await baseRepository.get(1);
       expect(findOneSpy).toHaveBeenCalledTimes(1);
       expect(findOneSpy).toHaveBeenCalledWith({
         where: { id: 1 },
-        relations: []
+        relations: [],
       });
       expect(result).toEqual(entity);
     });
 
     it('if entity is not found', async () => {
-      const findOneSpy = jest
-        .spyOn(Repository.prototype, 'findOne')
-        .mockResolvedValue(undefined);
-      await expect(baseRepository.get(1)).rejects.toThrowError(
-        NotFoundException
-      );
+      const findOneSpy = jest.spyOn(Repository.prototype, 'findOne').mockResolvedValue(undefined);
+      await expect(baseRepository.get(1)).rejects.toThrowError(NotFoundException);
       expect(findOneSpy).toHaveBeenCalledWith({
         where: { id: 1 },
-        relations: []
+        relations: [],
       });
     });
   });
@@ -70,9 +64,7 @@ describe('test base repository', () => {
       // const createQueryBuilderSpy = jest
       //   .spyOn(Repository.prototype, 'createQueryBuilder')
       //   .mockImplementation(() => createQueryBuilder);
-      const findSpy = jest
-        .spyOn(Repository.prototype, 'find')
-        .mockResolvedValue([entity]);
+      const findSpy = jest.spyOn(Repository.prototype, 'find').mockResolvedValue([entity]);
       await baseRepository.findAll(entity, []);
       expect(findSpy).toHaveBeenCalledTimes(1);
     });
@@ -80,9 +72,7 @@ describe('test base repository', () => {
 
   describe('test paginate method', () => {
     it('paginate', async () => {
-      const findAndCountSpy = jest
-        .spyOn(Repository.prototype, 'findAndCount')
-        .mockResolvedValue([[], 10]);
+      const findAndCountSpy = jest.spyOn(Repository.prototype, 'findAndCount').mockResolvedValue([[], 10]);
       baseRepository.transformMany = jest.fn().mockResolvedValue([]);
       await baseRepository.paginate(entity, [], { page: 1, limit: 10 });
       expect(findAndCountSpy).toHaveBeenCalledTimes(1);
@@ -92,12 +82,8 @@ describe('test base repository', () => {
 
   describe('test create entity', () => {
     it('create entity', async () => {
-      const createSpy = jest
-        .spyOn(Repository.prototype, 'save')
-        .mockResolvedValue(entity);
-      const findOneSpy = jest
-        .spyOn(Repository.prototype, 'findOne')
-        .mockResolvedValue(entity);
+      const createSpy = jest.spyOn(Repository.prototype, 'save').mockResolvedValue(entity);
+      const findOneSpy = jest.spyOn(Repository.prototype, 'findOne').mockResolvedValue(entity);
       const result = await baseRepository.createEntity(entity);
       expect(createSpy).toHaveBeenCalledTimes(1);
       expect(findOneSpy).toHaveBeenCalledTimes(1);
@@ -111,22 +97,20 @@ describe('test base repository', () => {
     let updateData, updateResult: UpdateResult;
     beforeEach(() => {
       updateData = {
-        test: 'changed'
+        test: 'changed',
       };
       updateResult = {
         generatedMaps: [],
         raw: {},
-        affected: 1
+        affected: 1,
       };
     });
     it('update existing entity', async () => {
       baseRepository.get = jest.fn();
       baseRepository.transform = jest.fn();
-      const updateSpy = jest
-        .spyOn(Repository.prototype, 'update')
-        .mockResolvedValue(updateResult);
+      const updateSpy = jest.spyOn(Repository.prototype, 'update').mockResolvedValue(updateResult);
       const updateData = {
-        test: 'changed'
+        test: 'changed',
       };
       await baseRepository.updateEntity(entity, updateData);
       expect(updateSpy).toHaveBeenCalledWith(1, updateData);
@@ -137,12 +121,8 @@ describe('test base repository', () => {
       baseRepository.get = jest.fn();
       baseRepository.get.mockRejectedValue(new NotFoundException());
       updateResult.affected = 0;
-      const updateSpy = jest
-        .spyOn(Repository.prototype, 'update')
-        .mockResolvedValue(updateResult);
-      await expect(
-        baseRepository.updateEntity(entity, updateData)
-      ).rejects.toThrowError(NotFoundException);
+      const updateSpy = jest.spyOn(Repository.prototype, 'update').mockResolvedValue(updateResult);
+      await expect(baseRepository.updateEntity(entity, updateData)).rejects.toThrowError(NotFoundException);
       expect(updateSpy).toHaveBeenCalledTimes(1);
     });
   });

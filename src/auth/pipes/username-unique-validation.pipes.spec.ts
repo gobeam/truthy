@@ -3,20 +3,15 @@ import { AuthService } from '../auth.service';
 import { IsUsernameAlreadyExist } from './username-unique-validation.pipes';
 
 const mockAuthService = () => ({
-  findBy: jest.fn()
+  findBy: jest.fn(),
 });
 describe('IsUsernameAlreadyExist', () => {
   let authService: AuthService, isUsernameAlreadyExist: IsUsernameAlreadyExist;
   beforeEach(async () => {
     const module = await Test.createTestingModule({
-      providers: [
-        IsUsernameAlreadyExist,
-        { provide: AuthService, useFactory: mockAuthService }
-      ]
+      providers: [IsUsernameAlreadyExist, { provide: AuthService, useFactory: mockAuthService }],
     }).compile();
-    isUsernameAlreadyExist = await module.get<IsUsernameAlreadyExist>(
-      IsUsernameAlreadyExist
-    );
+    isUsernameAlreadyExist = await module.get<IsUsernameAlreadyExist>(IsUsernameAlreadyExist);
     authService = await module.get<AuthService>(AuthService);
   });
 

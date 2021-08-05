@@ -5,11 +5,7 @@ import { useContainer } from 'class-validator';
 import { join } from 'path';
 import * as express from 'express';
 import * as config from 'config';
-import {
-  DocumentBuilder,
-  SwaggerCustomOptions,
-  SwaggerModule
-} from '@nestjs/swagger';
+import { DocumentBuilder, SwaggerCustomOptions, SwaggerModule } from '@nestjs/swagger';
 import * as cookieParser from 'cookie-parser';
 
 async function bootstrap() {
@@ -22,25 +18,21 @@ async function bootstrap() {
     app.enableCors({
       origin: true,
       methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
-      credentials: true
+      credentials: true,
     });
   } else {
     app.enableCors({
       origin: process.env.ORIGIN || serverConfig.origin,
-      credentials: true
+      credentials: true,
     });
-    logger.log(
-      `Accepting request only from: ${
-        process.env.ORIGIN || serverConfig.origin
-      }`
-    );
+    logger.log(`Accepting request only from: ${process.env.ORIGIN || serverConfig.origin}`);
   }
   useContainer(app.select(AppModule), { fallbackOnErrors: true });
   app.useGlobalPipes(
     new ValidationPipe({
       transform: true,
       whitelist: true,
-      forbidNonWhitelisted: true
+      forbidNonWhitelisted: true,
     })
   );
   const apiConfig = config.get('app');
@@ -52,9 +44,9 @@ async function bootstrap() {
     .build();
   const customOptions: SwaggerCustomOptions = {
     swaggerOptions: {
-      persistAuthorization: true
+      persistAuthorization: true,
     },
-    customSiteTitle: apiConfig.description
+    customSiteTitle: apiConfig.description,
   };
   const document = SwaggerModule.createDocument(app, swaggerConfig);
   SwaggerModule.setup('api', app, document, customOptions);

@@ -19,7 +19,7 @@ const appConfig = config.get('app');
 const tokenConfig = config.get('jwt');
 const BASE_OPTIONS: SignOptions = {
   issuer: appConfig.appUrl,
-  audience: appConfig.frontendUrl
+  audience: appConfig.frontendUrl,
 };
 
 @Injectable()
@@ -37,16 +37,13 @@ export class RefreshTokenService {
    * @param user
    * @param refreshToken
    */
-  public async generateRefreshToken(
-    user: UserSerializer,
-    refreshToken: Partial<RefreshToken>
-  ): Promise<string> {
+  public async generateRefreshToken(user: UserSerializer, refreshToken: Partial<RefreshToken>): Promise<string> {
     const token = await this.repository.createRefreshToken(user, refreshToken);
     const opts: SignOptions = {
       ...BASE_OPTIONS,
       expiresIn: tokenConfig.refreshExpiresIn,
       subject: String(user.id),
-      jwtid: String(token.id)
+      jwtid: String(token.id),
     };
 
     return this.jwt.signAsync({}, opts);
@@ -56,18 +53,12 @@ export class RefreshTokenService {
    * Resolve encoded refresh token
    * @param encoded
    */
-  public async resolveRefreshToken(
-    encoded: string
-  ): Promise<{ user: UserSerializer; token: RefreshToken }> {
+  public async resolveRefreshToken(encoded: string): Promise<{ user: UserSerializer; token: RefreshToken }> {
     const payload = await this.decodeRefreshToken(encoded);
     const token = await this.getStoredTokenFromRefreshTokenPayload(payload);
 
     if (!token) {
-      throw new CustomHttpException(
-        ExceptionTitleList.NotFound,
-        HttpStatus.NOT_FOUND,
-        StatusCodesList.NotFound
-      );
+      throw new CustomHttpException(ExceptionTitleList.NotFound, HttpStatus.NOT_FOUND, StatusCodesList.NotFound);
     }
 
     if (token.isRevoked) {
@@ -95,9 +86,7 @@ export class RefreshTokenService {
    * Create access token from refresh token
    * @param refresh
    */
-  public async createAccessTokenFromRefreshToken(
-    refresh: string
-  ): Promise<{ token: string; user: UserSerializer }> {
+  public async createAccessTokenFromRefreshToken(refresh: string): Promise<{ token: string; user: UserSerializer }> {
     const { user } = await this.resolveRefreshToken(refresh);
 
     const token = await this.authService.generateAccessToken(user);
@@ -133,9 +122,7 @@ export class RefreshTokenService {
    * get user detail from refresh token
    * @param payload
    */
-  async getUserFromRefreshTokenPayload(
-    payload: RefreshTokenInterface
-  ): Promise<UserSerializer> {
+  async getUserFromRefreshTokenPayload(payload: RefreshTokenInterface): Promise<UserSerializer> {
     const subId = payload.sub;
 
     if (!subId) {
@@ -153,9 +140,7 @@ export class RefreshTokenService {
    * Get refresh token entity from token payload
    * @param payload
    */
-  async getStoredTokenFromRefreshTokenPayload(
-    payload: RefreshTokenInterface
-  ): Promise<RefreshToken | null> {
+  async getStoredTokenFromRefreshTokenPayload(payload: RefreshTokenInterface): Promise<RefreshToken | null> {
     const tokenId = payload.jti;
 
     if (!tokenId) {
@@ -178,8 +163,8 @@ export class RefreshTokenService {
       where: {
         userId,
         isRevoked: false,
-        expires: MoreThanOrEqual(new Date())
-      }
+        expires: MoreThanOrEqual(new Date()),
+      },
     });
   }
 
@@ -188,10 +173,7 @@ export class RefreshTokenService {
    * @param id
    * @param userId
    */
-  async revokeRefreshTokenById(
-    id: number,
-    userId: number
-  ): Promise<RefreshToken> {
+  async revokeRefreshTokenById(id: number, userId: number): Promise<RefreshToken> {
     const token = await this.repository.findTokenById(id);
     if (!token) {
       throw new NotFoundException();

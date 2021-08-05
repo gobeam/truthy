@@ -12,17 +12,17 @@ export class RoleEntity extends CustomBaseEntity {
   @Column('text')
   description: string;
 
-  @ManyToMany(() => PermissionEntity, (permission) => permission.role)
+  @ManyToMany(() => PermissionEntity, permission => permission.role)
   @JoinTable({
     name: 'role_permission',
     joinColumn: {
       name: 'roleId',
-      referencedColumnName: 'id'
+      referencedColumnName: 'id',
     },
     inverseJoinColumn: {
       name: 'permissionId',
-      referencedColumnName: 'id'
-    }
+      referencedColumnName: 'id',
+    },
   })
   permission: PermissionEntity[];
 

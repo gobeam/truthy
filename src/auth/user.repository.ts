@@ -17,10 +17,7 @@ export class UserRepository extends BaseRepository<UserEntity, UserSerializer> {
    * @param createUserDto
    * @param token
    */
-  async store(
-    createUserDto: DeepPartial<UserEntity>,
-    token: string
-  ): Promise<UserSerializer> {
+  async store(createUserDto: DeepPartial<UserEntity>, token: string): Promise<UserSerializer> {
     if (!createUserDto.status) {
       createUserDto.status = UserStatusEnum.INACTIVE;
     }
@@ -35,37 +32,25 @@ export class UserRepository extends BaseRepository<UserEntity, UserSerializer> {
    * login user
    * @param userLoginDto
    */
-  async login(
-    userLoginDto: UserLoginDto
-  ): Promise<[user: UserEntity, error: string, code: number]> {
+  async login(userLoginDto: UserLoginDto): Promise<[user: UserEntity, error: string, code: number]> {
     const { username, password } = userLoginDto;
     const user = await this.findOne({
-      where: [{ username: username }, { email: username }]
+      where: [{ username: username }, { email: username }],
     });
     if (user && (await user.validatePassword(password))) {
       if (user.status !== UserStatusEnum.ACTIVE) {
-        return [
-          null,
-          ExceptionTitleList.UserInactive,
-          StatusCodesList.UserInactive
-        ];
+        return [null, ExceptionTitleList.UserInactive, StatusCodesList.UserInactive];
       }
       return [user, null, null];
     }
-    return [
-      null,
-      ExceptionTitleList.InvalidCredentials,
-      StatusCodesList.InvalidCredentials
-    ];
+    return [null, ExceptionTitleList.InvalidCredentials, StatusCodesList.InvalidCredentials];
   }
 
   /**
    * Get user entity for reset password
    * @param resetPasswordDto
    */
-  async getUserForResetPassword(
-    resetPasswordDto: ResetPasswordDto
-  ): Promise<UserEntity> {
+  async getUserForResetPassword(resetPasswordDto: ResetPasswordDto): Promise<UserEntity> {
     const { token } = resetPasswordDto;
     const query = this.createQueryBuilder('user');
     query.where('user.token = :token', { token });
@@ -79,11 +64,7 @@ export class UserRepository extends BaseRepository<UserEntity, UserSerializer> {
    * @param transformOption
    */
   transform(model: UserEntity, transformOption = {}): UserSerializer {
-    return plainToClass(
-      UserSerializer,
-      classToPlain(model, transformOption),
-      transformOption
-    );
+    return plainToClass(UserSerializer, classToPlain(model, transformOption), transformOption);
   }
 
   /**
@@ -92,6 +73,6 @@ export class UserRepository extends BaseRepository<UserEntity, UserSerializer> {
    * @param transformOption
    */
   transformMany(models: UserEntity[], transformOption = {}): UserSerializer[] {
-    return models.map((model) => this.transform(model, transformOption));
+    return models.map(model => this.transform(model, transformOption));
   }
 }

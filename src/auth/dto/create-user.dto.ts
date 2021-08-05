@@ -3,20 +3,14 @@ import { UserStatusEnum } from '../user-status.enum';
 import { OmitType } from '@nestjs/swagger';
 import { RegisterUserDto } from './register-user.dto';
 
-const statusEnumArray = [
-  UserStatusEnum.ACTIVE,
-  UserStatusEnum.INACTIVE,
-  UserStatusEnum.BLOCKED
-];
+const statusEnumArray = [UserStatusEnum.ACTIVE, UserStatusEnum.INACTIVE, UserStatusEnum.BLOCKED];
 
 /**
  * create user data transform object
  */
-export class CreateUserDto extends OmitType(RegisterUserDto, [
-  'password'
-] as const) {
+export class CreateUserDto extends OmitType(RegisterUserDto, ['password'] as const) {
   @IsIn(statusEnumArray, {
-    message: `isIn-{"items":"${statusEnumArray.join(',')}"}`
+    message: `isIn-{"items":"${statusEnumArray.join(',')}"}`,
   })
   status: UserStatusEnum;
 

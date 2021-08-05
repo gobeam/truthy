@@ -1,13 +1,6 @@
-import {
-  MigrationInterface,
-  QueryRunner,
-  Table,
-  TableColumn,
-  TableForeignKey
-} from 'typeorm';
+import { MigrationInterface, QueryRunner, Table, TableColumn, TableForeignKey } from 'typeorm';
 
-export class CreateRefreshTokenTable1623601947397
-  implements MigrationInterface {
+export class CreateRefreshTokenTable1623601947397 implements MigrationInterface {
   foreignKeysArray = [{ table: 'user', field: 'userId', reference: 'id' }];
   tableName = 'refresh_token';
 
@@ -21,19 +14,19 @@ export class CreateRefreshTokenTable1623601947397
             type: 'int',
             isPrimary: true,
             isGenerated: true,
-            generationStrategy: 'increment'
+            generationStrategy: 'increment',
           },
           {
             name: 'isRevoked',
             type: 'boolean',
-            default: false
+            default: false,
           },
           {
             name: 'expires',
             type: 'timestamp',
-            default: 'now()'
-          }
-        ]
+            default: 'now()',
+          },
+        ],
       }),
       false
     );
@@ -43,7 +36,7 @@ export class CreateRefreshTokenTable1623601947397
         this.tableName,
         new TableColumn({
           name: foreignKey.field,
-          type: 'int'
+          type: 'int',
         })
       );
 
@@ -53,7 +46,7 @@ export class CreateRefreshTokenTable1623601947397
           columnNames: [foreignKey.field],
           referencedColumnNames: [foreignKey.reference],
           referencedTableName: foreignKey.table,
-          onDelete: 'CASCADE'
+          onDelete: 'CASCADE',
         })
       );
     }
@@ -62,9 +55,7 @@ export class CreateRefreshTokenTable1623601947397
   public async down(queryRunner: QueryRunner): Promise<void> {
     const table = await queryRunner.getTable(this.tableName);
     for (const key of this.foreignKeysArray) {
-      const foreignKey = table.foreignKeys.find(
-        (fk) => fk.columnNames.indexOf(key.field) !== -1
-      );
+      const foreignKey = table.foreignKeys.find(fk => fk.columnNames.indexOf(key.field) !== -1);
       await queryRunner.dropForeignKey(this.tableName, foreignKey);
       await queryRunner.dropColumn(this.tableName, key.field);
     }

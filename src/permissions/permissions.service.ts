@@ -10,16 +10,11 @@ import { Not, ObjectLiteral } from 'typeorm';
 import { PermissionEntity } from './entities/permission.entity';
 import { basicFieldGroupsForSerializing } from '../roles/serializer/role.serializer';
 import { Pagination } from '../paginate';
-import {
-  PermissionConfiguration,
-  RoutePayloadInterface
-} from '../config/permission-config';
+import { PermissionConfiguration, RoutePayloadInterface } from '../config/permission-config';
 import { LoadPermissionMisc } from './misc/load-permission.misc';
 
 @Injectable()
-export class PermissionsService
-  extends LoadPermissionMisc
-  implements CommonServiceInterface<Permission> {
+export class PermissionsService extends LoadPermissionMisc implements CommonServiceInterface<Permission> {
   constructor(
     @InjectRepository(PermissionRepository)
     private repository: PermissionRepository
@@ -44,20 +39,12 @@ export class PermissionsService
 
     for (const moduleData of modules) {
       let resource = moduleData.resource;
-      permissionsList = this.assignResourceAndConcatPermission(
-        moduleData,
-        permissionsList,
-        resource
-      );
+      permissionsList = this.assignResourceAndConcatPermission(moduleData, permissionsList, resource);
 
       if (moduleData.hasSubmodules) {
         for (const submodule of moduleData.submodules) {
           resource = submodule.resource || resource;
-          permissionsList = this.assignResourceAndConcatPermission(
-            submodule,
-            permissionsList,
-            resource
-          );
+          permissionsList = this.assignResourceAndConcatPermission(submodule, permissionsList, resource);
         }
       }
     }
@@ -68,17 +55,10 @@ export class PermissionsService
    * Get all paginated Permission
    * @param permissionFilterDto
    */
-  async findAll(
-    permissionFilterDto: PermissionFilterDto
-  ): Promise<Pagination<Permission>> {
-    return this.repository.paginate(
-      permissionFilterDto,
-      [],
-      ['resource', 'description', 'path', 'method'],
-      {
-        groups: [...basicFieldGroupsForSerializing]
-      }
-    );
+  async findAll(permissionFilterDto: PermissionFilterDto): Promise<Pagination<Permission>> {
+    return this.repository.paginate(permissionFilterDto, [], ['resource', 'description', 'path', 'method'], {
+      groups: [...basicFieldGroupsForSerializing],
+    });
   }
 
   /**
@@ -87,7 +67,7 @@ export class PermissionsService
    */
   async findOne(id: number): Promise<Permission> {
     return this.repository.get(id, [], {
-      groups: [...basicFieldGroupsForSerializing]
+      groups: [...basicFieldGroupsForSerializing],
     });
   }
 
@@ -96,24 +76,19 @@ export class PermissionsService
    * @param id
    * @param updatePermissionDto
    */
-  async update(
-    id: number,
-    updatePermissionDto: UpdatePermissionDto
-  ): Promise<Permission> {
+  async update(id: number, updatePermissionDto: UpdatePermissionDto): Promise<Permission> {
     const permission = await this.repository.get(id);
     const condition: ObjectLiteral = {
-      description: updatePermissionDto.description
+      description: updatePermissionDto.description,
     };
     condition.id = Not(id);
-    const countSameDescription = await this.repository.countEntityByCondition(
-      condition
-    );
+    const countSameDescription = await this.repository.countEntityByCondition(condition);
     if (countSameDescription > 0) {
       throw new UnprocessableEntityException({
         property: 'name',
         constraints: {
-          unique: 'already taken'
-        }
+          unique: 'already taken',
+        },
       });
     }
     return this.repository.updateEntity(permission, updatePermissionDto);
@@ -133,9 +108,6 @@ export class PermissionsService
    * @param ids
    */
   async whereInIds(ids: number[]): Promise<PermissionEntity[]> {
-    return this.repository
-      .createQueryBuilder('permission')
-      .whereInIds(ids)
-      .getMany();
+    return this.repository.createQueryBuilder('permission').whereInIds(ids).getMany();
   }
 }

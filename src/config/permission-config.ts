@@ -16,7 +16,7 @@ export enum MethodList {
   PUT = 'put',
   DELETE = 'delete',
   ANY = 'any',
-  OPTIONS = 'options'
+  OPTIONS = 'options',
 }
 
 export interface RoutePayloadInterface {
@@ -54,63 +54,63 @@ export const PermissionConfiguration: PermissionConfigInterface = {
     {
       id: 1,
       name: 'superuser',
-      description: 'superuser of the system'
+      description: 'superuser of the system',
     },
     {
       id: 2,
       name: 'normal',
-      description: 'normal user of the system'
-    }
+      description: 'normal user of the system',
+    },
   ],
   defaultRoutes: [
     {
       path: '/check',
-      method: MethodList.GET
+      method: MethodList.GET,
     },
     {
       path: '/auth/register',
-      method: MethodList.POST
+      method: MethodList.POST,
     },
     {
       path: '/auth/login',
-      method: MethodList.POST
+      method: MethodList.POST,
     },
     {
       path: '/auth/profile',
-      method: MethodList.GET
+      method: MethodList.GET,
     },
     {
       path: '/auth/activate-account',
-      method: MethodList.GET
+      method: MethodList.GET,
     },
     {
       path: '/auth/forgot-password',
-      method: MethodList.PUT
+      method: MethodList.PUT,
     },
     {
       path: '/auth/reset-password',
-      method: MethodList.PUT
+      method: MethodList.PUT,
     },
     {
       path: '/auth/change-password',
-      method: MethodList.PUT
+      method: MethodList.PUT,
     },
     {
       path: '/auth/profile',
-      method: MethodList.PUT
+      method: MethodList.PUT,
     },
     {
       path: '/revoke/:id',
-      method: MethodList.PUT
+      method: MethodList.PUT,
     },
     {
       path: '/auth/token-info',
-      method: MethodList.GET
+      method: MethodList.GET,
     },
     {
       path: '/logout',
-      method: MethodList.POST
-    }
+      method: MethodList.POST,
+    },
   ],
   modules: [
     {
@@ -123,38 +123,38 @@ export const PermissionConfiguration: PermissionConfigInterface = {
           route: [
             {
               path: '/users',
-              method: MethodList.GET
-            }
-          ]
+              method: MethodList.GET,
+            },
+          ],
         },
         {
           name: 'Store new user',
           route: [
             {
               path: '/users',
-              method: MethodList.POST
-            }
-          ]
+              method: MethodList.POST,
+            },
+          ],
         },
         {
           name: 'Update user by id',
           route: [
             {
               path: '/users/:id',
-              method: MethodList.PUT
-            }
-          ]
+              method: MethodList.PUT,
+            },
+          ],
         },
         {
           name: 'Get user by id',
           route: [
             {
               path: '/users/:id',
-              method: MethodList.GET
-            }
-          ]
-        }
-      ]
+              method: MethodList.GET,
+            },
+          ],
+        },
+      ],
     },
     {
       name: 'Role management',
@@ -166,47 +166,47 @@ export const PermissionConfiguration: PermissionConfigInterface = {
           route: [
             {
               path: '/roles',
-              method: MethodList.GET
-            }
-          ]
+              method: MethodList.GET,
+            },
+          ],
         },
         {
           name: 'View role by id',
           route: [
             {
               path: '/roles/:id',
-              method: MethodList.GET
-            }
-          ]
+              method: MethodList.GET,
+            },
+          ],
         },
         {
           name: 'Store new role',
           route: [
             {
               path: '/roles',
-              method: MethodList.POST
-            }
-          ]
+              method: MethodList.POST,
+            },
+          ],
         },
         {
           name: 'Update role by id',
           route: [
             {
               path: '/roles/:id',
-              method: MethodList.PUT
-            }
-          ]
+              method: MethodList.PUT,
+            },
+          ],
         },
         {
           name: 'Delete role by id',
           route: [
             {
               path: '/roles/:id',
-              method: MethodList.DELETE
-            }
-          ]
-        }
-      ]
+              method: MethodList.DELETE,
+            },
+          ],
+        },
+      ],
     },
     {
       name: 'Permission management',
@@ -218,56 +218,56 @@ export const PermissionConfiguration: PermissionConfigInterface = {
           route: [
             {
               path: '/permissions',
-              method: MethodList.GET
-            }
-          ]
+              method: MethodList.GET,
+            },
+          ],
         },
         {
           name: 'Sync permission from config',
           route: [
             {
               path: '/permissions/sync',
-              method: MethodList.POST
-            }
-          ]
+              method: MethodList.POST,
+            },
+          ],
         },
         {
           name: 'View permission by id',
           route: [
             {
               path: '/permissions/:id',
-              method: MethodList.GET
-            }
-          ]
+              method: MethodList.GET,
+            },
+          ],
         },
         {
           name: 'Store new permission',
           route: [
             {
               path: '/permissions',
-              method: MethodList.POST
-            }
-          ]
+              method: MethodList.POST,
+            },
+          ],
         },
         {
           name: 'Update permission by id',
           route: [
             {
               path: '/permissions/:id',
-              method: MethodList.PUT
-            }
-          ]
+              method: MethodList.PUT,
+            },
+          ],
         },
         {
           name: 'Delete permission by id',
           route: [
             {
               path: '/permissions/:id',
-              method: MethodList.DELETE
-            }
-          ]
-        }
-      ]
+              method: MethodList.DELETE,
+            },
+          ],
+        },
+      ],
     },
     {
       name: 'Email Templates',
@@ -279,47 +279,47 @@ export const PermissionConfiguration: PermissionConfigInterface = {
           route: [
             {
               path: '/email-templates',
-              method: MethodList.GET
-            }
-          ]
+              method: MethodList.GET,
+            },
+          ],
         },
         {
           name: 'View email templates by id',
           route: [
             {
               path: '/email-templates/:id',
-              method: MethodList.GET
-            }
-          ]
+              method: MethodList.GET,
+            },
+          ],
         },
         {
           name: 'Store new email templates',
           route: [
             {
               path: '/email-templates',
-              method: MethodList.POST
-            }
-          ]
+              method: MethodList.POST,
+            },
+          ],
         },
         {
           name: 'Update email templates by id',
           route: [
             {
               path: '/email-templates/:id',
-              method: MethodList.PUT
-            }
-          ]
+              method: MethodList.PUT,
+            },
+          ],
         },
         {
           name: 'Delete email templates by id',
           route: [
             {
               path: '/email-templates/:id',
-              method: MethodList.DELETE
-            }
-          ]
-        }
-      ]
-    }
-  ]
+              method: MethodList.DELETE,
+            },
+          ],
+        },
+      ],
+    },
+  ],
 };

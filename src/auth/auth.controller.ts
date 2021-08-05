@@ -12,7 +12,7 @@ import {
   Res,
   UploadedFile,
   UseGuards,
-  ValidationPipe
+  ValidationPipe,
 } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { AuthService } from './auth.service';
@@ -45,27 +45,18 @@ export class AuthController {
   constructor(private authService: AuthService) {}
 
   @Post('/auth/register')
-  register(
-    @Body(ValidationPipe) registerUserDto: RegisterUserDto
-  ): Promise<UserSerializer> {
+  register(@Body(ValidationPipe) registerUserDto: RegisterUserDto): Promise<UserSerializer> {
     return this.authService.create(registerUserDto);
   }
 
   @Post('/auth/login')
-  async login(
-    @Req() req: Request,
-    @Res() response: Response,
-    @Body() userLoginDto: UserLoginDto
-  ) {
+  async login(@Req() req: Request, @Res() response: Response, @Body() userLoginDto: UserLoginDto) {
     const ua = UAParser(req.headers['user-agent']);
     const refreshTokenPayload: Partial<RefreshToken> = {
       ip: req.ip,
-      userAgent: JSON.stringify(ua)
+      userAgent: JSON.stringify(ua),
     };
-    const cookiePayload = await this.authService.login(
-      userLoginDto,
-      refreshTokenPayload
-    );
+    const cookiePayload = await this.authService.login(userLoginDto, refreshTokenPayload);
     response.setHeader('Set-Cookie', cookiePayload);
     return response.status(HttpStatus.NO_CONTENT).json({});
   }
@@ -73,9 +64,7 @@ export class AuthController {
   @Post('/refresh')
   async refresh(@Req() req: Request, @Res() response: Response) {
     try {
-      const cookiePayload = await this.authService.createAccessTokenFromRefreshToken(
-        req.cookies['Refresh']
-      );
+      const cookiePayload = await this.authService.createAccessTokenFromRefreshToken(req.cookies['Refresh']);
       response.setHeader('Set-Cookie', cookiePayload);
       return response.status(HttpStatus.NO_CONTENT).json({});
     } catch (e) {
@@ -110,9 +99,7 @@ export class AuthController {
 
   @UseGuards(JwtTwoFactorGuard)
   @Put('/auth/profile')
-  @UseInterceptors(
-    FileInterceptor('avatar', multerOptionsHelper('images/profile', 1000000))
-  )
+  @UseInterceptors(FileInterceptor('avatar', multerOptionsHelper('images/profile', 1000000)))
   updateProfile(
     @GetUser() user: UserEntity,
     @UploadedFile() file: Express.Multer.File,
@@ -126,35 +113,25 @@ export class AuthController {
 
   @UseGuards(JwtTwoFactorGuard)
   @Put('/auth/change-password')
-  changePassword(
-    @GetUser() user: UserEntity,
-    @Body() changePasswordDto: ChangePasswordDto
-  ): Promise<void> {
+  changePassword(@GetUser() user: UserEntity, @Body() changePasswordDto: ChangePasswordDto): Promise<void> {
     return this.authService.changePassword(user, changePasswordDto);
   }
 
   @UseGuards(JwtTwoFactorGuard, PermissionGuard)
   @Get('/users')
-  findAll(
-    @Query() userSearchFilterDto: UserSearchFilterDto
-  ): Promise<Pagination<UserSerializer>> {
+  findAll(@Query() userSearchFilterDto: UserSearchFilterDto): Promise<Pagination<UserSerializer>> {
     return this.authService.findAll(userSearchFilterDto);
   }
 
   @UseGuards(JwtTwoFactorGuard, PermissionGuard)
   @Post('/users')
-  create(
-    @Body(ValidationPipe) createUserDto: CreateUserDto
-  ): Promise<UserSerializer> {
+  create(@Body(ValidationPipe) createUserDto: CreateUserDto): Promise<UserSerializer> {
     return this.authService.create(createUserDto);
   }
 
   @UseGuards(JwtTwoFactorGuard, PermissionGuard)
   @Put('/users/:id')
-  update(
-    @Param('id') id: string,
-    @Body() updateUserDto: UpdateUserDto
-  ): Promise<UserSerializer> {
+  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto): Promise<UserSerializer> {
     return this.authService.update(+id, updateUserDto);
   }
 

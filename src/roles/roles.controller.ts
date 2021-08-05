@@ -9,7 +9,7 @@ import {
   Post,
   Put,
   Query,
-  UseGuards
+  UseGuards,
 } from '@nestjs/common';
 import { RolesService } from './roles.service';
 import { CreateRoleDto } from './dto/create-role.dto';
@@ -35,9 +35,7 @@ export class RolesController {
 
   @Get()
   @ApiQuery({ type: RoleFilterDto })
-  findAll(
-    @Query() roleFilterDto: RoleFilterDto
-  ): Promise<Pagination<RoleSerializer>> {
+  findAll(@Query() roleFilterDto: RoleFilterDto): Promise<Pagination<RoleSerializer>> {
     return this.rolesService.findAll(roleFilterDto);
   }
 
@@ -47,10 +45,7 @@ export class RolesController {
   }
 
   @Put(':id')
-  update(
-    @Param('id') id: string,
-    @Body() updateRoleDto: UpdateRoleDto
-  ): Promise<RoleSerializer> {
+  update(@Param('id') id: string, @Body() updateRoleDto: UpdateRoleDto): Promise<RoleSerializer> {
     return this.rolesService.update(+id, updateRoleDto);
   }
 

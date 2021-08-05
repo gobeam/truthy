@@ -7,18 +7,15 @@ import { Connection } from 'typeorm';
 
 const mockConnection = () => ({
   getRepository: jest.fn(() => ({
-    count: jest.fn().mockResolvedValue(0)
-  }))
+    count: jest.fn().mockResolvedValue(0),
+  })),
 });
 
 describe('UniqueValidatorPipe', () => {
   let isUnique: UniqueValidatorPipe, connection;
   beforeEach(async () => {
     const module = await Test.createTestingModule({
-      providers: [
-        UniqueValidatorPipe,
-        { provide: getConnectionToken(), useFactory: mockConnection }
-      ]
+      providers: [UniqueValidatorPipe, { provide: getConnectionToken(), useFactory: mockConnection }],
     }).compile();
     isUnique = await module.get<UniqueValidatorPipe>(UniqueValidatorPipe);
     connection = await module.get<Connection>(Connection);
@@ -32,7 +29,7 @@ describe('UniqueValidatorPipe', () => {
         value: username,
         targetName: '',
         object: { username },
-        property: 'username'
+        property: 'username',
       };
       const result = await isUnique.validate<UserEntity>('username', args);
       expect(connection.getRepository).toHaveBeenCalledWith(UserEntity);

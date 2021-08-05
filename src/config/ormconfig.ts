@@ -14,8 +14,8 @@ const ormConfig: ConnectionOptions = {
   synchronize: process.env.TYPE_ORM_SYNC || dbConfig.synchronize,
   migrations: [__dirname + '/../database/migrations/**/*{.ts,.js}'],
   cli: {
-    migrationsDir: 'src/database/migrations'
-  }
+    migrationsDir: 'src/database/migrations',
+  },
 };
 
 export = ormConfig;

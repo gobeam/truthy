@@ -17,7 +17,7 @@ const permissionRepositoryMock = () => ({
   delete: jest.fn(),
   createEntity: jest.fn(),
   countEntityByCondition: jest.fn(),
-  updateEntity: jest.fn()
+  updateEntity: jest.fn(),
 });
 
 const mockPermission = {
@@ -26,7 +26,7 @@ const mockPermission = {
   method: MethodList.POST,
   resource: 'test',
   save: jest.fn(),
-  remove: jest.fn()
+  remove: jest.fn(),
 };
 
 describe('PermissionsService', () => {
@@ -34,10 +34,7 @@ describe('PermissionsService', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [
-        PermissionsService,
-        { provide: PermissionRepository, useFactory: permissionRepositoryMock }
-      ]
+      providers: [PermissionsService, { provide: PermissionRepository, useFactory: permissionRepositoryMock }],
     }).compile();
 
     service = module.get<PermissionsService>(PermissionsService);
@@ -48,7 +45,7 @@ describe('PermissionsService', () => {
     const permissionFilterDto: PermissionFilterDto = {
       keywords: 'test description',
       limit: 10,
-      page: 1
+      page: 1,
     };
     repository.paginate.mockResolvedValue('result');
     const result = await service.findAll(permissionFilterDto);
@@ -94,9 +91,7 @@ describe('PermissionsService', () => {
     it('try to update using duplicate description', async () => {
       repository.findOne.mockResolvedValue(mockPermission);
       repository.countEntityByCondition.mockResolvedValue(1);
-      await expect(service.update(1, updatePermissionDto)).rejects.toThrowError(
-        UnprocessableEntityException
-      );
+      await expect(service.update(1, updatePermissionDto)).rejects.toThrowError(UnprocessableEntityException);
       expect(repository.countEntityByCondition).toHaveBeenCalledTimes(1);
     });
 
@@ -106,10 +101,7 @@ describe('PermissionsService', () => {
       repository.get.mockResolvedValue(mockPermission);
       const role = await service.update(1, updatePermissionDto);
       expect(repository.get).toHaveBeenCalledWith(1);
-      expect(repository.updateEntity).toHaveBeenCalledWith(
-        mockPermission,
-        updatePermissionDto
-      );
+      expect(repository.updateEntity).toHaveBeenCalledWith(mockPermission, updatePermissionDto);
       expect(role).toEqual(mockPermission);
     });
 
@@ -117,9 +109,7 @@ describe('PermissionsService', () => {
       repository.updateEntity.mockRejectedValue(new NotFoundException());
       const updatePermissionDto: UpdatePermissionDto = mockPermission;
       repository.get.mockResolvedValue(null);
-      await expect(service.update(1, updatePermissionDto)).rejects.toThrowError(
-        NotFoundException
-      );
+      await expect(service.update(1, updatePermissionDto)).rejects.toThrowError(NotFoundException);
     });
   });
 

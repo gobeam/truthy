@@ -1,12 +1,4 @@
-import {
-  IsNotEmpty,
-  IsNumber,
-  IsString,
-  MaxLength,
-  MinLength,
-  Validate,
-  ValidateIf
-} from 'class-validator';
+import { IsNotEmpty, IsNumber, IsString, MaxLength, MinLength, Validate, ValidateIf } from 'class-validator';
 import { UniqueValidatorPipe } from '../../common/pipes/unique-validator.pipe';
 import { RoleEntity } from '../entities/role.entity';
 

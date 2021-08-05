@@ -13,10 +13,7 @@ export class JwtAuthGuard extends AuthGuard('jwt-strategy') {
 
   handleRequest(err, user, info) {
     if (info instanceof TokenExpiredError) {
-      throw new ForbiddenException(
-        'tokenExpired',
-        StatusCodesList.TokenExpired
-      );
+      throw new ForbiddenException('tokenExpired', StatusCodesList.TokenExpired);
     }
     if (err || !user) {
       throw err || new UnauthorizedException();

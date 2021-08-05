@@ -6,12 +6,7 @@ export class GenerateCodeHelper {
    * @param lowercase
    * @param numerical
    */
-  generateRandomCode(
-    length: number,
-    uppercase = true,
-    lowercase = true,
-    numerical = true
-  ): string {
+  generateRandomCode(length: number, uppercase = true, lowercase = true, numerical = true): string {
     let result = '';
     const lowerCaseAlphabets = 'abcdefghijklmnopqrstuvwxyz';
     const upperCaseAlphabets = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
