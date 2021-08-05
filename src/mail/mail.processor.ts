@@ -1,7 +1,13 @@
 import { Logger } from '@nestjs/common';
 import * as config from 'config';
 import { MailerService } from '@nestjs-modules/mailer';
-import { OnQueueActive, OnQueueCompleted, OnQueueFailed, Process, Processor } from '@nestjs/bull';
+import {
+  OnQueueActive,
+  OnQueueCompleted,
+  OnQueueFailed,
+  Process,
+  Processor
+} from '@nestjs/bull';
 import { Job } from 'bull';
 import { MailJobInterface } from './interface/mail-job.interface';
 
@@ -13,21 +19,37 @@ export class MailProcessor {
 
   @OnQueueActive()
   onActive(job: Job) {
-    this.logger.debug(`Processing job ${job.id} of type ${job.name}. Data: ${JSON.stringify(job.data)}`);
+    this.logger.debug(
+      `Processing job ${job.id} of type ${job.name}. Data: ${JSON.stringify(
+        job.data
+      )}`
+    );
   }
 
   @OnQueueCompleted()
   onComplete(job: Job, result: any) {
-    this.logger.debug(`Completed job ${job.id} of type ${job.name}. Result: ${JSON.stringify(result)}`);
+    this.logger.debug(
+      `Completed job ${job.id} of type ${job.name}. Result: ${JSON.stringify(
+        result
+      )}`
+    );
   }
 
   @OnQueueFailed()
   onError(job: Job<any>, error: any) {
-    this.logger.error(`Failed job ${job.id} of type ${job.name}: ${error.message}`, error.stack);
+    this.logger.error(
+      `Failed job ${job.id} of type ${job.name}: ${error.message}`,
+      error.stack
+    );
   }
 
   @Process('system-mail')
-  async sendEmail(job: Job<{ payload: MailJobInterface; type: string }>): Promise<any> {
+  async sendEmail(
+    job: Job<{
+      payload: MailJobInterface;
+      type: string;
+    }>
+  ): Promise<any> {
     this.logger.log(`Sending email to '${job.data.payload.to}'`);
     const mailConfig = config.get('mail');
     try {
@@ -36,10 +58,13 @@ export class MailProcessor {
         from: process.env.MAIL_FROM || mailConfig.fromMail,
         subject: job.data.payload.subject,
         template: __dirname + `/../mail/templates/email/layouts/email-layout`,
-        context: job.data.payload.context,
+        context: job.data.payload.context
       });
     } catch (error) {
-      this.logger.error(`Failed to send email to '${job.data.payload.to}'`, error.stack);
+      this.logger.error(
+        `Failed to send email to '${job.data.payload.to}'`,
+        error.stack
+      );
       throw error;
     }
   }

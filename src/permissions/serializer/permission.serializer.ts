@@ -5,14 +5,18 @@ import { Expose } from 'class-transformer';
 export const basicFieldGroupsForSerializing: string[] = ['basic'];
 
 export class Permission extends ModelSerializer {
-  @Expose({ groups: basicFieldGroupsForSerializing })
+  @Expose({
+    groups: basicFieldGroupsForSerializing
+  })
   id: number;
 
   @ApiProperty()
   resource: string;
 
   @ApiProperty()
-  @Expose({ groups: basicFieldGroupsForSerializing })
+  @Expose({
+    groups: basicFieldGroupsForSerializing
+  })
   description: string;
 
   @ApiProperty()
@@ -22,14 +26,20 @@ export class Permission extends ModelSerializer {
   method: string;
 
   @ApiProperty()
-  @Expose({ groups: basicFieldGroupsForSerializing })
+  @Expose({
+    groups: basicFieldGroupsForSerializing
+  })
   isDefault: boolean;
 
   @ApiPropertyOptional()
-  @Expose({ groups: basicFieldGroupsForSerializing })
+  @Expose({
+    groups: basicFieldGroupsForSerializing
+  })
   createdAt: Date;
 
   @ApiPropertyOptional()
-  @Expose({ groups: basicFieldGroupsForSerializing })
+  @Expose({
+    groups: basicFieldGroupsForSerializing
+  })
   updatedAt: Date;
 }

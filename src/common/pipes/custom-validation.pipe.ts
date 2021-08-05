@@ -1,4 +1,9 @@
-import { ArgumentMetadata, Injectable, PipeTransform, UnprocessableEntityException } from '@nestjs/common';
+import {
+  ArgumentMetadata,
+  Injectable,
+  PipeTransform,
+  UnprocessableEntityException
+} from '@nestjs/common';
 import { plainToClass } from 'class-transformer';
 import { validate, ValidationError } from 'class-validator';
 
@@ -22,7 +27,7 @@ export class CustomValidationPipe implements PipeTransform<any> {
     for (const error of errors) {
       data.push({
         property: error.property,
-        constraints: error.constraints,
+        constraints: error.constraints
       });
     }
     return data;

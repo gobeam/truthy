@@ -6,13 +6,13 @@ export class Add2faColumnsUserTable1627278359782 implements MigrationInterface {
     new TableColumn({
       name: 'twoFASecret',
       type: 'varchar',
-      isNullable: true,
+      isNullable: true
     }),
     new TableColumn({
       name: 'isTwoFAEnabled',
       type: 'boolean',
-      default: false,
-    }),
+      default: false
+    })
   ];
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.addColumns(this.tableName, this.columns);

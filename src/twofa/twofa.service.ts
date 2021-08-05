@@ -17,24 +17,31 @@ export class TwofaService {
   public async generateTwoFASecret(user: UserEntity) {
     if (user.twoFAThrottleTime > new Date()) {
       throw new CustomHttpException(
-        `tooManyRequest-{"second":"${this.differentBetweenDatesInSec(user.twoFAThrottleTime, new Date())}"}`,
+        `tooManyRequest-{"second":"${this.differentBetweenDatesInSec(
+          user.twoFAThrottleTime,
+          new Date()
+        )}"}`,
         HttpStatus.TOO_MANY_REQUESTS,
         StatusCodesList.TooManyTries
       );
     }
     const secret = authenticator.generateSecret();
-    const otpauthUrl = authenticator.keyuri(user.email, TwofaConfig.authenticationAppNAme, secret);
+    const otpauthUrl = authenticator.keyuri(
+      user.email,
+      TwofaConfig.authenticationAppNAme,
+      secret
+    );
     await this.usersService.setTwoFactorAuthenticationSecret(secret, user.id);
     return {
       secret,
-      otpauthUrl,
+      otpauthUrl
     };
   }
 
   public isTwoFACodeValid(twoFASecret: string, user: UserEntity) {
     return authenticator.verify({
       token: twoFASecret,
-      secret: user.twoFASecret,
+      secret: user.twoFASecret
     });
   }
 

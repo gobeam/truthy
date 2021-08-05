@@ -8,5 +8,5 @@ export const ExceptionTitleList = {
   InvalidCredentials: 'invalidCredentials',
   InvalidRefreshToken: 'invalidRefreshToken',
   DeleteDefaultError: 'deleteDefaultError',
-  RefreshTokenExpired: 'refreshTokenExpired',
+  RefreshTokenExpired: 'refreshTokenExpired'
 } as const;

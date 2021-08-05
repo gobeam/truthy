@@ -8,7 +8,7 @@ import {
   Req,
   Res,
   UnauthorizedException,
-  UseGuards,
+  UseGuards
 } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { AuthService } from '../auth/auth.service';
@@ -21,18 +21,28 @@ import { TwofaService } from './twofa.service';
 
 @Controller('twofa')
 export class TwofaController {
-  constructor(private readonly twofaService: TwofaService, private readonly usersService: AuthService) {}
+  constructor(
+    private readonly twofaService: TwofaService,
+    private readonly usersService: AuthService
+  ) {}
 
   @Post('authenticate')
   @HttpCode(200)
   @UseGuards(JwtAuthGuard)
   async authenticate(
-    @Req() req: Request,
-    @Res() response: Response,
-    @GetUser() user: UserEntity,
-    @Body() twofaCodeDto: TwofaCodeDto
+    @Req()
+    req: Request,
+    @Res()
+    response: Response,
+    @GetUser()
+    user: UserEntity,
+    @Body()
+    twofaCodeDto: TwofaCodeDto
   ) {
-    const isCodeValid = this.twofaService.isTwoFACodeValid(twofaCodeDto.code, user);
+    const isCodeValid = this.twofaService.isTwoFACodeValid(
+      twofaCodeDto.code,
+      user
+    );
     if (!isCodeValid) {
       throw new UnauthorizedException('Wrong authentication code');
     }
@@ -44,7 +54,12 @@ export class TwofaController {
 
   @Post('generate')
   @UseGuards(JwtAuthGuard)
-  async generate(@Res() response: Response, @GetUser() user: UserEntity) {
+  async generate(
+    @Res()
+    response: Response,
+    @GetUser()
+    user: UserEntity
+  ) {
     const { otpauthUrl } = await this.twofaService.generateTwoFASecret(user);
     return this.twofaService.pipeQrCodeStream(response, otpauthUrl);
   }
@@ -52,7 +67,15 @@ export class TwofaController {
   @Put()
   @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(JwtAuthGuard)
-  async toggleTwoFa(@Body() twofaStatusUpdateDto: TwoFaStatusUpdateDto, @GetUser() user: UserEntity) {
-    return this.usersService.turnOnTwoFactorAuthentication(user.id, twofaStatusUpdateDto.isTwoFAEnabled);
+  async toggleTwoFa(
+    @Body()
+    twofaStatusUpdateDto: TwoFaStatusUpdateDto,
+    @GetUser()
+    user: UserEntity
+  ) {
+    return this.usersService.turnOnTwoFactorAuthentication(
+      user.id,
+      twofaStatusUpdateDto.isTwoFAEnabled
+    );
   }
 }

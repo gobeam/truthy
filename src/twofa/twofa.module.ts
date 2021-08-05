@@ -7,6 +7,6 @@ import { TwofaController } from './twofa.controller';
   providers: [TwofaService],
   imports: [AuthModule],
   exports: [TwofaService],
-  controllers: [TwofaController],
+  controllers: [TwofaController]
 })
 export class TwofaModule {}

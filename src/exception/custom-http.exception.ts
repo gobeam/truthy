@@ -9,7 +9,7 @@ export class CustomHttpException extends HttpException {
         message: message || ExceptionTitleList.BadRequest,
         code: code || StatusCodesList.BadRequest,
         statusCode: statusCode || HttpStatus.BAD_REQUEST,
-        error: true,
+        error: true
       },
       statusCode || HttpStatus.BAD_REQUEST
     );

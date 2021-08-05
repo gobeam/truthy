@@ -9,7 +9,7 @@ import {
   Post,
   Put,
   Query,
-  UseGuards,
+  UseGuards
 } from '@nestjs/common';
 import { EmailTemplateService } from './email-template.service';
 import { CreateEmailTemplateDto } from './dto/create-email-template.dto';
@@ -28,28 +28,45 @@ export class EmailTemplateController {
   constructor(private readonly emailTemplateService: EmailTemplateService) {}
 
   @Post()
-  create(@Body() createEmailTemplateDto: CreateEmailTemplateDto): Promise<EmailTemplate> {
+  create(
+    @Body()
+    createEmailTemplateDto: CreateEmailTemplateDto
+  ): Promise<EmailTemplate> {
     return this.emailTemplateService.create(createEmailTemplateDto);
   }
 
   @Get()
-  findAll(@Query() filter: EmailTemplatesSearchFilterDto): Promise<Pagination<EmailTemplate>> {
+  findAll(
+    @Query()
+    filter: EmailTemplatesSearchFilterDto
+  ): Promise<Pagination<EmailTemplate>> {
     return this.emailTemplateService.findAll(filter);
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string): Promise<EmailTemplate> {
+  findOne(
+    @Param('id')
+    id: string
+  ): Promise<EmailTemplate> {
     return this.emailTemplateService.findOne(+id);
   }
 
   @Put(':id')
-  update(@Param('id') id: string, @Body() updateEmailTemplateDto: UpdateEmailTemplateDto): Promise<EmailTemplate> {
+  update(
+    @Param('id')
+    id: string,
+    @Body()
+    updateEmailTemplateDto: UpdateEmailTemplateDto
+  ): Promise<EmailTemplate> {
     return this.emailTemplateService.update(+id, updateEmailTemplateDto);
   }
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  remove(@Param('id') id: string): Promise<void> {
+  remove(
+    @Param('id')
+    id: string
+  ): Promise<void> {
     return this.emailTemplateService.remove(+id);
   }
 }

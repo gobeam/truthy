@@ -10,6 +10,6 @@ import { AuthModule } from '../auth/auth.module';
   imports: [TypeOrmModule.forFeature([PermissionRepository]), AuthModule],
   exports: [PermissionsService],
   controllers: [PermissionsController],
-  providers: [PermissionsService, UniqueValidatorPipe],
+  providers: [PermissionsService, UniqueValidatorPipe]
 })
 export class PermissionsModule {}

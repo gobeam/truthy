@@ -7,9 +7,12 @@ import { UniqueValidatorPipe } from '../common/pipes/unique-validator.pipe';
 import { EmailTemplateRepository } from './email-template.repository';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([EmailTemplateRepository]), forwardRef(() => AuthModule)],
+  imports: [
+    TypeOrmModule.forFeature([EmailTemplateRepository]),
+    forwardRef(() => AuthModule)
+  ],
   exports: [EmailTemplateService],
   controllers: [EmailTemplateController],
-  providers: [EmailTemplateService, UniqueValidatorPipe],
+  providers: [EmailTemplateService, UniqueValidatorPipe]
 })
 export class EmailTemplateModule {}

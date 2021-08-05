@@ -7,16 +7,18 @@ const mockRefreshToken = {
   userId: 1,
   expires: new Date(),
   isRevoked: false,
-  save: jest.fn(),
+  save: jest.fn()
 };
 
 describe('Refresh token repository', () => {
   let repository, user;
   beforeEach(async () => {
     const module = await Test.createTestingModule({
-      providers: [RefreshTokenRepository],
+      providers: [RefreshTokenRepository]
     }).compile();
-    repository = await module.get<RefreshTokenRepository>(RefreshTokenRepository);
+    repository = await module.get<RefreshTokenRepository>(
+      RefreshTokenRepository
+    );
     user = new UserSerializer();
     user.id = 1;
     user.email = 'test@mail.com';

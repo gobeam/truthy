@@ -13,7 +13,9 @@ import { StatusCodesList } from '../common/constants/status-codes-list.constants
 import { ForbiddenException } from '../exception/forbidden.exception';
 
 @Injectable()
-export class EmailTemplateService implements CommonServiceInterface<EmailTemplate> {
+export class EmailTemplateService
+  implements CommonServiceInterface<EmailTemplate>
+{
   constructor(
     @InjectRepository(EmailTemplateRepository)
     private readonly repository: EmailTemplateRepository
@@ -38,17 +40,24 @@ export class EmailTemplateService implements CommonServiceInterface<EmailTemplat
    * @param slug
    */
   async findBySlug(slug) {
-    return await this.repository.findOne({ select: ['body'], where: { slug } });
+    return await this.repository.findOne({
+      select: ['body'],
+      where: {
+        slug
+      }
+    });
   }
 
   /**
    * Create new Email Template
    * @param createEmailTemplateDto
    */
-  create(createEmailTemplateDto: CreateEmailTemplateDto): Promise<EmailTemplate> {
+  create(
+    createEmailTemplateDto: CreateEmailTemplateDto
+  ): Promise<EmailTemplate> {
     return this.repository.createEntity({
       ...createEmailTemplateDto,
-      slug: this.slugify(createEmailTemplateDto.title),
+      slug: this.slugify(createEmailTemplateDto.title)
     });
   }
 
@@ -56,8 +65,14 @@ export class EmailTemplateService implements CommonServiceInterface<EmailTemplat
    * Get all email templates paginated list
    * @param filter
    */
-  findAll(filter: EmailTemplatesSearchFilterDto): Promise<Pagination<EmailTemplate>> {
-    return this.repository.paginate(filter, [], ['title', 'subject', 'body', 'sender']);
+  findAll(
+    filter: EmailTemplatesSearchFilterDto
+  ): Promise<Pagination<EmailTemplate>> {
+    return this.repository.paginate(
+      filter,
+      [],
+      ['title', 'subject', 'body', 'sender']
+    );
   }
 
   /**
@@ -73,24 +88,29 @@ export class EmailTemplateService implements CommonServiceInterface<EmailTemplat
    * @param id
    * @param updateEmailTemplateDto
    */
-  async update(id: number, updateEmailTemplateDto: UpdateEmailTemplateDto): Promise<EmailTemplate> {
+  async update(
+    id: number,
+    updateEmailTemplateDto: UpdateEmailTemplateDto
+  ): Promise<EmailTemplate> {
     const template = await this.repository.get(id);
     const condition: ObjectLiteral = {
-      title: updateEmailTemplateDto.title,
+      title: updateEmailTemplateDto.title
     };
     condition.id = Not(id);
-    const countSameDescription = await this.repository.countEntityByCondition(condition);
+    const countSameDescription = await this.repository.countEntityByCondition(
+      condition
+    );
     if (countSameDescription > 0) {
       throw new UnprocessableEntityException({
         property: 'title',
         constraints: {
-          unique: 'already taken',
-        },
+          unique: 'already taken'
+        }
       });
     }
     return this.repository.updateEntity(template, {
       ...updateEmailTemplateDto,
-      slug: this.slugify(updateEmailTemplateDto.title),
+      slug: this.slugify(updateEmailTemplateDto.title)
     });
   }
 
@@ -101,7 +121,10 @@ export class EmailTemplateService implements CommonServiceInterface<EmailTemplat
   async remove(id: number): Promise<void> {
     const template = await this.findOne(id);
     if (template.isDefault) {
-      throw new ForbiddenException(ExceptionTitleList.DeleteDefaultError, StatusCodesList.defaultItemDeleteError);
+      throw new ForbiddenException(
+        ExceptionTitleList.DeleteDefaultError,
+        StatusCodesList.DeleteDefaultError
+      );
     }
     await this.repository.delete({ id });
   }

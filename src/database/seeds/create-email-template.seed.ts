@@ -5,6 +5,12 @@ import { EmailTemplateEntity } from '../../email-template/entities/email-templat
 
 export default class CreateEmailTemplateSeed {
   public async run(factory: Factory, connection: Connection): Promise<any> {
-    await connection.createQueryBuilder().insert().into(EmailTemplateEntity).values(templates).orIgnore().execute();
+    await connection
+      .createQueryBuilder()
+      .insert()
+      .into(EmailTemplateEntity)
+      .values(templates)
+      .orIgnore()
+      .execute();
   }
 }

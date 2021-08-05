@@ -22,9 +22,9 @@ const queueConfig = config.get('queue');
           password: process.env.REDIS_PASSWORD || queueConfig.password,
           retryStrategy(times) {
             return Math.min(times * 50, 2000);
-          },
-        },
-      }),
+          }
+        }
+      })
     }),
     MailerModule.forRootAsync({
       useFactory: () => ({
@@ -35,25 +35,27 @@ const queueConfig = config.get('queue');
           ignoreTLS: mailConfig.ignoreTLS,
           auth: {
             user: process.env.MAIL_USER || mailConfig.user,
-            pass: process.env.MAIL_PASS || mailConfig.pass,
-          },
+            pass: process.env.MAIL_PASS || mailConfig.pass
+          }
         },
         defaults: {
-          from: `"${process.env.MAIL_FROM || mailConfig.from}" <${process.env.MAIL_FROM || mailConfig.fromMail}>`,
+          from: `"${process.env.MAIL_FROM || mailConfig.from}" <${
+            process.env.MAIL_FROM || mailConfig.fromMail
+          }>`
         },
         preview: mailConfig.preview,
         template: {
           dir: __dirname + '/templates',
           adapter: new PugAdapter(),
           options: {
-            strict: true,
-          },
-        },
-      }),
-    }),
+            strict: true
+          }
+        }
+      })
+    })
   ],
   controllers: [],
   providers: [MailService, MailProcessor],
-  exports: [MailService],
+  exports: [MailService]
 })
 export class MailModule {}

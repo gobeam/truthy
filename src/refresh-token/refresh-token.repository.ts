@@ -11,14 +11,19 @@ export class RefreshTokenRepository extends Repository<RefreshToken> {
    * @param user
    * @param tokenPayload
    */
-  public async createRefreshToken(user: UserSerializer, tokenPayload: Partial<RefreshToken>): Promise<RefreshToken> {
+  public async createRefreshToken(
+    user: UserSerializer,
+    tokenPayload: Partial<RefreshToken>
+  ): Promise<RefreshToken> {
     const token = this.create();
     token.userId = user.id;
     token.isRevoked = false;
     token.ip = tokenPayload.ip;
     token.userAgent = tokenPayload.userAgent;
     const expiration = new Date();
-    expiration.setSeconds(expiration.getSeconds() + tokenConfig.refreshExpiresIn);
+    expiration.setSeconds(
+      expiration.getSeconds() + tokenConfig.refreshExpiresIn
+    );
     token.expires = expiration;
     return token.save();
   }
@@ -30,8 +35,8 @@ export class RefreshTokenRepository extends Repository<RefreshToken> {
   public async findTokenById(id: number): Promise<RefreshToken | null> {
     return this.findOne({
       where: {
-        id,
-      },
+        id
+      }
     });
   }
 }

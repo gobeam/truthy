@@ -28,7 +28,7 @@ const mockUserRepository = () => ({
   findBy: jest.fn(),
   updateEntity: jest.fn(),
   getUserForResetPassword: jest.fn(),
-  countEntityByCondition: jest.fn(),
+  countEntityByCondition: jest.fn()
 });
 
 const mockUser = {
@@ -38,48 +38,70 @@ const mockUser = {
   password: 'test123',
   roleId: 2,
   status: UserStatusEnum.ACTIVE,
-  save: jest.fn(),
+  save: jest.fn()
 };
 
 const refreshTokenServiceMock = () => ({
   generateRefreshToken: jest.fn(),
   resolveRefreshToken: jest.fn(),
   getRefreshTokenByUserId: jest.fn(),
-  revokeRefreshTokenById: jest.fn(),
+  revokeRefreshTokenById: jest.fn()
 });
 
 const throttleMock = () => ({
   get: jest.fn(),
-  delete: jest.fn(),
+  delete: jest.fn()
 });
 
 const mailServiceMock = () => ({
-  sendMail: jest.fn(),
+  sendMail: jest.fn()
 });
 
 const jwtServiceMock = () => ({
   signAsync: jest.fn(),
-  verifyAsync: jest.fn(),
+  verifyAsync: jest.fn()
 });
 
 describe('AuthService', () => {
-  let service: AuthService, userRepository, refreshTokenService, mailService, throttleService, jwtService;
+  let service: AuthService,
+    userRepository,
+    refreshTokenService,
+    mailService,
+    throttleService,
+    jwtService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         AuthService,
-        { provide: JwtService, useFactory: jwtServiceMock },
-        { provide: UserRepository, useFactory: mockUserRepository },
-        { provide: RefreshTokenService, useFactory: refreshTokenServiceMock },
-        { provide: MailService, useFactory: mailServiceMock },
-        { provide: 'LOGIN_THROTTLE', useFactory: throttleMock },
-      ],
+        {
+          provide: JwtService,
+          useFactory: jwtServiceMock
+        },
+        {
+          provide: UserRepository,
+          useFactory: mockUserRepository
+        },
+        {
+          provide: RefreshTokenService,
+          useFactory: refreshTokenServiceMock
+        },
+        {
+          provide: MailService,
+          useFactory: mailServiceMock
+        },
+        {
+          provide: 'LOGIN_THROTTLE',
+          useFactory: throttleMock
+        }
+      ]
     }).compile();
 
     service = await module.get<AuthService>(AuthService);
     userRepository = await module.get<UserRepository>(UserRepository);
-    refreshTokenService = await module.get<RefreshTokenService>(RefreshTokenService);
+    refreshTokenService = await module.get<RefreshTokenService>(
+      RefreshTokenService
+    );
     mailService = await module.get<MailService>(MailService);
     throttleService = await module.get<'LOGIN_THROTTLE'>('LOGIN_THROTTLE');
     jwtService = await module.get<JwtService>(JwtService);
@@ -93,7 +115,7 @@ describe('AuthService', () => {
     it('forgot password with email', async () => {
       userRepository.findOne.mockResolvedValue(mockUser);
       const forgetPasswordDto: ForgetPasswordDto = {
-        email: 'truthycms@gmail.com',
+        email: 'truthycms@gmail.com'
       };
       await service.forgotPassword(forgetPasswordDto);
       expect(mockUser.save).toHaveBeenCalledTimes(1);
@@ -111,7 +133,7 @@ describe('AuthService', () => {
       await service.generateUniqueToken(6);
       expect(service.generateRandomCode).toHaveBeenCalledWith(6);
       expect(userRepository.countEntityByCondition).toHaveBeenCalledWith({
-        token: 'W45Rft',
+        token: 'W45Rft'
       });
     });
 
@@ -121,20 +143,24 @@ describe('AuthService', () => {
         resetPasswordDto = {
           password: 'Truthy@123',
           confirmPassword: 'Truthy@123',
-          token: 'Aer23C',
+          token: 'Aer23C'
         };
       });
       it('reset password for existing user', async () => {
         userRepository.getUserForResetPassword.mockResolvedValue(mockUser);
         service.generateUniqueToken = jest.fn();
         await service.resetPassword(resetPasswordDto);
-        expect(userRepository.getUserForResetPassword).toHaveBeenCalledWith(resetPasswordDto);
+        expect(userRepository.getUserForResetPassword).toHaveBeenCalledWith(
+          resetPasswordDto
+        );
         expect(service.generateUniqueToken).toHaveBeenCalledTimes(1);
         expect(mockUser.save).toHaveBeenCalled();
       });
       it('try to reset password with invalid token', async () => {
         userRepository.getUserForResetPassword.mockResolvedValue(null);
-        await expect(service.resetPassword(resetPasswordDto)).rejects.toThrowError(NotFoundException);
+        await expect(
+          service.resetPassword(resetPasswordDto)
+        ).rejects.toThrowError(NotFoundException);
       });
       describe('change password', () => {
         let user: UserEntity, changePasswordDto: ChangePasswordDto;
@@ -143,7 +169,7 @@ describe('AuthService', () => {
           changePasswordDto = {
             oldPassword: 'Truthy@prev',
             password: 'Truthy@123',
-            confirmPassword: 'Truthy@123',
+            confirmPassword: 'Truthy@123'
           };
 
           user = new UserEntity();
@@ -163,7 +189,9 @@ describe('AuthService', () => {
         it('change password for loggedin user with incorrect password', async () => {
           bcrypt.hash = jest.fn().mockResolvedValue('result');
           user.validatePassword = jest.fn().mockResolvedValue(false);
-          await expect(service.changePassword(user, changePasswordDto)).rejects.toThrowError(CustomHttpException);
+          await expect(
+            service.changePassword(user, changePasswordDto)
+          ).rejects.toThrowError(CustomHttpException);
           expect(user.validatePassword).toHaveBeenCalledTimes(1);
           expect(user.save).toHaveBeenCalledTimes(0);
         });
@@ -206,7 +234,9 @@ describe('AuthService', () => {
     it('activate account with invalid token', async () => {
       userRepository.findOne.mockResolvedValue(null);
       const token = 'Bgf2vBnVV';
-      await expect(service.activateAccount(token)).rejects.toThrowError(NotFoundException);
+      await expect(service.activateAccount(token)).rejects.toThrowError(
+        NotFoundException
+      );
       expect(userRepository.findOne).toHaveBeenCalledTimes(1);
       expect(mockUser.save).toHaveBeenCalledTimes(0);
     });
@@ -226,7 +256,7 @@ describe('AuthService', () => {
     beforeEach(() => {
       userLoginDto = {
         password: mockUser.password,
-        username: mockUser.username,
+        username: mockUser.username
       };
       user = new UserEntity();
       user.id = 1;
@@ -236,27 +266,33 @@ describe('AuthService', () => {
       ip = '::1';
       refreshTokenPayload = {
         ip: '::1',
-        userAgent: 'mozilla',
+        userAgent: 'mozilla'
       };
     });
 
     it('check if throttle error occurs if user tries to login multiple times', async () => {
       throttleService.get.mockResolvedValue({
         consumedPoints: 6,
-        msBeforeNext: 3000,
+        msBeforeNext: 3000
       });
       userRepository.login.mockResolvedValue(user);
-      await expect(service.login(userLoginDto, refreshTokenPayload)).rejects.toThrowError(CustomHttpException);
+      await expect(
+        service.login(userLoginDto, refreshTokenPayload)
+      ).rejects.toThrowError(CustomHttpException);
     });
 
     it('login user successfully', async () => {
       throttleService.get.mockResolvedValue(null);
       jest.spyOn(service, 'buildResponsePayload').mockReturnValue(['result']);
       userRepository.login.mockResolvedValue([user, null]);
-      jest.spyOn(service, 'generateAccessToken').mockResolvedValue('access_token');
+      jest
+        .spyOn(service, 'generateAccessToken')
+        .mockResolvedValue('access_token');
       await service.login(userLoginDto, refreshTokenPayload);
       expect(userRepository.login).toHaveBeenCalledWith(userLoginDto);
-      expect(throttleService.delete).toHaveBeenCalledWith(`${user.username}_${ip}`);
+      expect(throttleService.delete).toHaveBeenCalledWith(
+        `${user.username}_${ip}`
+      );
       expect(refreshTokenService.generateRefreshToken).toHaveBeenCalledTimes(1);
       expect(service.generateAccessToken).toHaveBeenCalledTimes(1);
       expect(service.buildResponsePayload).toHaveBeenCalledTimes(1);
@@ -283,7 +319,7 @@ describe('AuthService', () => {
           name: 'tester',
           avatar: 'test.jpg',
           address: 'test',
-          contact: 'test',
+          contact: 'test'
         };
       });
 
@@ -291,7 +327,9 @@ describe('AuthService', () => {
         userRepository.countEntityByCondition.mockResolvedValue(1);
 
         userRepository.get.mockResolvedValue(mockUser);
-        await expect(service.update(user, updateUserDto)).rejects.toThrowError(UnprocessableEntityException);
+        await expect(service.update(user, updateUserDto)).rejects.toThrowError(
+          UnprocessableEntityException
+        );
         expect(userRepository.countEntityByCondition).toHaveBeenCalledTimes(2);
       });
 
@@ -302,7 +340,10 @@ describe('AuthService', () => {
         await service.update(user.id, updateUserDto);
         expect(userRepository.countEntityByCondition).toHaveBeenCalledTimes(2);
         expect(userRepository.updateEntity).toHaveBeenCalledTimes(1);
-        expect(userRepository.updateEntity).toHaveBeenCalledWith(mockUser, updateUserDto);
+        expect(userRepository.updateEntity).toHaveBeenCalledWith(
+          mockUser,
+          updateUserDto
+        );
         expect(userRepository.updateEntity).not.toThrow();
       });
     });
@@ -311,31 +352,39 @@ describe('AuthService', () => {
       const mockToken = {
         id: 1,
         userId: 1,
-        save: jest.fn(),
+        save: jest.fn()
       };
       refreshTokenService.resolveRefreshToken.mockResolvedValue({
         user: mockUser,
-        token: mockToken,
+        token: mockToken
       });
       await service.revokeRefreshToken('refresh_token');
       expect(refreshTokenService.resolveRefreshToken).toHaveBeenCalledTimes(1);
-      expect(refreshTokenService.resolveRefreshToken).toHaveBeenCalledWith('refresh_token');
+      expect(refreshTokenService.resolveRefreshToken).toHaveBeenCalledWith(
+        'refresh_token'
+      );
     });
   });
 
   it('get user token list', async () => {
     const userId = 1;
     await service.activeRefreshTokenList(userId);
-    expect(refreshTokenService.getRefreshTokenByUserId).toHaveBeenCalledWith(userId);
-    expect(refreshTokenService.getRefreshTokenByUserId).toHaveBeenCalledTimes(1);
+    expect(refreshTokenService.getRefreshTokenByUserId).toHaveBeenCalledWith(
+      userId
+    );
+    expect(refreshTokenService.getRefreshTokenByUserId).toHaveBeenCalledTimes(
+      1
+    );
   });
 
   it('revokeTokenById', async () => {
     const mockRefreshToken = {
       ip: '::1',
-      userAgent: 'mozilla',
+      userAgent: 'mozilla'
     };
-    refreshTokenService.revokeRefreshTokenById.mockResolvedValue(mockRefreshToken);
+    refreshTokenService.revokeRefreshTokenById.mockResolvedValue(
+      mockRefreshToken
+    );
     await expect(service.revokeTokenById(1, 1)).resolves.not.toThrow();
     expect(refreshTokenService.revokeRefreshTokenById).toHaveBeenCalledTimes(1);
   });
@@ -349,7 +398,7 @@ describe('AuthService', () => {
     await service.turnOnTwoFactorAuthentication(1);
     expect(userRepository.update).toHaveBeenCalledTimes(1);
     expect(userRepository.update).toHaveBeenCalledWith(1, {
-      isTwoFAEnabled: true,
+      isTwoFAEnabled: true
     });
   });
 });

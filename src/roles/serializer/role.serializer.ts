@@ -13,17 +13,23 @@ export class RoleSerializer extends ModelSerializer {
   name: string;
 
   @ApiPropertyOptional()
-  @Expose({ groups: basicFieldGroupsForSerializing })
+  @Expose({
+    groups: basicFieldGroupsForSerializing
+  })
   description: string;
 
   @Type(() => Permission)
   permission: Permission[];
 
   @ApiPropertyOptional()
-  @Expose({ groups: basicFieldGroupsForSerializing })
+  @Expose({
+    groups: basicFieldGroupsForSerializing
+  })
   createdAt: Date;
 
   @ApiPropertyOptional()
-  @Expose({ groups: basicFieldGroupsForSerializing })
+  @Expose({
+    groups: basicFieldGroupsForSerializing
+  })
   updatedAt: Date;
 }

@@ -8,9 +8,13 @@ import { AuthModule } from '../auth/auth.module';
 import { PermissionsModule } from '../permissions/permissions.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([RoleRepository]), AuthModule, PermissionsModule],
+  imports: [
+    TypeOrmModule.forFeature([RoleRepository]),
+    AuthModule,
+    PermissionsModule
+  ],
   exports: [],
   controllers: [RolesController],
-  providers: [RolesService, UniqueValidatorPipe],
+  providers: [RolesService, UniqueValidatorPipe]
 })
 export class RolesModule {}

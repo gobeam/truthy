@@ -7,7 +7,11 @@ import { UserEntity } from '../../auth/entity/user.entity';
  * @constructor
  */
 export const SanitizeUser = (userField?: string, strong = true) => {
-  return (target: any, propertyKey: string, descriptor: TypedPropertyDescriptor<any>): TypedPropertyDescriptor<any> => {
+  return (
+    target: any,
+    propertyKey: string,
+    descriptor: TypedPropertyDescriptor<any>
+  ): TypedPropertyDescriptor<any> => {
     const decoratedFn = descriptor.value;
     async function newFunction(...args) {
       const data: any = await decoratedFn.apply(this, args);
@@ -25,7 +29,7 @@ export const SanitizeUser = (userField?: string, strong = true) => {
       return data;
     }
     return {
-      value: newFunction,
+      value: newFunction
     };
   };
 };
@@ -36,12 +40,16 @@ export const SanitizeUser = (userField?: string, strong = true) => {
  * @constructor
  */
 export const SanitizeUsers = (userField?: string) => {
-  return (target: any, propertyKey: string, descriptor: TypedPropertyDescriptor<any>): TypedPropertyDescriptor<any> => {
+  return (
+    target: any,
+    propertyKey: string,
+    descriptor: TypedPropertyDescriptor<any>
+  ): TypedPropertyDescriptor<any> => {
     const decoratedFn = descriptor.value;
 
     async function newFunction(...args) {
       const entities: any[] = await decoratedFn.apply(this, args);
-      return entities.map(entity => {
+      return entities.map((entity) => {
         const user: UserEntity = userField ? entity[userField] : entity;
         if (user) {
           user.password = null;
@@ -55,7 +63,7 @@ export const SanitizeUsers = (userField?: string) => {
       });
     }
     return {
-      value: newFunction,
+      value: newFunction
     };
   };
 };

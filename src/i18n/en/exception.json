@@ -7,6 +7,7 @@
   "Unauthorized": "Unauthorized",
   "otpRequired": "OTP required",
   "inactiveUser": "You account has not been activated yet!",
+  "invalidCredentials": "Credential didn't match!",
   "Forbidden": "Access to the requested resource is forbidden!",
   "userInactive": "User is inactive please contact your administrator for further help!",
   "Not Found": "Data not found!",

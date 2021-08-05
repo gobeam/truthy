@@ -2,7 +2,11 @@ import { ModelSerializer } from '../../common/serializer/model.serializer';
 import { UserStatusEnum } from '../user-status.enum';
 import { Exclude, Expose, Transform, Type } from 'class-transformer';
 import { RoleSerializer } from '../../roles/serializer/role.serializer';
-import { ApiHideProperty, ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import {
+  ApiHideProperty,
+  ApiProperty,
+  ApiPropertyOptional
+} from '@nestjs/swagger';
 
 export const adminUserGroupsForSerializing: string[] = ['admin'];
 export const ownerUserGroupsForSerializing: string[] = ['owner'];
@@ -13,7 +17,7 @@ export const defaultUserGroupsForSerializing: string[] = ['timestamps'];
  */
 export class UserSerializer extends ModelSerializer {
   @Expose({
-    groups: [...ownerUserGroupsForSerializing, ...adminUserGroupsForSerializing],
+    groups: [...ownerUserGroupsForSerializing, ...adminUserGroupsForSerializing]
   })
   id: number;
 
@@ -31,7 +35,9 @@ export class UserSerializer extends ModelSerializer {
   address: string;
 
   @ApiProperty()
-  @Expose({ groups: ownerUserGroupsForSerializing })
+  @Expose({
+    groups: ownerUserGroupsForSerializing
+  })
   isTwoFAEnabled: boolean;
 
   @ApiProperty()
@@ -43,25 +49,37 @@ export class UserSerializer extends ModelSerializer {
   avatar: string;
 
   @ApiPropertyOptional()
-  @Expose({ groups: adminUserGroupsForSerializing })
+  @Expose({
+    groups: adminUserGroupsForSerializing
+  })
   status: UserStatusEnum;
 
   @ApiHideProperty()
-  @Expose({ groups: ownerUserGroupsForSerializing })
+  @Expose({
+    groups: ownerUserGroupsForSerializing
+  })
   @Type(() => RoleSerializer)
   role: RoleSerializer;
 
-  @Exclude({ toClassOnly: true })
+  @Exclude({
+    toClassOnly: true
+  })
   roleId: number;
 
-  @Exclude({ toClassOnly: true })
+  @Exclude({
+    toClassOnly: true
+  })
   tokenValidityDate: Date;
 
   @ApiPropertyOptional()
-  @Expose({ groups: defaultUserGroupsForSerializing })
+  @Expose({
+    groups: defaultUserGroupsForSerializing
+  })
   createdAt: Date;
 
   @ApiPropertyOptional()
-  @Expose({ groups: defaultUserGroupsForSerializing })
+  @Expose({
+    groups: defaultUserGroupsForSerializing
+  })
   updatedAt: Date;
 }

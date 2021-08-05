@@ -1,10 +1,14 @@
 import { CustomBaseEntity } from '../../common/entity/custom-base.entity';
 import { Column, Entity, Index } from 'typeorm';
 
-@Entity({ name: 'email_templates' })
+@Entity({
+  name: 'email_templates'
+})
 export class EmailTemplateEntity extends CustomBaseEntity {
   @Column()
-  @Index({ unique: true })
+  @Index({
+    unique: true
+  })
   title: string;
 
   @Column()
