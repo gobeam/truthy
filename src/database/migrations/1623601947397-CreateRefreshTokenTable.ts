@@ -7,8 +7,7 @@ import {
 } from 'typeorm';
 
 export class CreateRefreshTokenTable1623601947397
-  implements MigrationInterface
-{
+  implements MigrationInterface {
   foreignKeysArray = [{ table: 'user', field: 'userId', reference: 'id' }];
   tableName = 'refresh_token';
 

@@ -5,11 +5,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UserLoginDto } from './dto/user-login.dto';
 import { UserEntity } from './entity/user.entity';
 import { UpdateUserProfileDto } from './dto/update-user-profile.dto';
-import {
-  HttpException,
-  NotFoundException,
-  UnprocessableEntityException
-} from '@nestjs/common';
+import { UnprocessableEntityException } from '@nestjs/common';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { ForgetPasswordDto } from './dto/forget-password.dto';
 import { UserStatusEnum } from './user-status.enum';
@@ -19,6 +15,8 @@ import { MailService } from '../mail/mail.service';
 import { RefreshTokenService } from '../refresh-token/refresh-token.service';
 import { JwtService } from '@nestjs/jwt';
 import { UserSerializer } from './serializer/user.serializer';
+import { NotFoundException } from '../exception/not-found.exception';
+import { CustomHttpException } from '../exception/custom-http.exception';
 
 const mockUserRepository = () => ({
   findOne: jest.fn(),
@@ -178,7 +176,7 @@ describe('AuthService', () => {
           user.validatePassword = jest.fn().mockResolvedValue(false);
           await expect(
             service.changePassword(user, changePasswordDto)
-          ).rejects.toThrowError(HttpException);
+          ).rejects.toThrowError(CustomHttpException);
           expect(user.validatePassword).toHaveBeenCalledTimes(1);
           expect(user.save).toHaveBeenCalledTimes(0);
         });
@@ -265,7 +263,7 @@ describe('AuthService', () => {
       userRepository.login.mockResolvedValue(user);
       await expect(
         service.login(userLoginDto, refreshTokenPayload)
-      ).rejects.toThrowError(HttpException);
+      ).rejects.toThrowError(CustomHttpException);
     });
 
     it('login user successfully', async () => {

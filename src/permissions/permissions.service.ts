@@ -19,8 +19,7 @@ import { LoadPermissionMisc } from './misc/load-permission.misc';
 @Injectable()
 export class PermissionsService
   extends LoadPermissionMisc
-  implements CommonServiceInterface<Permission>
-{
+  implements CommonServiceInterface<Permission> {
   constructor(
     @InjectRepository(PermissionRepository)
     private repository: PermissionRepository
@@ -111,7 +110,10 @@ export class PermissionsService
     );
     if (countSameDescription > 0) {
       throw new UnprocessableEntityException({
-        name: 'already taken'
+        property: 'name',
+        constraints: {
+          unique: 'already taken'
+        }
       });
     }
     return this.repository.updateEntity(permission, updatePermissionDto);

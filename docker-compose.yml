@@ -19,7 +19,6 @@ services:
     depends_on:
       - postgres
 
-
   postgres:
     container_name: postgres
     image: postgres:12
@@ -36,7 +35,6 @@ services:
       - 5300:${DB_PORT}
     volumes:
       - pgdata:/var/lib/postgresql/data
-
 
 networks:
   webnet:

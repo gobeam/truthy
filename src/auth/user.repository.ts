@@ -7,8 +7,8 @@ import { UserSerializer } from './serializer/user.serializer';
 import { classToPlain, plainToClass } from 'class-transformer';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { UserStatusEnum } from './user-status.enum';
-import { ExceptionTitleList } from 'src/common/constants/exception-title-list.constants';
-import { StatusCodesList } from 'src/common/constants/status-codes-list.constants';
+import { ExceptionTitleList } from '../common/constants/exception-title-list.constants';
+import { StatusCodesList } from '../common/constants/status-codes-list.constants';
 
 @EntityRepository(UserEntity)
 export class UserRepository extends BaseRepository<UserEntity, UserSerializer> {

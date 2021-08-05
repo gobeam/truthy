@@ -73,10 +73,9 @@ export class AuthController {
   @Post('/refresh')
   async refresh(@Req() req: Request, @Res() response: Response) {
     try {
-      const cookiePayload =
-        await this.authService.createAccessTokenFromRefreshToken(
-          req.cookies['Refresh']
-        );
+      const cookiePayload = await this.authService.createAccessTokenFromRefreshToken(
+        req.cookies['Refresh']
+      );
       response.setHeader('Set-Cookie', cookiePayload);
       return response.status(HttpStatus.NO_CONTENT).json({});
     } catch (e) {

@@ -3,7 +3,7 @@ import { TwofaService } from './twofa.service';
 import { AuthService } from '../auth/auth.service';
 import { authenticator } from 'otplib';
 import { UserEntity } from '../auth/entity/user.entity';
-import { HttpException } from '@nestjs/common';
+import { CustomHttpException } from '../exception/custom-http.exception';
 
 const authServiceMock = () => ({
   setTwoFactorAuthenticationSecret: jest.fn()
@@ -39,7 +39,7 @@ describe('TwofaService', () => {
       twoFAThrottleTime.setSeconds(twoFAThrottleTime.getSeconds() + 60);
       user.twoFAThrottleTime = twoFAThrottleTime;
       await expect(service.generateTwoFASecret(user)).rejects.toThrowError(
-        HttpException
+        CustomHttpException
       );
     });
     it('should generate 2fa secret', async () => {

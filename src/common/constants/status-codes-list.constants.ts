@@ -13,4 +13,9 @@ export const StatusCodesList = {
   UserInactive: 1012,
   BadRequest: 1013,
   InvalidCredentials: 1014,
+  InvalidRefreshToken: 1015,
+  UnsupportedFileType: 1016,
+  OtpRequired: 1017,
+  defaultItemDeleteError: 1018,
+  RefreshTokenExpired: 1019
 } as const;

@@ -1,10 +1,12 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { UserEntity } from '../auth/entity/user.entity';
-import { AuthService } from '../auth/auth.service';
-import { authenticator } from 'otplib';
+import { HttpStatus, Injectable } from '@nestjs/common';
 import * as config from 'config';
-import { toFileStream } from 'qrcode';
 import { Response } from 'express';
+import { authenticator } from 'otplib';
+import { toFileStream } from 'qrcode';
+import { StatusCodesList } from '../common/constants/status-codes-list.constants';
+import { AuthService } from '../auth/auth.service';
+import { UserEntity } from '../auth/entity/user.entity';
+import { CustomHttpException } from '../exception/custom-http.exception';
 
 const TwofaConfig = config.get('twofa');
 
@@ -14,15 +16,13 @@ export class TwofaService {
 
   public async generateTwoFASecret(user: UserEntity) {
     if (user.twoFAThrottleTime > new Date()) {
-      throw new HttpException(
-        {
-          message: `tooManyRequest-{"second":"${this.differentBetweenDatesInSec(
-            user.twoFAThrottleTime,
-            new Date()
-          )}"}`,
-          error: true
-        },
-        HttpStatus.TOO_MANY_REQUESTS
+      throw new CustomHttpException(
+        `tooManyRequest-{"second":"${this.differentBetweenDatesInSec(
+          user.twoFAThrottleTime,
+          new Date()
+        )}"}`,
+        HttpStatus.TOO_MANY_REQUESTS,
+        StatusCodesList.TooManyTries
       );
     }
     const secret = authenticator.generateSecret();

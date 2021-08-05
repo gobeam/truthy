@@ -18,8 +18,7 @@ export interface UniqueValidationArguments<E> extends ValidationArguments {
  * abstract class to validate unique
  */
 export abstract class AbstractUniqueValidator
-  implements ValidatorConstraintInterface
-{
+  implements ValidatorConstraintInterface {
   protected constructor(protected readonly connection: Connection) {}
 
   /**

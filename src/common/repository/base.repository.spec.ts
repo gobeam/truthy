@@ -2,7 +2,7 @@ import { BaseRepository } from './base.repository';
 import { ModelSerializer } from '../serializer/model.serializer';
 import { Repository, UpdateResult } from 'typeorm';
 import { Expose } from 'class-transformer';
-import { NotFoundException } from 'src/exception/not-found.exception';
+import { NotFoundException } from '../../exception/not-found.exception';
 
 class MockEntity {
   id: number;

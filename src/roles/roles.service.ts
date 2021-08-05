@@ -105,7 +105,12 @@ export class RolesService implements CommonServiceInterface<RoleSerializer> {
       condition
     );
     if (checkUniqueTitle > 0) {
-      throw new UnprocessableEntityException({ name: 'already taken' });
+      throw new UnprocessableEntityException({
+        property: 'name',
+        constraints: {
+          unique: 'already taken'
+        }
+      });
     }
     const { permissions } = updateRoleDto;
     const permission = await this.getPermissionByIds(permissions);

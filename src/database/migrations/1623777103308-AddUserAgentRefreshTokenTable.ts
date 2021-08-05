@@ -1,8 +1,7 @@
 import { MigrationInterface, QueryRunner, TableColumn } from 'typeorm';
 
 export class AddUserAgentRefreshTokenTable1623777103308
-  implements MigrationInterface
-{
+  implements MigrationInterface {
   tableName = 'refresh_token';
   columns = [
     new TableColumn({

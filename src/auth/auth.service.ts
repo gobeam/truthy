@@ -39,6 +39,7 @@ import {
 } from './serializer/user.serializer';
 import { UserStatusEnum } from './user-status.enum';
 import { UserRepository } from './user.repository';
+import { ValidationPayloadInterface } from 'src/common/interfaces/validation-error.interface';
 
 const throttleConfig = config.get('throttle.login');
 const jwtConfig = config.get('jwt');
@@ -275,7 +276,7 @@ export class AuthService {
       ]
     });
     const checkUniqueFieldArray = ['username', 'email'];
-    const error = {};
+    const errorPayload: ValidationPayloadInterface[] = [];
     for (const field of checkUniqueFieldArray) {
       const condition: ObjectLiteral = {
         [field]: updateUserDto[field]
@@ -285,11 +286,16 @@ export class AuthService {
         condition
       );
       if (checkUnique > 0) {
-        error[field] = `already taken`;
+        errorPayload.push({
+          property: field,
+          constraints: {
+            unique: 'already taken'
+          }
+        });
       }
     }
-    if (Object.keys(error).length > 0) {
-      throw new UnprocessableEntityException(error);
+    if (Object.keys(errorPayload).length > 0) {
+      throw new UnprocessableEntityException(errorPayload);
     }
     if (updateUserDto.avatar && user.avatar) {
       const path = `images/profile/${user.avatar}`;
@@ -484,10 +490,11 @@ export class AuthService {
    * @param refreshToken
    */
   async createAccessTokenFromRefreshToken(refreshToken: string) {
-    const { token } =
-      await this.refreshTokenService.createAccessTokenFromRefreshToken(
-        refreshToken
-      );
+    const {
+      token
+    } = await this.refreshTokenService.createAccessTokenFromRefreshToken(
+      refreshToken
+    );
     return this.buildResponsePayload(token);
   }
 
@@ -505,7 +512,13 @@ export class AuthService {
         token.isRevoked = true;
         await token.save();
       }
-    } catch (e) {}
+    } catch (e) {
+      throw new CustomHttpException(
+        ExceptionTitleList.InvalidRefreshToken,
+        HttpStatus.PRECONDITION_FAILED,
+        StatusCodesList.InvalidRefreshToken
+      );
+    }
   }
 
   activeRefreshTokenList(userId: number): Promise<Array<RefreshToken>> {

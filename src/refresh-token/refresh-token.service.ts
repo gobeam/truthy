@@ -1,21 +1,19 @@
-import {
-  BadRequestException,
-  ForbiddenException,
-  forwardRef,
-  Inject,
-  Injectable,
-  NotFoundException
-} from '@nestjs/common';
+import { forwardRef, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { SignOptions, TokenExpiredError } from 'jsonwebtoken';
-import { RefreshTokenRepository } from './refresh-token.repository';
+import { InjectRepository } from '@nestjs/typeorm';
 import * as config from 'config';
-import { RefreshTokenInterface } from './interface/refresh-token.interface';
-import { RefreshToken } from './entities/refresh-token.entity';
+import { SignOptions, TokenExpiredError } from 'jsonwebtoken';
+import { CustomHttpException } from '../exception/custom-http.exception';
+import { MoreThanOrEqual } from 'typeorm';
 import { AuthService } from '../auth/auth.service';
 import { UserSerializer } from '../auth/serializer/user.serializer';
-import { InjectRepository } from '@nestjs/typeorm';
-import { MoreThanOrEqual } from 'typeorm';
+import { ExceptionTitleList } from '../common/constants/exception-title-list.constants';
+import { StatusCodesList } from '../common/constants/status-codes-list.constants';
+import { ForbiddenException } from '../exception/forbidden.exception';
+import { NotFoundException } from '../exception/not-found.exception';
+import { RefreshToken } from './entities/refresh-token.entity';
+import { RefreshTokenInterface } from './interface/refresh-token.interface';
+import { RefreshTokenRepository } from './refresh-token.repository';
 
 const appConfig = config.get('app');
 const tokenConfig = config.get('jwt');
@@ -65,17 +63,29 @@ export class RefreshTokenService {
     const token = await this.getStoredTokenFromRefreshTokenPayload(payload);
 
     if (!token) {
-      throw new BadRequestException('Refresh token not found');
+      throw new CustomHttpException(
+        ExceptionTitleList.NotFound,
+        HttpStatus.NOT_FOUND,
+        StatusCodesList.NotFound
+      );
     }
 
     if (token.isRevoked) {
-      throw new BadRequestException('Refresh token revoked');
+      throw new CustomHttpException(
+        ExceptionTitleList.InvalidRefreshToken,
+        HttpStatus.BAD_REQUEST,
+        StatusCodesList.InvalidRefreshToken
+      );
     }
 
     const user = await this.getUserFromRefreshTokenPayload(payload);
 
     if (!user) {
-      throw new BadRequestException('Refresh token malformed');
+      throw new CustomHttpException(
+        ExceptionTitleList.InvalidRefreshToken,
+        HttpStatus.BAD_REQUEST,
+        StatusCodesList.InvalidRefreshToken
+      );
     }
 
     return { user, token };
@@ -104,9 +114,17 @@ export class RefreshTokenService {
       return await this.jwt.verifyAsync(token);
     } catch (e) {
       if (e instanceof TokenExpiredError) {
-        throw new BadRequestException('refreshTokenExpired');
+        throw new CustomHttpException(
+          ExceptionTitleList.RefreshTokenExpired,
+          HttpStatus.BAD_REQUEST,
+          StatusCodesList.RefreshTokenExpired
+        );
       } else {
-        throw new BadRequestException('refreshTokenMalformed');
+        throw new CustomHttpException(
+          ExceptionTitleList.InvalidRefreshToken,
+          HttpStatus.BAD_REQUEST,
+          StatusCodesList.InvalidRefreshToken
+        );
       }
     }
   }
@@ -121,7 +139,11 @@ export class RefreshTokenService {
     const subId = payload.sub;
 
     if (!subId) {
-      throw new BadRequestException('Refresh token malformed');
+      throw new CustomHttpException(
+        ExceptionTitleList.InvalidRefreshToken,
+        HttpStatus.BAD_REQUEST,
+        StatusCodesList.InvalidRefreshToken
+      );
     }
 
     return this.authService.findById(subId);
@@ -137,7 +159,11 @@ export class RefreshTokenService {
     const tokenId = payload.jti;
 
     if (!tokenId) {
-      throw new BadRequestException('Refresh token malformed');
+      throw new CustomHttpException(
+        ExceptionTitleList.InvalidRefreshToken,
+        HttpStatus.BAD_REQUEST,
+        StatusCodesList.InvalidRefreshToken
+      );
     }
 
     return this.repository.findTokenById(tokenId);

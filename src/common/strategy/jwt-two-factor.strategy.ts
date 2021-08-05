@@ -1,12 +1,14 @@
-import { ExtractJwt, Strategy } from 'passport-jwt';
+import { HttpStatus, Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { Request } from 'express';
-import * as config from 'config';
 import { InjectRepository } from '@nestjs/typeorm';
-import { UserRepository } from '../../auth/user.repository';
-import { UserEntity } from '../../auth/entity/user.entity';
+import * as config from 'config';
+import { Request } from 'express';
+import { ExtractJwt, Strategy } from 'passport-jwt';
+import { StatusCodesList } from 'src/common/constants/status-codes-list.constants';
+import { CustomHttpException } from 'src/exception/custom-http.exception';
 import { JwtPayloadDto } from '../../auth/dto/jwt-payload.dto';
+import { UserEntity } from '../../auth/entity/user.entity';
+import { UserRepository } from '../../auth/user.repository';
 
 @Injectable()
 export class JwtTwoFactorStrategy extends PassportStrategy(
@@ -37,13 +39,10 @@ export class JwtTwoFactorStrategy extends PassportStrategy(
     if (isTwoFAAuthenticated) {
       return user;
     }
-    throw new HttpException(
-      {
-        message: 'otpRequired',
-        statusCode: HttpStatus.FORBIDDEN,
-        error: true
-      },
-      HttpStatus.FORBIDDEN
+    throw new CustomHttpException(
+      'otpRequired',
+      HttpStatus.FORBIDDEN,
+      StatusCodesList.OtpRequired
     );
   }
 }

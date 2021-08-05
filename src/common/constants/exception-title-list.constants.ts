@@ -5,5 +5,8 @@ export const ExceptionTitleList = {
   IncorrectOldPassword: 'incorrectOldPassword',
   UserInactive: 'userInactive',
   BadRequest: 'badRequest',
-  InvalidCredentials: 'invalidCredentials'
+  InvalidCredentials: 'invalidCredentials',
+  InvalidRefreshToken: 'invalidRefreshToken',
+  DeleteDefaultError: 'deleteDefaultError',
+  RefreshTokenExpired: 'refreshTokenExpired'
 } as const;

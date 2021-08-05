@@ -1,8 +1,7 @@
 import { MigrationInterface, QueryRunner, TableColumn } from 'typeorm';
 
 export class addTokenValidityDateInUserEntity1617559216655
-  implements MigrationInterface
-{
+  implements MigrationInterface {
   tableName = 'user';
 
   public async up(queryRunner: QueryRunner): Promise<void> {

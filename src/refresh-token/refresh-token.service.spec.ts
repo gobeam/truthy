@@ -5,12 +5,10 @@ import { AuthService } from '../auth/auth.service';
 import { RefreshTokenRepository } from './refresh-token.repository';
 import { UserSerializer } from '../auth/serializer/user.serializer';
 import { RefreshToken } from './entities/refresh-token.entity';
-import {
-  BadRequestException,
-  ForbiddenException,
-  NotFoundException
-} from '@nestjs/common';
 import { TokenExpiredError } from 'jsonwebtoken';
+import { CustomHttpException } from '../exception/custom-http.exception';
+import { NotFoundException } from '../exception/not-found.exception';
+import { ForbiddenException } from '../exception/forbidden.exception';
 
 const jwtServiceMock = () => ({
   signAsync: jest.fn(),
@@ -90,7 +88,7 @@ describe('RefreshTokenService', () => {
         .spyOn(service, 'getUserFromRefreshTokenPayload')
         .mockResolvedValue(null);
       await expect(service.resolveRefreshToken(testToken)).rejects.toThrowError(
-        BadRequestException
+        CustomHttpException
       );
       expect(service.decodeRefreshToken).toHaveBeenCalledTimes(1);
       expect(
@@ -149,7 +147,7 @@ describe('RefreshTokenService', () => {
 
       await expect(
         service.decodeRefreshToken('refresh_token_hash')
-      ).rejects.toThrowError(BadRequestException);
+      ).rejects.toThrowError(CustomHttpException);
     });
 
     it('decode valid refresh token', async () => {
@@ -164,7 +162,7 @@ describe('RefreshTokenService', () => {
     it('check get user from refresh token with malformed token', async () => {
       await expect(
         service.getUserFromRefreshTokenPayload({ jti: null, sub: null })
-      ).rejects.toThrowError(BadRequestException);
+      ).rejects.toThrowError(CustomHttpException);
       expect(authService.findById).toHaveBeenCalledTimes(0);
     });
 
@@ -182,7 +180,7 @@ describe('RefreshTokenService', () => {
     it('check for malformed token', async () => {
       await expect(
         service.getStoredTokenFromRefreshTokenPayload({ jti: null, sub: null })
-      ).rejects.toThrowError(BadRequestException);
+      ).rejects.toThrowError(CustomHttpException);
     });
 
     it('get stored token from refresh token payload', async () => {

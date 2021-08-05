@@ -1,8 +1,10 @@
-import { extname } from 'path';
+import { HttpStatus } from '@nestjs/common';
 import { existsSync, mkdirSync } from 'fs';
 import { diskStorage } from 'multer';
+import { extname } from 'path';
+import { CustomHttpException } from 'src/exception/custom-http.exception';
 import { v4 as uuid } from 'uuid';
-import { HttpException, HttpStatus } from '@nestjs/common';
+import { StatusCodesList } from '../constants/status-codes-list.constants';
 
 export const multerOptionsHelper = (
   destinationPath: string,
@@ -16,7 +18,11 @@ export const multerOptionsHelper = (
       cb(null, true);
     } else {
       cb(
-        new HttpException(`Unsupported file type`, HttpStatus.BAD_REQUEST),
+        new CustomHttpException(
+          'unsupportedFileType',
+          HttpStatus.BAD_REQUEST,
+          StatusCodesList.UnsupportedFileType
+        ),
         false
       );
     }

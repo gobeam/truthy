@@ -1,8 +1,7 @@
 import { MigrationInterface, QueryRunner, TableColumn } from 'typeorm';
 
 export class AddAvatarColumnUserTable1626924978575
-  implements MigrationInterface
-{
+  implements MigrationInterface {
   tableName = 'user';
   columns = [
     new TableColumn({

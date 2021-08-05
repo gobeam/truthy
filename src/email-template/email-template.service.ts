@@ -1,8 +1,4 @@
-import {
-  ForbiddenException,
-  Injectable,
-  UnprocessableEntityException
-} from '@nestjs/common';
+import { Injectable, UnprocessableEntityException } from '@nestjs/common';
 import { CreateEmailTemplateDto } from './dto/create-email-template.dto';
 import { UpdateEmailTemplateDto } from './dto/update-email-template.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -12,11 +8,13 @@ import { Pagination } from '../paginate';
 import { EmailTemplate } from './serializer/email-template.serializer';
 import { EmailTemplatesSearchFilterDto } from './dto/email-templates-search-filter.dto';
 import { Not, ObjectLiteral } from 'typeorm';
+import { ExceptionTitleList } from '../common/constants/exception-title-list.constants';
+import { StatusCodesList } from '../common/constants/status-codes-list.constants';
+import { ForbiddenException } from '../exception/forbidden.exception';
 
 @Injectable()
 export class EmailTemplateService
-  implements CommonServiceInterface<EmailTemplate>
-{
+  implements CommonServiceInterface<EmailTemplate> {
   constructor(
     @InjectRepository(EmailTemplateRepository)
     private readonly repository: EmailTemplateRepository
@@ -98,7 +96,10 @@ export class EmailTemplateService
     );
     if (countSameDescription > 0) {
       throw new UnprocessableEntityException({
-        title: 'already taken'
+        property: 'title',
+        constraints: {
+          unique: 'already taken'
+        }
       });
     }
     return this.repository.updateEntity(template, {
@@ -114,7 +115,10 @@ export class EmailTemplateService
   async remove(id: number): Promise<void> {
     const template = await this.findOne(id);
     if (template.isDefault) {
-      throw new ForbiddenException();
+      throw new ForbiddenException(
+        ExceptionTitleList.DeleteDefaultError,
+        StatusCodesList.defaultItemDeleteError
+      );
     }
     await this.repository.delete({ id });
   }

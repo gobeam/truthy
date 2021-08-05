@@ -47,7 +47,9 @@ export class I18nExceptionFilterPipe implements ExceptionFilter {
     return exceptionResponse;
   }
 
-  checkIfConstraintAvailable(message: string): {
+  checkIfConstraintAvailable(
+    message: string
+  ): {
     title: string;
     argument: Record<string, any>;
   } {

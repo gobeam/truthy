@@ -4,6 +4,8 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UserLoginDto } from './dto/user-login.dto';
 import { UserEntity } from './entity/user.entity';
 import { UserStatusEnum } from './user-status.enum';
+import { StatusCodesList } from '../common/constants/status-codes-list.constants';
+import { ExceptionTitleList } from '../common/constants/exception-title-list.constants';
 
 const mockUser = {
   roleId: 1,
@@ -59,20 +61,28 @@ describe('User Repository', () => {
           { email: userLoginDto.username }
         ]
       });
-      expect(result).toEqual([user, null]);
+      expect(result).toEqual([user, null, null]);
     });
 
     it('throw error if username and password does not matches', async () => {
       userRepository.findOne.mockResolvedValue(user);
       user.validatePassword.mockResolvedValue(false);
       const result = await userRepository.login(userLoginDto);
-      expect(result).toEqual([null, 'Unauthorized']);
+      expect(result).toEqual([
+        null,
+        ExceptionTitleList.InvalidCredentials,
+        StatusCodesList.InvalidCredentials
+      ]);
     });
 
     it('check if user is null', async () => {
       userRepository.findOne.mockResolvedValue(null);
       const result = await userRepository.login(userLoginDto);
-      expect(result).toEqual([null, 'Unauthorized']);
+      expect(result).toEqual([
+        null,
+        ExceptionTitleList.InvalidCredentials,
+        StatusCodesList.InvalidCredentials
+      ]);
     });
   });
 });

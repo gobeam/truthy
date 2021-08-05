@@ -1,8 +1,7 @@
 import { MigrationInterface, QueryRunner, TableColumn } from 'typeorm';
 
 export class AddTwoSecretGenerateThrottleTime1627736950484
-  implements MigrationInterface
-{
+  implements MigrationInterface {
   tableName = 'user';
   columns = [
     new TableColumn({
