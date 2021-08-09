@@ -48,7 +48,8 @@ describe('User Repository', () => {
       user.password = mockUser.password;
       user.validatePassword = jest.fn();
       userLoginDto = {
-        ...mockUser
+        ...mockUser,
+        remember: true
       };
     });
     it('check if username and password matches and return user', async () => {

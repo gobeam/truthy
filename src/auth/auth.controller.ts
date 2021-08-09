@@ -12,32 +12,33 @@ import {
   Res,
   UploadedFile,
   UseGuards,
+  UseInterceptors,
   ValidationPipe
 } from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto';
-import { AuthService } from './auth.service';
-import { UserLoginDto } from './dto/user-login.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { ApiTags } from '@nestjs/swagger';
+import { Request, Response } from 'express';
+import { UAParser } from 'ua-parser-js';
 import { GetUser } from '../common/decorators/get-user.decorator';
+import JwtTwoFactorGuard from '../common/guard/jwt-two-factor.guard';
+import { PermissionGuard } from '../common/guard/permission.guard';
+import { multerOptionsHelper } from '../common/helper/multer-options.helper';
+import { Pagination } from '../paginate';
+import { RefreshToken } from '../refresh-token/entities/refresh-token.entity';
+import { AuthService } from './auth.service';
+import { ChangePasswordDto } from './dto/change-password.dto';
+import { CreateUserDto } from './dto/create-user.dto';
+import { ForgetPasswordDto } from './dto/forget-password.dto';
+import { RegisterUserDto } from './dto/register-user.dto';
+import { ResetPasswordDto } from './dto/reset-password.dto';
+import { UpdateUserProfileDto } from './dto/update-user-profile.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
+import { UserLoginDto } from './dto/user-login.dto';
+import { UserSearchFilterDto } from './dto/user-search-filter.dto';
 import { UserEntity } from './entity/user.entity';
 import { UserSerializer } from './serializer/user.serializer';
-import { UpdateUserProfileDto } from './dto/update-user-profile.dto';
-import { ApiTags } from '@nestjs/swagger';
-import { ResetPasswordDto } from './dto/reset-password.dto';
-import { ForgetPasswordDto } from './dto/forget-password.dto';
-import { ChangePasswordDto } from './dto/change-password.dto';
-import { PermissionGuard } from '../common/guard/permission.guard';
-import { Pagination } from '../paginate';
-import { Request, Response } from 'express';
-import { UserSearchFilterDto } from './dto/user-search-filter.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
-import { RegisterUserDto } from './dto/register-user.dto';
-import { JwtAuthGuard } from '../common/guard/jwt-auth.guard';
-import { RefreshToken } from '../refresh-token/entities/refresh-token.entity';
-import { UseInterceptors } from '@nestjs/common';
-import { FileInterceptor } from '@nestjs/platform-express';
-import { multerOptionsHelper } from '../common/helper/multer-options.helper';
-import { UAParser } from 'ua-parser-js';
-import JwtTwoFactorGuard from '../common/guard/jwt-two-factor.guard';
+import { RefreshPaginateFilterDto } from '../refresh-token/dto/refresh-paginate-filter.dto';
+import { RefreshTokenSerializer } from '../refresh-token/serializer/refresh-token.serializer';
 
 @ApiTags('user')
 @Controller()
@@ -198,7 +199,6 @@ export class AuthController {
     return this.authService.findById(+id);
   }
 
-  @UseGuards(JwtAuthGuard)
   @Post('/logout')
   async logOut(
     @Req()
@@ -206,7 +206,10 @@ export class AuthController {
     @Res()
     response: Response
   ) {
-    await this.authService.revokeRefreshToken(req.cookies['Refresh']);
+    const refreshCookie = req.cookies['Refresh'];
+    if (refreshCookie) {
+      await this.authService.revokeRefreshToken(req.cookies['Refresh']);
+    }
     response.setHeader('Set-Cookie', this.authService.getCookieForLogOut());
     return response.sendStatus(HttpStatus.NO_CONTENT);
   }
@@ -214,10 +217,12 @@ export class AuthController {
   @UseGuards(JwtTwoFactorGuard)
   @Get('/auth/token-info')
   getRefreshToken(
+    @Query()
+    filter: RefreshPaginateFilterDto,
     @GetUser()
     user: UserEntity
-  ): Promise<Array<RefreshToken>> {
-    return this.authService.activeRefreshTokenList(+user.id);
+  ): Promise<Pagination<RefreshTokenSerializer>> {
+    return this.authService.activeRefreshTokenList(+user.id, filter);
   }
 
   @UseGuards(JwtTwoFactorGuard)

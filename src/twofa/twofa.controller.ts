@@ -52,18 +52,6 @@ export class TwofaController {
     return response.status(HttpStatus.NO_CONTENT).json({});
   }
 
-  @Post('generate')
-  @UseGuards(JwtAuthGuard)
-  async generate(
-    @Res()
-    response: Response,
-    @GetUser()
-    user: UserEntity
-  ) {
-    const { otpauthUrl } = await this.twofaService.generateTwoFASecret(user);
-    return this.twofaService.pipeQrCodeStream(response, otpauthUrl);
-  }
-
   @Put()
   @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(JwtAuthGuard)
@@ -73,9 +61,15 @@ export class TwofaController {
     @GetUser()
     user: UserEntity
   ) {
+    let qrDataUri = null;
+    if (twofaStatusUpdateDto.isTwoFAEnabled) {
+      const { otpauthUrl } = await this.twofaService.generateTwoFASecret(user);
+      qrDataUri = await this.twofaService.qrDataToUrl(otpauthUrl);
+    }
     return this.usersService.turnOnTwoFactorAuthentication(
-      user.id,
-      twofaStatusUpdateDto.isTwoFAEnabled
+      user,
+      twofaStatusUpdateDto.isTwoFAEnabled,
+      qrDataUri
     );
   }
 }

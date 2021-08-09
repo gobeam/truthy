@@ -5,6 +5,7 @@
     "zero": "second"
   },
   "Unauthorized": "Unauthorized",
+  "internalError": "Internal Server Error!",
   "otpRequired": "OTP required",
   "inactiveUser": "You account has not been activated yet!",
   "invalidCredentials": "Credential didn't match!",
@@ -18,5 +19,6 @@
   "tooManyRequest": "Too many tries, retry after {second} $t(exception.sec, {{\"count\": {second} }})!",
   "invalidRefreshToken": "Invalid refresh token!",
   "deleteDefaultError": "Cannot delete default item!",
-  "refreshTokenExpired": "Refresh token is expired!"
+  "refreshTokenExpired": "Refresh token is expired!",
+  "tooManyTries": "Too many tries!"
 }

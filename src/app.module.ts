@@ -22,6 +22,7 @@ import {
 import { I18nExceptionFilterPipe } from './common/pipes/i18n-exception-filter.pipe';
 import { CustomValidationPipe } from './common/pipes/custom-validation.pipe';
 import { TwofaModule } from './twofa/twofa.module';
+import { CustomThrottlerGuard } from './common/guard/custom-throttle.guard';
 
 const appConfig = config.get('app');
 
@@ -66,7 +67,7 @@ const appConfig = config.get('app');
     },
     {
       provide: APP_GUARD,
-      useClass: ThrottlerGuard
+      useClass: CustomThrottlerGuard
     },
     {
       provide: APP_FILTER,

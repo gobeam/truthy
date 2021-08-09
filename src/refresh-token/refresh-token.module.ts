@@ -10,6 +10,7 @@ import { RefreshTokenRepository } from './refresh-token.repository';
     TypeOrmModule.forFeature([RefreshTokenRepository])
   ],
   providers: [RefreshTokenService],
-  exports: [RefreshTokenService]
+  exports: [RefreshTokenService],
+  controllers: []
 })
 export class RefreshTokenModule {}

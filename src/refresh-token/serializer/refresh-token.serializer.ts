@@ -1,0 +1,21 @@
+import { ApiProperty } from '@nestjs/swagger';
+import { ModelSerializer } from '../../common/serializer/model.serializer';
+
+export class RefreshTokenSerializer extends ModelSerializer {
+  id: number;
+
+  @ApiProperty()
+  userId: number;
+
+  @ApiProperty()
+  ip: string;
+
+  @ApiProperty()
+  userAgent: string;
+
+  @ApiProperty()
+  isRevoked: boolean;
+
+  @ApiProperty()
+  expires: Date;
+}

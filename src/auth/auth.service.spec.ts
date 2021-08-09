@@ -17,6 +17,7 @@ import { JwtService } from '@nestjs/jwt';
 import { UserSerializer } from './serializer/user.serializer';
 import { NotFoundException } from '../exception/not-found.exception';
 import { CustomHttpException } from '../exception/custom-http.exception';
+import { RefreshPaginateFilterDto } from 'src/refresh-token/dto/refresh-paginate-filter.dto';
 
 const mockUserRepository = () => ({
   findOne: jest.fn(),
@@ -256,7 +257,8 @@ describe('AuthService', () => {
     beforeEach(() => {
       userLoginDto = {
         password: mockUser.password,
-        username: mockUser.username
+        username: mockUser.username,
+        remember: true
       };
       user = new UserEntity();
       user.id = 1;
@@ -368,9 +370,14 @@ describe('AuthService', () => {
 
   it('get user token list', async () => {
     const userId = 1;
-    await service.activeRefreshTokenList(userId);
+    const filter: RefreshPaginateFilterDto = {
+      limit: 10,
+      page: 1
+    };
+    await service.activeRefreshTokenList(userId, filter);
     expect(refreshTokenService.getRefreshTokenByUserId).toHaveBeenCalledWith(
-      userId
+      userId,
+      filter
     );
     expect(refreshTokenService.getRefreshTokenByUserId).toHaveBeenCalledTimes(
       1
@@ -395,7 +402,12 @@ describe('AuthService', () => {
   });
 
   it('should update user twofa enable status', async () => {
-    await service.turnOnTwoFactorAuthentication(1);
+    const user = new UserEntity();
+    user.id = 1;
+    user.email = mockUser.email;
+    user.username = mockUser.username;
+    user.password = mockUser.password;
+    await service.turnOnTwoFactorAuthentication(user, true, 'qrcode');
     expect(userRepository.update).toHaveBeenCalledTimes(1);
     expect(userRepository.update).toHaveBeenCalledWith(1, {
       isTwoFAEnabled: true

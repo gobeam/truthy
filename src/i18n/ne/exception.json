@@ -1,5 +1,6 @@
 {
   "Unauthorized": "अनधिकृत पहुँच अस्वीकृत!",
+  "internalError": "आन्तरिक सर्वर त्रुटि!",
   "inactiveUser": "तपाइँको खाता अझै सक्रिय गरिएको छैन।",
   "Not Found": "डाटा भेटिएन!",
   "tokenExpired": "तपाईको सत्रको समयावधि सकियो!",
@@ -13,5 +14,6 @@
   "tooManyRequest": "धेरै प्रयत्नहरू, {second} सेकेन्ड पछि पुनःप्रयास गर्नुहोस्!",
   "invalidRefreshToken": "अवैध टोकन!",
   "deleteDefaultError": "पूर्वनिर्धारित आइटम मेटाउन मिल्दैन!",
-  "refreshTokenExpired": "रिफ्रेस टोकनको म्याद सकिएको छ!"
+  "refreshTokenExpired": "रिफ्रेस टोकनको म्याद सकिएको छ!",
+  "tooManyTries": "धेरै अनुरोध निषेध!"
 }

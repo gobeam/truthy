@@ -4,7 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import * as config from 'config';
 import { SignOptions, TokenExpiredError } from 'jsonwebtoken';
 import { CustomHttpException } from '../exception/custom-http.exception';
-import { MoreThanOrEqual } from 'typeorm';
+import { FindManyOptions, MoreThanOrEqual } from 'typeorm';
 import { AuthService } from '../auth/auth.service';
 import { UserSerializer } from '../auth/serializer/user.serializer';
 import { ExceptionTitleList } from '../common/constants/exception-title-list.constants';
@@ -14,6 +14,10 @@ import { NotFoundException } from '../exception/not-found.exception';
 import { RefreshToken } from './entities/refresh-token.entity';
 import { RefreshTokenInterface } from './interface/refresh-token.interface';
 import { RefreshTokenRepository } from './refresh-token.repository';
+import { RefreshPaginateFilterDto } from './dto/refresh-paginate-filter.dto';
+import { Pagination } from '../paginate';
+import { PaginationInfoInterface } from '../paginate/pagination-info.interface';
+import { RefreshTokenSerializer } from './serializer/refresh-token.serializer';
 
 const appConfig = config.get('app');
 const tokenConfig = config.get('jwt');
@@ -104,9 +108,7 @@ export class RefreshTokenService {
     user: UserSerializer;
   }> {
     const { user } = await this.resolveRefreshToken(refresh);
-
     const token = await this.authService.generateAccessToken(user);
-
     return {
       user,
       token
@@ -181,13 +183,34 @@ export class RefreshTokenService {
    * Get active refresh token list of user
    * @param userId
    */
-  getRefreshTokenByUserId(userId: number): Promise<Array<RefreshToken>> {
-    return this.repository.find({
+  async getRefreshTokenByUserId(
+    userId: number,
+    filter: RefreshPaginateFilterDto
+  ): Promise<Pagination<RefreshTokenSerializer>> {
+    const paginationInfo: PaginationInfoInterface =
+      this.repository.getPaginationInfo(filter);
+    const findOptions: FindManyOptions = {
       where: {
         userId,
         isRevoked: false,
         expires: MoreThanOrEqual(new Date())
       }
+    };
+    const { page, skip, limit } = paginationInfo;
+    findOptions.take = paginationInfo.limit;
+    findOptions.skip = paginationInfo.skip;
+    findOptions.order = {
+      id: 'DESC'
+    };
+    const [results, total] = await this.repository.findAndCount(findOptions);
+    const serializedResult = this.repository.transformMany(results);
+    return new Pagination<RefreshTokenSerializer>({
+      results: serializedResult,
+      totalItems: total,
+      pageSize: limit,
+      currentPage: page,
+      previous: page > 1 ? page - 1 : 0,
+      next: total > skip + limit ? page + 1 : 0
     });
   }
 

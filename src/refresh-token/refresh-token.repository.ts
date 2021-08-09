@@ -1,11 +1,16 @@
 import { RefreshToken } from './entities/refresh-token.entity';
 import { UserSerializer } from '../auth/serializer/user.serializer';
-import { EntityRepository, Repository } from 'typeorm';
+import { EntityRepository } from 'typeorm';
 import * as config from 'config';
+import { BaseRepository } from '../common/repository/base.repository';
+import { RefreshTokenSerializer } from './serializer/refresh-token.serializer';
 
 const tokenConfig = config.get('jwt');
 @EntityRepository(RefreshToken)
-export class RefreshTokenRepository extends Repository<RefreshToken> {
+export class RefreshTokenRepository extends BaseRepository<
+  RefreshToken,
+  RefreshTokenSerializer
+> {
   /**
    * Create refresh token
    * @param user

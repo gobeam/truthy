@@ -39,7 +39,9 @@ import {
 } from './serializer/user.serializer';
 import { UserStatusEnum } from './user-status.enum';
 import { UserRepository } from './user.repository';
-import { ValidationPayloadInterface } from 'src/common/interfaces/validation-error.interface';
+import { ValidationPayloadInterface } from '../common/interfaces/validation-error.interface';
+import { RefreshPaginateFilterDto } from '../refresh-token/dto/refresh-paginate-filter.dto';
+import { RefreshTokenSerializer } from '../refresh-token/serializer/refresh-token.serializer';
 
 const throttleConfig = config.get('throttle.login');
 const jwtConfig = config.get('jwt');
@@ -167,15 +169,14 @@ export class AuthService {
       }
       throw new UnauthorizedException(error, code);
     }
-    const accessTokenPromise = this.generateAccessToken(user);
-    const refreshTokenPromise = this.refreshTokenService.generateRefreshToken(
-      user,
-      refreshTokenPayload
-    );
-    const [accessToken, refreshToken] = await Promise.all([
-      accessTokenPromise,
-      refreshTokenPromise
-    ]);
+    const accessToken = await this.generateAccessToken(user);
+    let refreshToken = null;
+    if (userLoginDto.remember) {
+      refreshToken = await this.refreshTokenService.generateRefreshToken(
+        user,
+        refreshTokenPayload
+      );
+    }
     await this.rateLimiter.delete(usernameIPkey);
     return this.buildResponsePayload(accessToken, refreshToken);
   }
@@ -464,6 +465,9 @@ export class AuthService {
       }`,
       `Refresh=; HttpOnly; Path=/; Max-Age=0; ${
         !appConfig.sameSite ? 'SameSite=None; Secure;' : ''
+      }`,
+      `ExpiresIn=; Path=/; Max-Age=0; ${
+        !appConfig.sameSite ? 'SameSite=None; Secure;' : ''
       }`
     ];
   }
@@ -474,22 +478,22 @@ export class AuthService {
    * @param refreshToken
    */
   buildResponsePayload(accessToken: string, refreshToken?: string): string[] {
-    const expiration = new Date();
-    expiration.setSeconds(expiration.getSeconds() + jwtConfig.expiresIn);
-    const tokenCookies = [
+    let tokenCookies = [
       `Authentication=${accessToken}; HttpOnly; Path=/; ${
-        !appConfig.sameSite ? 'SameSite=None; Secure;' : ''
-      } Max-Age=${jwtConfig.cookieExpiresIn}`,
-      `ExpiresIn=${expiration}; Path=/; ${
         !appConfig.sameSite ? 'SameSite=None; Secure;' : ''
       } Max-Age=${jwtConfig.cookieExpiresIn}`
     ];
     if (refreshToken) {
-      tokenCookies.push(
+      const expiration = new Date();
+      expiration.setSeconds(expiration.getSeconds() + jwtConfig.expiresIn);
+      tokenCookies = tokenCookies.concat([
         `Refresh=${refreshToken}; HttpOnly; Path=/; ${
           !appConfig.sameSite ? 'SameSite=None; Secure;' : ''
+        } Max-Age=${jwtConfig.cookieExpiresIn}`,
+        `ExpiresIn=${expiration}; Path=/; ${
+          !appConfig.sameSite ? 'SameSite=None; Secure;' : ''
         } Max-Age=${jwtConfig.cookieExpiresIn}`
-      );
+      ]);
     }
     return tokenCookies;
   }
@@ -529,8 +533,11 @@ export class AuthService {
     }
   }
 
-  activeRefreshTokenList(userId: number): Promise<Array<RefreshToken>> {
-    return this.refreshTokenService.getRefreshTokenByUserId(userId);
+  activeRefreshTokenList(
+    userId: number,
+    filter: RefreshPaginateFilterDto
+  ): Promise<Pagination<RefreshTokenSerializer>> {
+    return this.refreshTokenService.getRefreshTokenByUserId(userId, filter);
   }
 
   revokeTokenById(id: number, userId: number): Promise<RefreshToken> {
@@ -547,8 +554,27 @@ export class AuthService {
     });
   }
 
-  async turnOnTwoFactorAuthentication(userId: number, isTwoFAEnabled = true) {
-    return this.userRepository.update(userId, {
+  async turnOnTwoFactorAuthentication(
+    user: UserEntity,
+    isTwoFAEnabled = true,
+    qrDataUri: string
+  ) {
+    if (isTwoFAEnabled) {
+      const subject = 'Activate Two Factor Authentication';
+      const mailData: MailJobInterface = {
+        to: user.email,
+        subject,
+        slug: 'twofa-activate',
+        context: {
+          email: user.email,
+          qrcode: qrDataUri,
+          username: user.username,
+          subject
+        }
+      };
+      await this.mailService.sendMail(mailData, 'system-mail');
+    }
+    return this.userRepository.update(user.id, {
       isTwoFAEnabled
     });
   }

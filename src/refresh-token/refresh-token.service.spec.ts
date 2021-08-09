@@ -9,6 +9,7 @@ import { TokenExpiredError } from 'jsonwebtoken';
 import { CustomHttpException } from '../exception/custom-http.exception';
 import { NotFoundException } from '../exception/not-found.exception';
 import { ForbiddenException } from '../exception/forbidden.exception';
+import { RefreshPaginateFilterDto } from './dto/refresh-paginate-filter.dto';
 
 const jwtServiceMock = () => ({
   signAsync: jest.fn(),
@@ -23,6 +24,9 @@ const authServiceMock = () => ({
 const repositoryMock = () => ({
   createRefreshToken: jest.fn(),
   findTokenById: jest.fn(),
+  getPaginationInfo: jest.fn(),
+  findAndCount: jest.fn(),
+  transformMany: jest.fn(),
   find: jest.fn()
 });
 
@@ -221,8 +225,19 @@ describe('RefreshTokenService', () => {
 
   it('getRefreshTokenByUserId', async () => {
     const userId = 1;
-    await service.getRefreshTokenByUserId(userId);
-    expect(repository.find).toHaveBeenCalledTimes(1);
+    const filter: RefreshPaginateFilterDto = {
+      limit: 10,
+      page: 1
+    };
+    repository.getPaginationInfo.mockReturnValue({
+      page: 1,
+      limit: 10,
+      skip: 1
+    });
+    repository.findAndCount.mockResolvedValue(['results', 'total']);
+    await service.getRefreshTokenByUserId(userId, filter);
+    expect(repository.findAndCount).toHaveBeenCalledTimes(1);
+    expect(repository.transformMany).toHaveBeenCalledTimes(1);
   });
 
   describe('revokeRefreshTokenById', () => {

@@ -2,7 +2,8 @@ import {
   ArgumentsHost,
   Catch,
   ExceptionFilter,
-  HttpException
+  HttpException,
+  HttpStatus
 } from '@nestjs/common';
 import { I18nService } from 'nestjs-i18n';
 import { ValidationErrorInterface } from '../interfaces/validation-error.interface';
@@ -27,28 +28,47 @@ export class I18nExceptionFilterPipe implements ExceptionFilter {
 
   async getMessage(exception: HttpException, lang: string) {
     const exceptionResponse = exception.getResponse() as any;
-    if (exceptionResponse.hasOwnProperty('message')) {
-      if (exceptionResponse.message instanceof Array) {
+    if (!exceptionResponse.message && typeof exceptionResponse === 'string') {
+      return await this.i18n.translate(`exception.${exceptionResponse}`, {
+        lang,
+        args: {}
+      });
+    }
+    if (exceptionResponse.statusCode === HttpStatus.UNPROCESSABLE_ENTITY) {
+      if (
+        exceptionResponse.hasOwnProperty('message') &&
+        exceptionResponse.message instanceof Array
+      ) {
         exceptionResponse.code = StatusCodesList.ValidationError;
         exceptionResponse.message = await this.translateArray(
           exceptionResponse.message,
           lang
         );
-      } else if (typeof exceptionResponse.message === 'string') {
-        const { title, argument } = this.checkIfConstraintAvailable(
-          exceptionResponse.message
-        );
-        exceptionResponse.message = await this.i18n.translate(
-          `exception.${title}`,
-          {
-            lang,
-            args: {
-              ...argument
-            }
-          }
-        );
       }
+      return exceptionResponse;
     }
+    let errorMessage = 'internalError';
+    if (exceptionResponse.message instanceof Array) {
+      errorMessage = exceptionResponse.message[0];
+    } else if (typeof exceptionResponse.message === 'string') {
+      errorMessage = exceptionResponse.message;
+    } else if (
+      !exceptionResponse.message &&
+      typeof exceptionResponse === 'string'
+    ) {
+      errorMessage = exceptionResponse;
+    }
+
+    const { title, argument } = this.checkIfConstraintAvailable(errorMessage);
+    exceptionResponse.message = await this.i18n.translate(
+      `exception.${title}`,
+      {
+        lang,
+        args: {
+          ...argument
+        }
+      }
+    );
     return exceptionResponse;
   }
 

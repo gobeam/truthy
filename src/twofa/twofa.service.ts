@@ -2,7 +2,7 @@ import { HttpStatus, Injectable } from '@nestjs/common';
 import * as config from 'config';
 import { Response } from 'express';
 import { authenticator } from 'otplib';
-import { toFileStream } from 'qrcode';
+import { toFileStream, toDataURL } from 'qrcode';
 import { StatusCodesList } from '../common/constants/status-codes-list.constants';
 import { AuthService } from '../auth/auth.service';
 import { UserEntity } from '../auth/entity/user.entity';
@@ -14,7 +14,7 @@ const TwofaConfig = config.get('twofa');
 export class TwofaService {
   constructor(private readonly usersService: AuthService) {}
 
-  public async generateTwoFASecret(user: UserEntity) {
+  async generateTwoFASecret(user: UserEntity) {
     if (user.twoFAThrottleTime > new Date()) {
       throw new CustomHttpException(
         `tooManyRequest-{"second":"${this.differentBetweenDatesInSec(
@@ -38,15 +38,19 @@ export class TwofaService {
     };
   }
 
-  public isTwoFACodeValid(twoFASecret: string, user: UserEntity) {
+  isTwoFACodeValid(twoFASecret: string, user: UserEntity) {
     return authenticator.verify({
       token: twoFASecret,
       secret: user.twoFASecret
     });
   }
 
-  public async pipeQrCodeStream(stream: Response, otpauthUrl: string) {
+  async pipeQrCodeStream(stream: Response, otpauthUrl: string) {
     return toFileStream(stream, otpauthUrl);
+  }
+
+  async qrDataToUrl(otpauthUrl: string): Promise<string> {
+    return toDataURL(otpauthUrl);
   }
 
   differentBetweenDatesInSec(initialDate: Date, endDate: Date): number {
