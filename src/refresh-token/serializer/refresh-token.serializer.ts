@@ -14,6 +14,12 @@ export class RefreshTokenSerializer extends ModelSerializer {
   userAgent: string;
 
   @ApiProperty()
+  browser: string;
+
+  @ApiProperty()
+  os: string;
+
+  @ApiProperty()
   isRevoked: boolean;
 
   @ApiProperty()

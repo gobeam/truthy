@@ -234,4 +234,14 @@ export class RefreshTokenService {
     await token.save();
     return token;
   }
+
+  async getRefreshTokenGroupedData(field: string) {
+    return this.repository
+      .createQueryBuilder('token')
+      .select(`token.${field}`)
+      .where(`token.${field} IS NOT NULL`)
+      .addSelect('COUNT(*) AS count')
+      .groupBy(`token.${field}`)
+      .getRawMany();
+  }
 }

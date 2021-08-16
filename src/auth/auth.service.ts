@@ -123,7 +123,7 @@ export class AuthService {
    * @param value
    */
   async findBy(field: string, value: string): Promise<UserSerializer> {
-    return await this.userRepository.findBy(field, value);
+    return this.userRepository.findBy(field, value);
   }
 
   /**
@@ -533,6 +533,11 @@ export class AuthService {
     }
   }
 
+  /**
+   * get active refresh token list for user
+   * @param userId
+   * @param filter
+   **/
   activeRefreshTokenList(
     userId: number,
     filter: RefreshPaginateFilterDto
@@ -540,10 +545,20 @@ export class AuthService {
     return this.refreshTokenService.getRefreshTokenByUserId(userId, filter);
   }
 
+  /**
+   * revoke token by id
+   * @param id
+   * @param userId
+   **/
   revokeTokenById(id: number, userId: number): Promise<RefreshToken> {
     return this.refreshTokenService.revokeRefreshTokenById(id, userId);
   }
 
+  /**
+   * set two factor auth secret for user
+   * @param secret
+   * @param userId
+   **/
   async setTwoFactorAuthenticationSecret(secret: string, userId: number) {
     // add one minute throttle to generate next two factor token
     const twoFAThrottleTime = new Date();
@@ -554,6 +569,12 @@ export class AuthService {
     });
   }
 
+  /**
+   * Turn two factor authentication for user
+   * @param user
+   * @param isTwoFAEnabled
+   * @param qrDataUri
+   **/
   async turnOnTwoFactorAuthentication(
     user: UserEntity,
     isTwoFAEnabled = true,
@@ -577,5 +598,17 @@ export class AuthService {
     return this.userRepository.update(user.id, {
       isTwoFAEnabled
     });
+  }
+
+  /**
+   * Count data by condition
+   * @param condition
+   **/
+  async countByCondition(condition: ObjectLiteral) {
+    return this.userRepository.countEntityByCondition(condition);
+  }
+
+  async getRefreshTokenGroupedData(field: string) {
+    return this.refreshTokenService.getRefreshTokenGroupedData(field);
   }
 }

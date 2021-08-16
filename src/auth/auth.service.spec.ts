@@ -413,4 +413,9 @@ describe('AuthService', () => {
       isTwoFAEnabled: true
     });
   });
+
+  it('should return users stats data', async () => {
+    await service.countByCondition({});
+    expect(userRepository.countEntityByCondition).toHaveBeenCalledTimes(1);
+  });
 });

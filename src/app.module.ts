@@ -23,6 +23,7 @@ import { I18nExceptionFilterPipe } from './common/pipes/i18n-exception-filter.pi
 import { CustomValidationPipe } from './common/pipes/custom-validation.pipe';
 import { TwofaModule } from './twofa/twofa.module';
 import { CustomThrottlerGuard } from './common/guard/custom-throttle.guard';
+import { DashboardModule } from './dashboard/dashboard.module';
 
 const appConfig = config.get('app');
 
@@ -58,7 +59,8 @@ const appConfig = config.get('app');
     MailModule,
     EmailTemplateModule,
     RefreshTokenModule,
-    TwofaModule
+    TwofaModule,
+    DashboardModule
   ],
   providers: [
     {

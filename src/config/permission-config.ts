@@ -108,6 +108,18 @@ export const PermissionConfiguration: PermissionConfigInterface = {
       method: MethodList.GET
     },
     {
+      path: '/dashboard/users',
+      method: MethodList.GET
+    },
+    {
+      path: '/dashboard/os',
+      method: MethodList.GET
+    },
+    {
+      path: '/dashboard/browser',
+      method: MethodList.GET
+    },
+    {
       path: '/logout',
       method: MethodList.POST
     }

@@ -17,6 +17,12 @@ export class RefreshToken extends BaseEntity {
   userAgent: string;
 
   @Column()
+  browser: string;
+
+  @Column()
+  os: string;
+
+  @Column()
   isRevoked: boolean;
 
   @Column()

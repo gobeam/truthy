@@ -65,7 +65,9 @@ export class AuthController {
     const ua = UAParser(req.headers['user-agent']);
     const refreshTokenPayload: Partial<RefreshToken> = {
       ip: req.ip,
-      userAgent: JSON.stringify(ua)
+      userAgent: JSON.stringify(ua),
+      browser: ua.browser.name,
+      os: ua.os.name
     };
     const cookiePayload = await this.authService.login(
       userLoginDto,

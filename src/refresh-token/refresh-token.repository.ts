@@ -25,6 +25,8 @@ export class RefreshTokenRepository extends BaseRepository<
     token.isRevoked = false;
     token.ip = tokenPayload.ip;
     token.userAgent = tokenPayload.userAgent;
+    token.browser = tokenPayload.browser;
+    token.os = tokenPayload.os;
     const expiration = new Date();
     expiration.setSeconds(
       expiration.getSeconds() + tokenConfig.refreshExpiresIn
