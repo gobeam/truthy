@@ -238,9 +238,9 @@ export class RefreshTokenService {
   async getRefreshTokenGroupedData(field: string) {
     return this.repository
       .createQueryBuilder('token')
-      .select(`token.${field}`)
+      .select(`token.${field} AS type`)
       .where(`token.${field} IS NOT NULL`)
-      .addSelect('COUNT(*) AS count')
+      .addSelect('COUNT(*)::int AS value')
       .groupBy(`token.${field}`)
       .getRawMany();
   }
