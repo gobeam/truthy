@@ -7,6 +7,7 @@
   "Unauthorized": "Unauthorized",
   "internalError": "Internal Server Error!",
   "otpRequired": "OTP required",
+  "invalidOTP": "Invalid OTP",
   "inactiveUser": "You account has not been activated yet!",
   "invalidCredentials": "Credential didn't match!",
   "Forbidden": "Access to the requested resource is forbidden!",

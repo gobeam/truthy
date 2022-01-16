@@ -58,7 +58,8 @@ export class MailProcessor {
         from: process.env.MAIL_FROM || mailConfig.fromMail,
         subject: job.data.payload.subject,
         template: __dirname + `/../mail/templates/email/layouts/email-layout`,
-        context: job.data.payload.context
+        context: job.data.payload.context,
+        attachments: job.data.payload.attachments
       });
     } catch (error) {
       this.logger.error(

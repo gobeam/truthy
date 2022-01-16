@@ -3,4 +3,5 @@ export interface MailJobInterface {
   slug: string;
   subject: string;
   context: any;
+  attachments?: any;
 }

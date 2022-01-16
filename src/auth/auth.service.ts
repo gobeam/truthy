@@ -585,13 +585,20 @@ export class AuthService {
       const mailData: MailJobInterface = {
         to: user.email,
         subject,
-        slug: 'twofa-activate',
+        slug: 'two-factor-authentication',
         context: {
           email: user.email,
-          qrcode: qrDataUri,
+          qrcode: 'cid:2fa-qrcode',
           username: user.username,
           subject
-        }
+        },
+        attachments: [
+          {
+            filename: '2fa-qrcode.png',
+            path: qrDataUri,
+            cid: '2fa-qrcode'
+          }
+        ]
       };
       await this.mailService.sendMail(mailData, 'system-mail');
     }
