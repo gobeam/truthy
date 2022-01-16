@@ -25,10 +25,14 @@
 - [License](#license)
 - [Acknowledgement](#acknowledgement)
 
+---
+
 ## Getting Started
 
 This project was created to help developers by bootstrapping basic modules that need to be present while creating a standard CMS. The main motto of this project was to save precious time while developing CMS and focus more on the core part. This project is trying to follow the best possible standard to make it optimized and production-ready. Hope you like it. <br>
 If you love it don't forget to share your experience. If you want to contribute to the Truthy CMS in any way like API, Frontend, Design, Logo you're more than welcome to do so. Our plan is to make this no. 1 CMS maintained by opensource community.
+
+---
 
 ## Prerequisites
 
@@ -37,6 +41,8 @@ https://nodejs.org/en/
 
 Typescript
 https://www.typescriptlang.org/
+
+---
 
 ## Available Scripts
 
@@ -87,6 +93,8 @@ This command is used to rollback migration.
 
 This command is used to run existing seeders.
 
+---
+
 ## Setup
 
 First, you need to clone the project
@@ -102,6 +110,7 @@ If you want to run locally,
 ```bash
 yarn start
 ```
+*If you want to view swagger docs on development open http://localhost:7777/api-docs (assuming you are running application on 7777 port)*
 
 Run Migration
 ```bash
@@ -117,6 +126,8 @@ Rollback Migration
 ```bash
 yarn migration:rollback
 ```
+
+---
 
 ## Docker Setup
 
@@ -152,6 +163,8 @@ To run seeder on docker container
 ```bash
 docker exec -it <container_id_or_name> yarn seed
 ```
+
+---
 
 ## File Structure
 
@@ -204,14 +217,20 @@ truthy
 ├── tsconfig.json                           * Typescript configuration for application.
 ```
 
+---
+
 ## Contributing
 
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
 Please make sure to update tests as appropriate. - see `CONTRIBUTING.md` for details.
 
+---
+
 ## License
 
 Released under the MIT License - see `LICENSE.md` for details.
+
+---
 
 ## Acknowledgement
 
