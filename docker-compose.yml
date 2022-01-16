@@ -11,7 +11,6 @@ services:
       - /usr/src/app/node_modules
     ports:
       - ${SERVER_PORT}:${SERVER_PORT}
-    command: npm run start:dev
     env_file:
       - .env
     networks:
@@ -32,9 +31,23 @@ services:
       POSTGRES_DB: ${DB_DATABASE_NAME}
       PG_DATA: /var/lib/postgresql/data
     ports:
-      - 5300:${DB_PORT}
+      - ${DB_PORT}:5432
     volumes:
       - pgdata:/var/lib/postgresql/data
+
+  redis:
+    image: "redis:alpine"
+    container_name: redis
+    restart: always
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+    volumes:
+      - .:/data
+    env_file:
+      - .env
+    ports:
+      - ${REDIS_PORT}:6379
+
 
 networks:
   webnet:

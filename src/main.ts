@@ -17,6 +17,7 @@ async function bootstrap() {
   const serverConfig = config.get('server');
   const port = process.env.PORT || serverConfig.port;
   const app = await NestFactory.create(AppModule);
+  const apiConfig = config.get('app');
   app.use('/assets', express.static(join(__dirname, '..', 'images')));
   if (process.env.NODE_ENV === 'development') {
     app.enableCors({
@@ -24,6 +25,20 @@ async function bootstrap() {
       methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
       credentials: true
     });
+    const swaggerConfig = new DocumentBuilder()
+      .setTitle(apiConfig.name)
+      .setDescription(apiConfig.description)
+      .setVersion(apiConfig.version)
+      .addBearerAuth()
+      .build();
+    const customOptions: SwaggerCustomOptions = {
+      swaggerOptions: {
+        persistAuthorization: true
+      },
+      customSiteTitle: apiConfig.description
+    };
+    const document = SwaggerModule.createDocument(app, swaggerConfig);
+    SwaggerModule.setup('api-docs', app, document, customOptions);
   } else {
     app.enableCors({
       origin: process.env.ORIGIN || serverConfig.origin,
@@ -45,21 +60,6 @@ async function bootstrap() {
       forbidNonWhitelisted: true
     })
   );
-  const apiConfig = config.get('app');
-  const swaggerConfig = new DocumentBuilder()
-    .setTitle(apiConfig.name)
-    .setDescription(apiConfig.description)
-    .setVersion(apiConfig.version)
-    .addBearerAuth()
-    .build();
-  const customOptions: SwaggerCustomOptions = {
-    swaggerOptions: {
-      persistAuthorization: true
-    },
-    customSiteTitle: apiConfig.description
-  };
-  const document = SwaggerModule.createDocument(app, swaggerConfig);
-  SwaggerModule.setup('api', app, document, customOptions);
 
   app.use(cookieParser());
   await app.listen(port);

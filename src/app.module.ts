@@ -7,7 +7,7 @@ import * as ormConfig from './config/ormconfig';
 import * as throttleConfig from './config/throttle-config';
 import { MailModule } from './mail/mail.module';
 import { EmailTemplateModule } from './email-template/email-template.module';
-import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { ThrottlerModule } from '@nestjs/throttler';
 import { APP_FILTER, APP_GUARD, APP_PIPE } from '@nestjs/core';
 import { RefreshTokenModule } from './refresh-token/refresh-token.module';
 import * as path from 'path';
