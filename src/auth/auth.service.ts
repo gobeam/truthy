@@ -194,12 +194,10 @@ export class AuthService {
       ...BASE_OPTIONS,
       subject: String(user.id)
     };
-    return this.jwt.signAsync(
-      {
-        isTwoFAAuthenticated
-      },
-      opts
-    );
+    return this.jwt.signAsync({
+      ...opts,
+      isTwoFAAuthenticated
+    });
   }
 
   /**

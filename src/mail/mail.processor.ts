@@ -53,14 +53,15 @@ export class MailProcessor {
     this.logger.log(`Sending email to '${job.data.payload.to}'`);
     const mailConfig = config.get('mail');
     try {
-      return await this.mailerService.sendMail({
+      const options: Record<string, any> = {
         to: job.data.payload.to,
         from: process.env.MAIL_FROM || mailConfig.fromMail,
         subject: job.data.payload.subject,
         template: __dirname + `/../mail/templates/email/layouts/email-layout`,
         context: job.data.payload.context,
         attachments: job.data.payload.attachments
-      });
+      };
+      return await this.mailerService.sendMail({ ...options });
     } catch (error) {
       this.logger.error(
         `Failed to send email to '${job.data.payload.to}'`,

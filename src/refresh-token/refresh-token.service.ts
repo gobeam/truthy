@@ -53,7 +53,7 @@ export class RefreshTokenService {
       jwtid: String(token.id)
     };
 
-    return this.jwt.signAsync({}, opts);
+    return this.jwt.signAsync({ ...opts });
   }
 
   /**

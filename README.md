@@ -8,6 +8,10 @@
 <p align="center"> This repository is Backend API part of Truthy CMS written in NestJS. For Frontend please visit https://github.com/gobeam/truthy-react-frontend. This project includes API for Authentication, User Management, Role Management, Permission Management, Email Module, Account Settings, OTP, RBAC support, Localization, and many more. </p>
 <br>
 <p align="center">
+<img alt="GitHub" src="https://img.shields.io/github/license/gobeam/truthy">
+<img alt="GitHub package.json version" src="https://img.shields.io/github/package-json/v/gobeam/truthy">
+<img alt="GitHub all releases" src="https://img.shields.io/github/downloads/gobeam/truthy/total">
+<img alt="Lines of code" src="https://img.shields.io/tokei/lines/github/gobeam/truthy">
 </p>
 <div align="center">
   <sub>Created by <a href="https://www.linkedin.com/in/roshan-ranabhat/">Roshan Ranabhat (gobeam)</a> and maintained with ❤️ by an amazing <a href="https://github.com/gobeam/truthy-contributors">team of awesome developers</a>.</sub>

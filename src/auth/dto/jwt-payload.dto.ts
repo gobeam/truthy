@@ -2,6 +2,6 @@
  * JWT payload data transfer object
  */
 export class JwtPayloadDto {
-  sub: string;
+  subject: string;
   isTwoFAAuthenticated?: boolean;
 }

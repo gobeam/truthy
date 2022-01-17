@@ -24,6 +24,8 @@ import { CustomValidationPipe } from './common/pipes/custom-validation.pipe';
 import { TwofaModule } from './twofa/twofa.module';
 import { CustomThrottlerGuard } from './common/guard/custom-throttle.guard';
 import { DashboardModule } from './dashboard/dashboard.module';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 
 const appConfig = config.get('app');
 
@@ -52,6 +54,10 @@ const appConfig = config.get('app');
         new HeaderResolver(['x-custom-lang']),
         new CookieResolver(['lang', 'locale', 'l'])
       ]
+    }),
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'images'),
+      exclude: ['/api*']
     }),
     AuthModule,
     RolesModule,
