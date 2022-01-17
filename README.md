@@ -47,7 +47,7 @@ https://www.typescriptlang.org/
 
 ## Available Scripts
 
-### npx truthy
+### npx truthy-api
 
 This commands downloads the latest version of truthy i.e NestJS Truthy CMS backend API.
 
