@@ -36,19 +36,22 @@ describe('Test JWT strategy', () => {
       user.name = 'test';
       user.username = 'tester';
       const payload: JwtPayloadDto = {
-        sub: '1'
+        subject: '1'
       };
       userRepository.findOne.mockResolvedValue(user);
       const result = await jwtStrategy.validate(payload);
-      expect(userRepository.findOne).toHaveBeenCalledWith(Number(payload.sub), {
-        relations: ['role', 'role.permission']
-      });
+      expect(userRepository.findOne).toHaveBeenCalledWith(
+        Number(payload.subject),
+        {
+          relations: ['role', 'role.permission']
+        }
+      );
       expect(result).toEqual(user);
     });
 
     it('should throw error if subject is not found on database', async () => {
       const payload: JwtPayloadDto = {
-        sub: '1'
+        subject: '1'
       };
       userRepository.findOne.mockResolvedValue(null);
       await expect(jwtStrategy.validate(payload)).rejects.toThrow(

@@ -30,8 +30,8 @@ export class JwtTwoFactorStrategy extends PassportStrategy(
   }
 
   async validate(payload: JwtPayloadDto): Promise<UserEntity> {
-    const { isTwoFAAuthenticated, sub } = payload;
-    const user = await this.userRepository.findOne(Number(sub), {
+    const { isTwoFAAuthenticated, subject } = payload;
+    const user = await this.userRepository.findOne(Number(subject), {
       relations: ['role', 'role.permission']
     });
     if (!user.isTwoFAEnabled) {

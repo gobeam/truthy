@@ -39,11 +39,13 @@ const LoginThrottleFactory = {
 
 @Module({
   imports: [
-    JwtModule.register({
-      secret: process.env.JWT_SECRET || jwtConfig.secret,
-      signOptions: {
-        expiresIn: process.env.JWT_EXPIRES_IN || jwtConfig.expiresIn
-      }
+    JwtModule.registerAsync({
+      useFactory: () => ({
+        secret: process.env.JWT_SECRET || jwtConfig.secret,
+        signOptions: {
+          expiresIn: process.env.JWT_EXPIRES_IN || jwtConfig.expiresIn
+        }
+      })
     }),
     PassportModule.register({
       defaultStrategy: 'jwt'
