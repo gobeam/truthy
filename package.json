@@ -2,7 +2,7 @@
   "name": "truthy",
   "version": "0.1.0",
   "description": "Truthy API",
-  "author": "Roshan Ranabhat <roshanranabhat11@gmail.com>",
+  "author": "gobeam <roshanranabhat11@gmail.com>",
   "license": "MIT",
   "scripts": {
     "prebuild": "rimraf dist",
