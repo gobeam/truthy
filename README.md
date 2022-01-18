@@ -8,16 +8,27 @@
 <p align="center"> This repository is Backend API part of Truthy CMS written in NestJS. For Frontend please visit https://github.com/gobeam/truthy-react-frontend. This project includes API for Authentication, User Management, Role Management, Permission Management, Email Module, Account Settings, OTP, RBAC support, Localization, and many more. </p>
 <br>
 <p align="center">
-<img alt="GitHub" src="https://img.shields.io/github/license/gobeam/truthy">
 <img alt="GitHub package.json version" src="https://img.shields.io/github/package-json/v/gobeam/truthy">
-<img alt="GitHub all releases" src="https://img.shields.io/github/downloads/gobeam/truthy/total">
+<img alt="GitHub" src="https://img.shields.io/github/license/gobeam/truthy">
 <img alt="Lines of code" src="https://img.shields.io/tokei/lines/github/gobeam/truthy">
 <img src='https://www.codetriage.com/gobeam/truthy/badges/users.svg' alt='Open Source Helpers' />
-<img src='https://www.codetriage.com/gobeam/truthy-react-frontend/badges/users.svg' alt='Open Source Helpers' />
 </p>
-<div align="center">
+<p align="center">
+<a href="https://www.buymeacoffee.com/gobeam" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-green.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" ></a>
+</p>
+<p align="center">
   <sub>Created by <a href="https://www.linkedin.com/in/roshan-ranabhat/">Roshan Ranabhat (gobeam)</a> and maintained with ❤️ by an amazing <a href="https://github.com/gobeam/truthy-contributors">team of awesome developers</a>.</sub>
-</div>
+</p>
+
+<p align="center">
+  <sub>Check Live code deployed here:  Backend API Docs: <a href="https://truthy-backend.herokuapp.com/api-docs/">Swagger Docs</a>
+  Frontend: <a href="https://truthy-cms.herokuapp.com">Truthy CMS</a>
+  </sub>
+</p>
+
+<p align="center">
+<img src="https://gobeam.github.io/truthy-contributors/truthy.gif" alt="Truthy CMS" >
+</p>
 
 ## Table of Contents
 
