@@ -12,6 +12,8 @@
 <img alt="GitHub package.json version" src="https://img.shields.io/github/package-json/v/gobeam/truthy">
 <img alt="GitHub all releases" src="https://img.shields.io/github/downloads/gobeam/truthy/total">
 <img alt="Lines of code" src="https://img.shields.io/tokei/lines/github/gobeam/truthy">
+<img src='https://www.codetriage.com/gobeam/truthy/badges/users.svg' alt='Open Source Helpers' />
+<img src='https://www.codetriage.com/gobeam/truthy-react-frontend/badges/users.svg' alt='Open Source Helpers' />
 </p>
 <div align="center">
   <sub>Created by <a href="https://www.linkedin.com/in/roshan-ranabhat/">Roshan Ranabhat (gobeam)</a> and maintained with ❤️ by an amazing <a href="https://github.com/gobeam/truthy-contributors">team of awesome developers</a>.</sub>

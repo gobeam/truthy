@@ -92,8 +92,8 @@ describe('RefreshTokenService', () => {
     it('test for malformed token', async () => {
       const testToken = 'test_token_hash';
       jest.spyOn(service, 'decodeRefreshToken').mockResolvedValue({
-        jti: 1,
-        sub: 1
+        jwtid: 1,
+        subject: 1
       });
       jest
         .spyOn(service, 'getStoredTokenFromRefreshTokenPayload')
@@ -116,8 +116,8 @@ describe('RefreshTokenService', () => {
     it('resolve refresh token for valid refresh token', async () => {
       const testToken = 'test_token_hash';
       jest.spyOn(service, 'decodeRefreshToken').mockResolvedValue({
-        jti: 1,
-        sub: 1
+        jwtid: 1,
+        subject: 1
       });
       jest
         .spyOn(service, 'getStoredTokenFromRefreshTokenPayload')
@@ -134,8 +134,8 @@ describe('RefreshTokenService', () => {
       expect(
         service.getStoredTokenFromRefreshTokenPayload
       ).toHaveBeenCalledWith({
-        jti: 1,
-        sub: 1
+        jwtid: 1,
+        subject: 1
       });
     });
   });
@@ -168,8 +168,8 @@ describe('RefreshTokenService', () => {
 
     it('decode valid refresh token', async () => {
       jwtService.verifyAsync.mockResolvedValue({
-        jti: 1,
-        sub: 1
+        jwtid: 1,
+        subject: 1
       });
       await service.decodeRefreshToken('refresh_token_hash');
       expect(jwtService.verifyAsync).toHaveBeenCalledTimes(1);
@@ -181,8 +181,8 @@ describe('RefreshTokenService', () => {
     it('check get user from refresh token with malformed token', async () => {
       await expect(
         service.getUserFromRefreshTokenPayload({
-          jti: null,
-          sub: null
+          jwtid: null,
+          subject: null
         })
       ).rejects.toThrowError(CustomHttpException);
       expect(authService.findById).toHaveBeenCalledTimes(0);
@@ -192,8 +192,8 @@ describe('RefreshTokenService', () => {
       authService.findById.mockResolvedValue(user);
       await expect(
         service.getUserFromRefreshTokenPayload({
-          jti: 1,
-          sub: 1
+          jwtid: 1,
+          subject: 1
         })
       ).resolves.not.toThrow();
       expect(authService.findById).toHaveBeenCalledTimes(1);
@@ -205,8 +205,8 @@ describe('RefreshTokenService', () => {
     it('check for malformed token', async () => {
       await expect(
         service.getStoredTokenFromRefreshTokenPayload({
-          jti: null,
-          sub: null
+          jwtid: null,
+          subject: null
         })
       ).rejects.toThrowError(CustomHttpException);
     });
@@ -215,8 +215,8 @@ describe('RefreshTokenService', () => {
       repository.findTokenById.mockResolvedValue(refreshToken);
       await expect(
         service.getStoredTokenFromRefreshTokenPayload({
-          jti: 1,
-          sub: 1
+          jwtid: 1,
+          subject: 1
         })
       ).resolves.not.toThrow();
       expect(repository.findTokenById).toHaveBeenCalledTimes(1);

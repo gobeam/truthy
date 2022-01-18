@@ -46,6 +46,7 @@ import { RefreshTokenSerializer } from '../refresh-token/serializer/refresh-toke
 const throttleConfig = config.get('throttle.login');
 const jwtConfig = config.get('jwt');
 const appConfig = config.get('app');
+const isSameSite = process.env.IS_SAME_SITE || appConfig.sameSite;
 const BASE_OPTIONS: SignOptions = {
   issuer: appConfig.appUrl,
   audience: appConfig.frontendUrl
@@ -459,13 +460,13 @@ export class AuthService {
   getCookieForLogOut(): string[] {
     return [
       `Authentication=; HttpOnly; Path=/; Max-Age=0; ${
-        !appConfig.sameSite ? 'SameSite=None; Secure;' : ''
+        !isSameSite ? 'SameSite=None; Secure;' : ''
       }`,
       `Refresh=; HttpOnly; Path=/; Max-Age=0; ${
-        !appConfig.sameSite ? 'SameSite=None; Secure;' : ''
+        !isSameSite ? 'SameSite=None; Secure;' : ''
       }`,
       `ExpiresIn=; Path=/; Max-Age=0; ${
-        !appConfig.sameSite ? 'SameSite=None; Secure;' : ''
+        !isSameSite ? 'SameSite=None; Secure;' : ''
       }`
     ];
   }
@@ -478,7 +479,7 @@ export class AuthService {
   buildResponsePayload(accessToken: string, refreshToken?: string): string[] {
     let tokenCookies = [
       `Authentication=${accessToken}; HttpOnly; Path=/; ${
-        !appConfig.sameSite ? 'SameSite=None; Secure;' : ''
+        !isSameSite ? 'SameSite=None; Secure;' : ''
       } Max-Age=${jwtConfig.cookieExpiresIn}`
     ];
     if (refreshToken) {
@@ -486,10 +487,10 @@ export class AuthService {
       expiration.setSeconds(expiration.getSeconds() + jwtConfig.expiresIn);
       tokenCookies = tokenCookies.concat([
         `Refresh=${refreshToken}; HttpOnly; Path=/; ${
-          !appConfig.sameSite ? 'SameSite=None; Secure;' : ''
+          !isSameSite ? 'SameSite=None; Secure;' : ''
         } Max-Age=${jwtConfig.cookieExpiresIn}`,
         `ExpiresIn=${expiration}; Path=/; ${
-          !appConfig.sameSite ? 'SameSite=None; Secure;' : ''
+          !isSameSite ? 'SameSite=None; Secure;' : ''
         } Max-Age=${jwtConfig.cookieExpiresIn}`
       ]);
     }
