@@ -46,7 +46,9 @@ import { RefreshTokenSerializer } from '../refresh-token/serializer/refresh-toke
 const throttleConfig = config.get('throttle.login');
 const jwtConfig = config.get('jwt');
 const appConfig = config.get('app');
-const isSameSite = process.env.IS_SAME_SITE || appConfig.sameSite;
+// const isSameSite = process.env.IS_SAME_SITE || appConfig.sameSite;
+// for heroku
+const isSameSite = process.env.IS_SAME_SITE;
 const BASE_OPTIONS: SignOptions = {
   issuer: appConfig.appUrl,
   audience: appConfig.frontendUrl
