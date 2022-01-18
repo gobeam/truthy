@@ -66,7 +66,6 @@ export class RefreshTokenService {
   }> {
     const payload = await this.decodeRefreshToken(encoded);
     const token = await this.getStoredTokenFromRefreshTokenPayload(payload);
-
     if (!token) {
       throw new CustomHttpException(
         ExceptionTitleList.NotFound,
@@ -146,7 +145,7 @@ export class RefreshTokenService {
   async getUserFromRefreshTokenPayload(
     payload: RefreshTokenInterface
   ): Promise<UserSerializer> {
-    const subId = payload.sub;
+    const subId = payload.subject;
 
     if (!subId) {
       throw new CustomHttpException(
@@ -166,7 +165,7 @@ export class RefreshTokenService {
   async getStoredTokenFromRefreshTokenPayload(
     payload: RefreshTokenInterface
   ): Promise<RefreshToken | null> {
-    const tokenId = payload.jti;
+    const tokenId = payload.jwtid;
 
     if (!tokenId) {
       throw new CustomHttpException(
