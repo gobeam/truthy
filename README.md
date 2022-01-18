@@ -49,6 +49,12 @@ https://nodejs.org/en/
 Typescript
 https://www.typescriptlang.org/
 
+PostgresQL
+https://www.postgresql.org/
+
+Redis
+https://redis.io/
+
 ---
 
 ## Available Scripts
@@ -108,11 +114,18 @@ This command is used to run existing seeders.
 
 ## Setup
 
-First, you need to clone the project
+First, you need to install the project using npx command
+
+```bash
+npx truthy-api
+```
+
+or clone it using
+
 ```bash
 git clone https://github.com/gobeam/truthy.git
 ```
-
+**You also need to run PostgresQL for database and Redis for key-val storage which will be used for queue and throttling.**
 After cloning the make changes in configuration file that exists in config folder which exists in root of project.
 File names are named in accordance with environment you run project with. For example if you're running project in development environment you should make change in configuration of development.yml file. 
 **Please keep in mind environment variables always overrides the config.**
