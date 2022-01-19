@@ -48,7 +48,7 @@ const jwtConfig = config.get('jwt');
 const appConfig = config.get('app');
 // const isSameSite = process.env.IS_SAME_SITE || appConfig.sameSite;
 // for heroku
-const isSameSite = process.env.IS_SAME_SITE;
+const isSameSite = process.env.IS_SAME_SITE === 'true';
 const BASE_OPTIONS: SignOptions = {
   issuer: appConfig.appUrl,
   audience: appConfig.frontendUrl
