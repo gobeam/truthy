@@ -40,6 +40,7 @@
 - [File Structure](#file-structure)
 - [Application Security](#application-security)
 - [Contributing](#contributing)
+- [Sponsors](#sponsors)
 - [License](#license)
 - [Acknowledgement](#acknowledgement)
 
@@ -270,6 +271,12 @@ User Will have 2FA authentication option available to be turned on or off. For 2
 
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
 Please make sure to update tests as appropriate. - see `CONTRIBUTING.md` for details.
+**If you want to be featured in contributors list on our home page please add PR on https://github.com/gobeam/truthy-contributors to provide your details.**
+
+---
+
+## Sponsors
+- [Ekbana Solutions Pvt. Ltd](https://ekbana.com/)
 
 ---
 
