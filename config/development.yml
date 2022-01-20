@@ -1,10 +1,56 @@
+server:
+  port: 7777
+  origin: 'http://localhost:3000'
+
 db:
   host: 'localhost'
   type: 'postgres'
   port: 5432
+  database: 'truthy'
   username: 'postgres'
-  password: 'root'
+  password: ''
   synchronize: false
 
 jwt:
-  secret: 'example@123'
+  expiresIn: 900
+  refreshExpiresIn: 604800
+  cookieExpiresIn: 604800
+  secret: 'Rtya$#asdf@sdfsco123ejsd@@3#'
+
+app:
+  name: 'Truthy'
+  version: '0.2.0'
+  description: 'Official Truthy API'
+  appUrl: 'http://157.245.148.131:7777'
+  frontendUrl: 'http://157.245.148.131:3000'
+  sameSite: true
+
+mail:
+  host: 'in-v3.mailjet.com'
+  port: 587
+  user: 'e3818ebeda5d271f541c4925e12e60af'
+  pass: 'fd10758be28c2873ddf9e359644e873a'
+  from: 'alischettri83@gmail.com'
+  fromMail: 'alischettri83@gmail.com'
+  preview: false
+  secure: false
+  ignoreTLS: true
+  queueName: 'truthy-mail'
+
+queue:
+  driver: 'redis'
+  host: 'localhost'
+  port: 6379
+  db: ''
+  password: ''
+  username: ''
+
+throttle:
+  global:
+    ttl: 60
+    limit: 60
+  login:
+    prefix: 'login_fail_throttle'
+    limit: 5
+    duration: 2592000
+    blockDuration: 3000

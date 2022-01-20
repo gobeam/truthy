@@ -57,7 +57,7 @@ export class MailProcessor {
         to: job.data.payload.to,
         from: process.env.MAIL_FROM || mailConfig.fromMail,
         subject: job.data.payload.subject,
-        template: __dirname + `/../mail/templates/email/layouts/email-layout`,
+        template: 'email-layout',
         context: job.data.payload.context,
         attachments: job.data.payload.attachments
       };
