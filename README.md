@@ -21,8 +21,8 @@
 </p>
 
 <p align="center">
-  <sub>Check Live code deployed here:  Backend API Docs: <a href="https://truthy-backend.herokuapp.com/api-docs/">Swagger Docs</a>
-  Frontend: <a href="https://truthy-cms.herokuapp.com">Truthy CMS</a>
+  <sub>Check Live code deployed here:  Backend API Docs: <a href="http://157.245.148.131:7777/api-docs/">Swagger Docs</a>
+  Frontend: <a href="http://157.245.148.131:3000">Truthy CMS</a>
   </sub>
 </p>
 
