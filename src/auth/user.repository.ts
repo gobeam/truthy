@@ -1,14 +1,15 @@
 import { DeepPartial, EntityRepository } from 'typeorm';
-import { UserEntity } from './entity/user.entity';
 import * as bcrypt from 'bcrypt';
-import { UserLoginDto } from './dto/user-login.dto';
-import { BaseRepository } from '../common/repository/base.repository';
-import { UserSerializer } from './serializer/user.serializer';
 import { classToPlain, plainToClass } from 'class-transformer';
-import { ResetPasswordDto } from './dto/reset-password.dto';
-import { UserStatusEnum } from './user-status.enum';
-import { ExceptionTitleList } from '../common/constants/exception-title-list.constants';
-import { StatusCodesList } from '../common/constants/status-codes-list.constants';
+
+import { UserEntity } from 'src/auth/entity/user.entity';
+import { UserLoginDto } from 'src/auth/dto/user-login.dto';
+import { BaseRepository } from 'src/common/repository/base.repository';
+import { UserSerializer } from 'src/auth/serializer/user.serializer';
+import { ResetPasswordDto } from 'src/auth/dto/reset-password.dto';
+import { UserStatusEnum } from 'src/auth/user-status.enum';
+import { ExceptionTitleList } from 'src/common/constants/exception-title-list.constants';
+import { StatusCodesList } from 'src/common/constants/status-codes-list.constants';
 
 @EntityRepository(UserEntity)
 export class UserRepository extends BaseRepository<UserEntity, UserSerializer> {

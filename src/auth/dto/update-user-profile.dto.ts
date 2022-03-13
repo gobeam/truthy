@@ -1,6 +1,6 @@
 import { ApiPropertyOptional, OmitType } from '@nestjs/swagger';
-import { UpdateUserDto } from './update-user.dto';
 import { ValidateIf } from 'class-validator';
+import { UpdateUserDto } from 'src/auth/dto/update-user.dto';
 
 /**
  * update user profile transfer object

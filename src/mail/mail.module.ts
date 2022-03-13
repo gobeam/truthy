@@ -3,9 +3,10 @@ import { BullModule } from '@nestjs/bull';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { PugAdapter } from '@nestjs-modules/mailer/dist/adapters/pug.adapter';
 import * as config from 'config';
-import { MailService } from './mail.service';
-import { MailProcessor } from './mail.processor';
-import { EmailTemplateModule } from '../email-template/email-template.module';
+
+import { MailService } from 'src/mail/mail.service';
+import { MailProcessor } from 'src/mail/mail.processor';
+import { EmailTemplateModule } from 'src/email-template/email-template.module';
 
 const mailConfig = config.get('mail');
 const queueConfig = config.get('queue');

@@ -1,4 +1,4 @@
-import { UserEntity } from '../../auth/entity/user.entity';
+import { UserEntity } from 'src/auth/entity/user.entity';
 
 /**
  * sanitize user fields

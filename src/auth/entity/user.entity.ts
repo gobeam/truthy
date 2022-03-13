@@ -8,11 +8,12 @@ import {
   JoinColumn,
   OneToOne
 } from 'typeorm';
-import { UserStatusEnum } from '../user-status.enum';
 import * as bcrypt from 'bcrypt';
-import { CustomBaseEntity } from '../../common/entity/custom-base.entity';
-import { RoleEntity } from '../../roles/entities/role.entity';
 import { Exclude } from 'class-transformer';
+
+import { UserStatusEnum } from 'src/auth/user-status.enum';
+import { CustomBaseEntity } from 'src/common/entity/custom-base.entity';
+import { RoleEntity } from 'src/role/entities/role.entity';
 
 /**
  * User Entity

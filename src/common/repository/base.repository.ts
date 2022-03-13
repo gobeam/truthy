@@ -1,5 +1,4 @@
 import { plainToClass } from 'class-transformer';
-import { NotFoundException } from '../../exception/not-found.exception';
 import {
   DeepPartial,
   FindManyOptions,
@@ -8,10 +7,12 @@ import {
   Repository
 } from 'typeorm';
 import { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity';
-import { Pagination } from '../../paginate';
-import { PaginationInfoInterface } from '../../paginate/pagination-info.interface';
-import { SearchFilterInterface } from '../interfaces/search-filter.interface';
-import { ModelSerializer } from '../serializer/model.serializer';
+
+import { NotFoundException } from 'src/exception/not-found.exception';
+import { Pagination } from 'src/paginate';
+import { PaginationInfoInterface } from 'src/paginate/pagination-info.interface';
+import { SearchFilterInterface } from 'src/common/interfaces/search-filter.interface';
+import { ModelSerializer } from 'src/common/serializer/model.serializer';
 
 /**
  * Base Repository for code reuse

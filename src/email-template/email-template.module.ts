@@ -1,10 +1,11 @@
 import { forwardRef, Module } from '@nestjs/common';
-import { EmailTemplateService } from './email-template.service';
-import { EmailTemplateController } from './email-template.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { AuthModule } from '../auth/auth.module';
-import { UniqueValidatorPipe } from '../common/pipes/unique-validator.pipe';
-import { EmailTemplateRepository } from './email-template.repository';
+
+import { EmailTemplateService } from 'src/email-template/email-template.service';
+import { EmailTemplateController } from 'src/email-template/email-template.controller';
+import { AuthModule } from 'src/auth/auth.module';
+import { UniqueValidatorPipe } from 'src/common/pipes/unique-validator.pipe';
+import { EmailTemplateRepository } from 'src/email-template/email-template.repository';
 
 @Module({
   imports: [

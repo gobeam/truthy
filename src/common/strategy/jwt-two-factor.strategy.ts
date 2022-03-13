@@ -4,11 +4,12 @@ import { InjectRepository } from '@nestjs/typeorm';
 import * as config from 'config';
 import { Request } from 'express';
 import { ExtractJwt, Strategy } from 'passport-jwt';
-import { StatusCodesList } from '../../common/constants/status-codes-list.constants';
-import { CustomHttpException } from '../../exception/custom-http.exception';
-import { JwtPayloadDto } from '../../auth/dto/jwt-payload.dto';
-import { UserEntity } from '../../auth/entity/user.entity';
-import { UserRepository } from '../../auth/user.repository';
+
+import { StatusCodesList } from 'src/common/constants/status-codes-list.constants';
+import { CustomHttpException } from 'src/exception/custom-http.exception';
+import { JwtPayloadDto } from 'src/auth/dto/jwt-payload.dto';
+import { UserEntity } from 'src/auth/entity/user.entity';
+import { UserRepository } from 'src/auth/user.repository';
 
 @Injectable()
 export class JwtTwoFactorStrategy extends PassportStrategy(

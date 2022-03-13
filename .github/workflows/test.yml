@@ -1,0 +1,44 @@
+name: test
+
+on: push
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:14
+        env:
+          POSTGRES_DB: truthy_db
+          POSTGRES_USER: truthy_user
+          POSTGRES_PASSWORD: truthypwd
+        ports:
+          - 5432:5432
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: 14.3.0
+
+      - name: Set environment variables
+        uses: allenevans/set-env@v2.0.0
+        with:
+          NODE_ENV: test
+          DATABASE_HOST: 127.0.0.1
+          DATABASE_PORT: ${{ job.services.postgres.ports[5432] }}
+          DATABASE_NAME: truthy_db
+          DATABASE_USER: truthy_user
+          DATABASE_PASSWORD: truthypwd
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run linter
+        run: npm run lint
+
+      - name: Run unit test
+        run: npm run test:unit

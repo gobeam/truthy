@@ -1,17 +1,11 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { AuthModule } from './auth/auth.module';
-import { RolesModule } from './roles/roles.module';
-import { PermissionsModule } from './permissions/permissions.module';
-import * as ormConfig from './config/ormconfig';
-import * as throttleConfig from './config/throttle-config';
-import { MailModule } from './mail/mail.module';
-import { EmailTemplateModule } from './email-template/email-template.module';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { APP_FILTER, APP_GUARD, APP_PIPE } from '@nestjs/core';
-import { RefreshTokenModule } from './refresh-token/refresh-token.module';
 import * as path from 'path';
 import * as config from 'config';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 import {
   CookieResolver,
   HeaderResolver,
@@ -19,13 +13,21 @@ import {
   I18nModule,
   QueryResolver
 } from 'nestjs-i18n';
-import { I18nExceptionFilterPipe } from './common/pipes/i18n-exception-filter.pipe';
-import { CustomValidationPipe } from './common/pipes/custom-validation.pipe';
-import { TwofaModule } from './twofa/twofa.module';
-import { CustomThrottlerGuard } from './common/guard/custom-throttle.guard';
-import { DashboardModule } from './dashboard/dashboard.module';
-import { ServeStaticModule } from '@nestjs/serve-static';
-import { join } from 'path';
+
+import { AuthModule } from 'src/auth/auth.module';
+import { RolesModule } from 'src/role/roles.module';
+import { PermissionsModule } from 'src/permission/permissions.module';
+import * as ormConfig from 'src/config/ormconfig';
+import * as throttleConfig from 'src/config/throttle-config';
+import { MailModule } from 'src/mail/mail.module';
+import { EmailTemplateModule } from 'src/email-template/email-template.module';
+import { RefreshTokenModule } from 'src/refresh-token/refresh-token.module';
+import { I18nExceptionFilterPipe } from 'src/common/pipes/i18n-exception-filter.pipe';
+import { CustomValidationPipe } from 'src/common/pipes/custom-validation.pipe';
+import { TwofaModule } from 'src/twofa/twofa.module';
+import { CustomThrottlerGuard } from 'src/common/guard/custom-throttle.guard';
+import { DashboardModule } from 'src/dashboard/dashboard.module';
+import { AppController } from 'src/app.controller';
 
 const appConfig = config.get('app');
 
@@ -81,6 +83,7 @@ const appConfig = config.get('app');
       provide: APP_FILTER,
       useClass: I18nExceptionFilterPipe
     }
-  ]
+  ],
+  controllers: [AppController]
 })
 export class AppModule {}

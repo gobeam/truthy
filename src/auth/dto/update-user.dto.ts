@@ -1,6 +1,7 @@
 import { IsEmail, IsIn, IsString, ValidateIf } from 'class-validator';
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { UserStatusEnum } from '../user-status.enum';
+
+import { UserStatusEnum } from 'src/auth/user-status.enum';
 
 const statusEnumArray = [
   UserStatusEnum.ACTIVE,

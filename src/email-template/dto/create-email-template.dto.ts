@@ -8,8 +8,8 @@ import {
   MinLength,
   Validate
 } from 'class-validator';
-import { UniqueValidatorPipe } from '../../common/pipes/unique-validator.pipe';
-import { EmailTemplateEntity } from '../entities/email-template.entity';
+import { UniqueValidatorPipe } from 'src/common/pipes/unique-validator.pipe';
+import { EmailTemplateEntity } from 'src/email-template/entities/email-template.entity';
 
 export class CreateEmailTemplateDto {
   @IsNotEmpty()
