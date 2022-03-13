@@ -1,5 +1,5 @@
-import { CommonDtoInterface } from './common-dto.interface';
-import { Pagination } from '../../paginate';
+import { CommonDtoInterface } from 'src/common/interfaces/common-dto.interface';
+import { Pagination } from 'src/paginate';
 
 /**
  * common service interface

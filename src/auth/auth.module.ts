@@ -1,18 +1,19 @@
 import { Module } from '@nestjs/common';
-import { AuthController } from './auth.controller';
-import { AuthService } from './auth.service';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { UserRepository } from './user.repository';
 import { PassportModule } from '@nestjs/passport';
-import * as config from 'config';
-import { UniqueValidatorPipe } from '../common/pipes/unique-validator.pipe';
-import { MailModule } from '../mail/mail.module';
-import * as Redis from 'ioredis';
-import { RateLimiterRedis } from 'rate-limiter-flexible';
-import { RefreshTokenModule } from '../refresh-token/refresh-token.module';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { JwtModule } from '@nestjs/jwt';
-import { JwtTwoFactorStrategy } from '../common/strategy/jwt-two-factor.strategy';
-import { JwtStrategy } from '../common/strategy/jwt.strategy';
+import * as Redis from 'ioredis';
+import * as config from 'config';
+
+import { AuthController } from 'src/auth/auth.controller';
+import { AuthService } from 'src/auth/auth.service';
+import { UserRepository } from 'src/auth/user.repository';
+import { UniqueValidatorPipe } from 'src/common/pipes/unique-validator.pipe';
+import { MailModule } from 'src/mail/mail.module';
+import { RateLimiterRedis } from 'rate-limiter-flexible';
+import { RefreshTokenModule } from 'src/refresh-token/refresh-token.module';
+import { JwtTwoFactorStrategy } from 'src/common/strategy/jwt-two-factor.strategy';
+import { JwtStrategy } from 'src/common/strategy/jwt.strategy';
 
 const throttleConfig = config.get('throttle.login');
 const redisConfig = config.get('queue');

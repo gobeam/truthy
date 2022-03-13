@@ -3,10 +3,11 @@ import { ExtractJwt, Strategy } from 'passport-jwt';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as config from 'config';
-import { UserRepository } from '../../auth/user.repository';
-import { UserEntity } from '../../auth/entity/user.entity';
-import { JwtPayloadDto } from '../../auth/dto/jwt-payload.dto';
-import { UnauthorizedException } from '../../exception/unauthorized.exception';
+
+import { UserRepository } from 'src/auth/user.repository';
+import { UserEntity } from 'src/auth/entity/user.entity';
+import { JwtPayloadDto } from 'src/auth/dto/jwt-payload.dto';
+import { UnauthorizedException } from 'src/exception/unauthorized.exception';
 
 const cookieExtractor = (req) => {
   return req?.cookies?.Authentication;

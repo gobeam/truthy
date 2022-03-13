@@ -11,13 +11,14 @@ import {
   UseGuards
 } from '@nestjs/common';
 import { Request, Response } from 'express';
-import { AuthService } from '../auth/auth.service';
-import { UserEntity } from '../auth/entity/user.entity';
-import { GetUser } from '../common/decorators/get-user.decorator';
-import { JwtAuthGuard } from '../common/guard/jwt-auth.guard';
-import { TwofaCodeDto } from './dto/twofa-code.dto';
-import { TwoFaStatusUpdateDto } from './dto/twofa-status-update.dto';
-import { TwofaService } from './twofa.service';
+
+import { AuthService } from 'src/auth/auth.service';
+import { UserEntity } from 'src/auth/entity/user.entity';
+import { GetUser } from 'src/common/decorators/get-user.decorator';
+import { JwtAuthGuard } from 'src/common/guard/jwt-auth.guard';
+import { TwofaCodeDto } from 'src/twofa/dto/twofa-code.dto';
+import { TwoFaStatusUpdateDto } from 'src/twofa/dto/twofa-status-update.dto';
+import { TwofaService } from 'src/twofa/twofa.service';
 
 @Controller('twofa')
 export class TwofaController {

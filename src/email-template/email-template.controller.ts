@@ -11,15 +11,16 @@ import {
   Query,
   UseGuards
 } from '@nestjs/common';
-import { EmailTemplateService } from './email-template.service';
-import { CreateEmailTemplateDto } from './dto/create-email-template.dto';
-import { UpdateEmailTemplateDto } from './dto/update-email-template.dto';
 import { ApiTags } from '@nestjs/swagger';
-import { PermissionGuard } from '../common/guard/permission.guard';
-import { Pagination } from '../paginate';
-import { EmailTemplate } from './serializer/email-template.serializer';
-import { EmailTemplatesSearchFilterDto } from './dto/email-templates-search-filter.dto';
-import JwtTwoFactorGuard from '../common/guard/jwt-two-factor.guard';
+
+import { EmailTemplateService } from 'src/email-template/email-template.service';
+import { CreateEmailTemplateDto } from 'src/email-template/dto/create-email-template.dto';
+import { UpdateEmailTemplateDto } from 'src/email-template/dto/update-email-template.dto';
+import { PermissionGuard } from 'src/common/guard/permission.guard';
+import { Pagination } from 'src/paginate';
+import { EmailTemplate } from 'src/email-template/serializer/email-template.serializer';
+import { EmailTemplatesSearchFilterDto } from 'src/email-template/dto/email-templates-search-filter.dto';
+import JwtTwoFactorGuard from 'src/common/guard/jwt-two-factor.guard';
 
 @ApiTags('email-templates')
 @UseGuards(JwtTwoFactorGuard, PermissionGuard)

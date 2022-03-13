@@ -1,6 +1,6 @@
-import * as config from 'config';
 import { ThrottlerStorageRedisService } from 'nestjs-throttler-storage-redis';
 import { ThrottlerModuleOptions } from '@nestjs/throttler';
+import * as config from 'config';
 
 const throttleConfigVariables = config.get('throttle.global');
 const redisConfig = config.get('queue');

@@ -3,8 +3,8 @@ import { Observable } from 'rxjs';
 import {
   PermissionConfiguration,
   RoutePayloadInterface
-} from '../../config/permission-config';
-import { UserEntity } from '../../auth/entity/user.entity';
+} from 'src/config/permission-config';
+import { UserEntity } from 'src/auth/entity/user.entity';
 
 @Injectable()
 export class PermissionGuard implements CanActivate {

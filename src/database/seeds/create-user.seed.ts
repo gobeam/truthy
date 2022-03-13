@@ -1,8 +1,9 @@
 import { Factory } from 'typeorm-seeding';
 import { Connection } from 'typeorm';
-import { UserEntity } from '../../auth/entity/user.entity';
-import { UserStatusEnum } from '../../auth/user-status.enum';
-import { RoleEntity } from '../../roles/entities/role.entity';
+
+import { UserEntity } from 'src/auth/entity/user.entity';
+import { UserStatusEnum } from 'src/auth/user-status.enum';
+import { RoleEntity } from 'src/role/entities/role.entity';
 
 export default class CreateUserSeed {
   public async run(factory: Factory, connection: Connection): Promise<any> {

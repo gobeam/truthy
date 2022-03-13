@@ -19,26 +19,27 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiTags } from '@nestjs/swagger';
 import { Request, Response } from 'express';
 import { UAParser } from 'ua-parser-js';
-import { GetUser } from '../common/decorators/get-user.decorator';
-import JwtTwoFactorGuard from '../common/guard/jwt-two-factor.guard';
-import { PermissionGuard } from '../common/guard/permission.guard';
-import { multerOptionsHelper } from '../common/helper/multer-options.helper';
-import { Pagination } from '../paginate';
-import { RefreshToken } from '../refresh-token/entities/refresh-token.entity';
-import { AuthService } from './auth.service';
-import { ChangePasswordDto } from './dto/change-password.dto';
-import { CreateUserDto } from './dto/create-user.dto';
-import { ForgetPasswordDto } from './dto/forget-password.dto';
-import { RegisterUserDto } from './dto/register-user.dto';
-import { ResetPasswordDto } from './dto/reset-password.dto';
-import { UpdateUserProfileDto } from './dto/update-user-profile.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
-import { UserLoginDto } from './dto/user-login.dto';
-import { UserSearchFilterDto } from './dto/user-search-filter.dto';
-import { UserEntity } from './entity/user.entity';
-import { UserSerializer } from './serializer/user.serializer';
-import { RefreshPaginateFilterDto } from '../refresh-token/dto/refresh-paginate-filter.dto';
-import { RefreshTokenSerializer } from '../refresh-token/serializer/refresh-token.serializer';
+
+import { GetUser } from 'src/common/decorators/get-user.decorator';
+import JwtTwoFactorGuard from 'src/common/guard/jwt-two-factor.guard';
+import { PermissionGuard } from 'src/common/guard/permission.guard';
+import { multerOptionsHelper } from 'src/common/helper/multer-options.helper';
+import { Pagination } from 'src/paginate';
+import { RefreshToken } from 'src/refresh-token/entities/refresh-token.entity';
+import { AuthService } from 'src/auth/auth.service';
+import { ChangePasswordDto } from 'src/auth/dto/change-password.dto';
+import { CreateUserDto } from 'src/auth/dto/create-user.dto';
+import { ForgetPasswordDto } from 'src/auth/dto/forget-password.dto';
+import { RegisterUserDto } from 'src/auth/dto/register-user.dto';
+import { ResetPasswordDto } from 'src/auth/dto/reset-password.dto';
+import { UpdateUserProfileDto } from 'src/auth/dto/update-user-profile.dto';
+import { UpdateUserDto } from 'src/auth/dto/update-user.dto';
+import { UserLoginDto } from 'src/auth/dto/user-login.dto';
+import { UserSearchFilterDto } from 'src/auth/dto/user-search-filter.dto';
+import { UserEntity } from 'src/auth/entity/user.entity';
+import { UserSerializer } from 'src/auth/serializer/user.serializer';
+import { RefreshPaginateFilterDto } from 'src/refresh-token/dto/refresh-paginate-filter.dto';
+import { RefreshTokenSerializer } from 'src/refresh-token/serializer/refresh-token.serializer';
 
 @ApiTags('user')
 @Controller()

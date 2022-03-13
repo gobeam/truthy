@@ -1,5 +1,4 @@
 import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
 import { Logger, ValidationPipe } from '@nestjs/common';
 import { useContainer } from 'class-validator';
 import * as config from 'config';
@@ -9,6 +8,8 @@ import {
   SwaggerModule
 } from '@nestjs/swagger';
 import * as cookieParser from 'cookie-parser';
+
+import { AppModule } from 'src/app.module';
 
 async function bootstrap() {
   const logger = new Logger('bootstrap');

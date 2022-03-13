@@ -2,9 +2,10 @@ import { HttpStatus } from '@nestjs/common';
 import { existsSync, mkdirSync } from 'fs';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
-import { CustomHttpException } from '../../exception/custom-http.exception';
 import { v4 as uuid } from 'uuid';
-import { StatusCodesList } from '../constants/status-codes-list.constants';
+
+import { CustomHttpException } from 'src/exception/custom-http.exception';
+import { StatusCodesList } from 'src/common/constants/status-codes-list.constants';
 
 export const multerOptionsHelper = (
   destinationPath: string,

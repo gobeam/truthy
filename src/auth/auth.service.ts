@@ -9,39 +9,40 @@ import { InjectRepository } from '@nestjs/typeorm';
 import * as config from 'config';
 import { existsSync, unlinkSync } from 'fs';
 import { SignOptions } from 'jsonwebtoken';
+import { DeepPartial, Not, ObjectLiteral } from 'typeorm';
 import {
   RateLimiterRes,
   RateLimiterStoreAbstract
 } from 'rate-limiter-flexible';
-import { ExceptionTitleList } from '../common/constants/exception-title-list.constants';
-import { StatusCodesList } from '../common/constants/status-codes-list.constants';
-import { ForbiddenException } from '../exception/forbidden.exception';
-import { NotFoundException } from '../exception/not-found.exception';
-import { UnauthorizedException } from '../exception/unauthorized.exception';
-import { DeepPartial, Not, ObjectLiteral } from 'typeorm';
-import { CustomHttpException } from '../exception/custom-http.exception';
-import { MailJobInterface } from '../mail/interface/mail-job.interface';
-import { MailService } from '../mail/mail.service';
-import { Pagination } from '../paginate';
-import { RefreshToken } from '../refresh-token/entities/refresh-token.entity';
-import { RefreshTokenService } from '../refresh-token/refresh-token.service';
-import { ChangePasswordDto } from './dto/change-password.dto';
-import { ForgetPasswordDto } from './dto/forget-password.dto';
-import { ResetPasswordDto } from './dto/reset-password.dto';
-import { UserLoginDto } from './dto/user-login.dto';
-import { UserSearchFilterDto } from './dto/user-search-filter.dto';
-import { UserEntity } from './entity/user.entity';
+
+import { ExceptionTitleList } from 'src/common/constants/exception-title-list.constants';
+import { StatusCodesList } from 'src/common/constants/status-codes-list.constants';
+import { ForbiddenException } from 'src/exception/forbidden.exception';
+import { NotFoundException } from 'src/exception/not-found.exception';
+import { UnauthorizedException } from 'src/exception/unauthorized.exception';
+import { CustomHttpException } from 'src/exception/custom-http.exception';
+import { MailJobInterface } from 'src/mail/interface/mail-job.interface';
+import { MailService } from 'src/mail/mail.service';
+import { Pagination } from 'src/paginate';
+import { RefreshToken } from 'src/refresh-token/entities/refresh-token.entity';
+import { RefreshTokenService } from 'src/refresh-token/refresh-token.service';
+import { ChangePasswordDto } from 'src/auth/dto/change-password.dto';
+import { ForgetPasswordDto } from 'src/auth/dto/forget-password.dto';
+import { ResetPasswordDto } from 'src/auth/dto/reset-password.dto';
+import { UserLoginDto } from 'src/auth/dto/user-login.dto';
+import { UserSearchFilterDto } from 'src/auth/dto/user-search-filter.dto';
+import { UserEntity } from 'src/auth/entity/user.entity';
 import {
   adminUserGroupsForSerializing,
   defaultUserGroupsForSerializing,
   ownerUserGroupsForSerializing,
   UserSerializer
-} from './serializer/user.serializer';
-import { UserStatusEnum } from './user-status.enum';
-import { UserRepository } from './user.repository';
-import { ValidationPayloadInterface } from '../common/interfaces/validation-error.interface';
-import { RefreshPaginateFilterDto } from '../refresh-token/dto/refresh-paginate-filter.dto';
-import { RefreshTokenSerializer } from '../refresh-token/serializer/refresh-token.serializer';
+} from 'src/auth/serializer/user.serializer';
+import { UserStatusEnum } from 'src/auth/user-status.enum';
+import { UserRepository } from 'src/auth/user.repository';
+import { ValidationPayloadInterface } from 'src/common/interfaces/validation-error.interface';
+import { RefreshPaginateFilterDto } from 'src/refresh-token/dto/refresh-paginate-filter.dto';
+import { RefreshTokenSerializer } from 'src/refresh-token/serializer/refresh-token.serializer';
 
 const throttleConfig = config.get('throttle.login');
 const jwtConfig = config.get('jwt');
