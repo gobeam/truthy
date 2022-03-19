@@ -137,7 +137,10 @@ export class AuthController {
   @UseGuards(JwtTwoFactorGuard)
   @Put('/auth/profile')
   @UseInterceptors(
-    FileInterceptor('avatar', multerOptionsHelper('images/profile', 1000000))
+    FileInterceptor(
+      'avatar',
+      multerOptionsHelper('public/images/profile', 1000000)
+    )
   )
   updateProfile(
     @GetUser()

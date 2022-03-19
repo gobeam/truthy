@@ -6,7 +6,9 @@ db:
   host: 'localhost'
   type: 'postgres'
   port: 5432
-  database: 'truthy'
+  username: 'postgres'
+  password: 'root'
+  synchronize: false
 
 jwt:
   # expiresIn: 10
@@ -55,3 +57,11 @@ throttle:
 
 twofa:
   authenticationAppNAme: 'truthy'
+
+winston:
+  groupName: 'truthy'
+  streamName: 'truthy-stream'
+  awsAccessKeyId: ''
+  awsSecretAccessKey: ''
+  awsRegion: ''
+  
