@@ -9,6 +9,7 @@
 <br>
 <p align="center">
 <img alt="GitHub package.json version" src="https://img.shields.io/github/package-json/v/gobeam/truthy">
+<img alt="Workflow test" src="https://github.com/gobeam/truthy/actions/workflows/test.yml/badge.svg">
 <img alt="GitHub" src="https://img.shields.io/github/license/gobeam/truthy">
 <img alt="Lines of code" src="https://img.shields.io/tokei/lines/github/gobeam/truthy">
 <img src='https://www.codetriage.com/gobeam/truthy/badges/users.svg' alt='Open Source Helpers' />
