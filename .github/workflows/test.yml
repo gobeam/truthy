@@ -35,11 +35,12 @@ jobs:
         uses: allenevans/set-env@v2.0.0
         with:
           NODE_ENV: test
-          DATABASE_HOST: 127.0.0.1
-          DATABASE_PORT: ${{ job.services.postgres.ports[5432] }}
-          DATABASE_NAME: truthy_db
-          DATABASE_USER: truthy_user
-          DATABASE_PASSWORD: truthypwd
+          DB_TYPE: postgres
+          DB_HOST: 127.0.0.1
+          DB_PORT: ${{ job.services.postgres.ports[5432] }}
+          DB_DATABASE_NAME: truthy_db
+          DB_USERNAME: truthy_user
+          DB_PASSWORD: truthypwd
 
       - name: Install dependencies
         run: npm install
