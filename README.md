@@ -1,5 +1,5 @@
 <div align="center">
-<img src="./images/logo.svg" alt="Truthy Logo">
+<img src="./public/images/logo.svg" alt="Truthy Logo">
 </div><br>
 <h1 align="center">
   Truthy CMS (NestJS Headless API)

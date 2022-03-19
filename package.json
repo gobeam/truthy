@@ -20,15 +20,15 @@
     "test:watch": "jest --config ./test/unit/jest-unit.json --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/e2e/jest-e2e.json --runInBand",
+    "test:e2e": "jest --config ./test/e2e/jest-e2e.json",
     "test:unit": "jest --config ./test/unit/jest-unit.json --runInBand",
     "typeorm": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js --config src/config/ormconfig.ts",
     "orm-create": "npm run typeorm migration:create -- -n",
     "migrate": "npm run typeorm migration:run",
     "migration:rollback": "npm run typeorm migration:revert",
     "seed": "ts-node ./node_modules/typeorm-seeding/dist/cli.js seed -n ./src/config/ormconfig.ts",
-    "precommit": "lint-staged && npm run lint && npm run test:unit",
-    "prepush": "npm run test:unit",
+    "precommit": "lint-staged && npm run lint && npm run test:unit && npm run test:e2e",
+    "prepush": "npm run test:unit && npm run test:e2e",
     "prepare": "husky install"
   },
   "dependencies": {
@@ -45,6 +45,7 @@
     "@nestjs/throttler": "^2.0.0",
     "@nestjs/typeorm": "^8.0.3",
     "@types/cookie-parser": "^1.4.2",
+    "aws-sdk": "^2.1092.0",
     "bcrypt": "^5.0.0",
     "bull": "^4.2.1",
     "class-transformer": "^0.5.1",
@@ -53,6 +54,7 @@
     "cookie-parser": "^1.4.6",
     "coveralls": "^3.1.1",
     "ioredis": "^4.28.3",
+    "nest-winston": "^1.6.2",
     "nestjs-i18n": "^8.2.2",
     "nestjs-throttler-storage-redis": "^0.1.18",
     "nodemailer": "^6.7.2",
@@ -69,7 +71,9 @@
     "typeorm": "^0.2.41",
     "typeorm-seeding": "^1.6.1",
     "ua-parser-js": "^1.0.2",
-    "uuid": "^8.3.2"
+    "uuid": "^8.3.2",
+    "winston": "^3.6.0",
+    "winston-cloudwatch": "^3.1.1"
   },
   "devDependencies": {
     "@commitlint/cli": "^16.0.2",

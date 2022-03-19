@@ -13,6 +13,7 @@ import {
   I18nModule,
   QueryResolver
 } from 'nestjs-i18n';
+import { WinstonModule } from 'nest-winston';
 
 import { AuthModule } from 'src/auth/auth.module';
 import { RolesModule } from 'src/role/roles.module';
@@ -28,11 +29,13 @@ import { TwofaModule } from 'src/twofa/twofa.module';
 import { CustomThrottlerGuard } from 'src/common/guard/custom-throttle.guard';
 import { DashboardModule } from 'src/dashboard/dashboard.module';
 import { AppController } from 'src/app.controller';
+import winstonConfig from 'src/config/winston';
 
 const appConfig = config.get('app');
 
 @Module({
   imports: [
+    WinstonModule.forRoot(winstonConfig),
     ThrottlerModule.forRootAsync({
       useFactory: () => throttleConfig
     }),
@@ -58,7 +61,7 @@ const appConfig = config.get('app');
       ]
     }),
     ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', 'images'),
+      rootPath: join(__dirname, '..', 'public'),
       exclude: ['/api*']
     }),
     AuthModule,

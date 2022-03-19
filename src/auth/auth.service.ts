@@ -309,9 +309,9 @@ export class AuthService {
       throw new UnprocessableEntityException(errorPayload);
     }
     if (updateUserDto.avatar && user.avatar) {
-      const path = `images/profile/${user.avatar}`;
+      const path = `public/images/profile/${user.avatar}`;
       if (existsSync(path)) {
-        unlinkSync(`images/profile/${user.avatar}`);
+        unlinkSync(`public/images/profile/${user.avatar}`);
       }
     }
     return this.userRepository.updateEntity(user, updateUserDto);
