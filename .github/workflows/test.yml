@@ -5,11 +5,6 @@ on: push
 jobs:   
   test:
     runs-on: ubuntu-latest
-    steps:
-      - name: Set Environment Variables
-        uses: ./.github/actions/setvars
-        with:
-          varFilePath: ./.github/variables/myvars.env
 
     services:
       postgres:
@@ -36,16 +31,10 @@ jobs:
         with:
           node-version: 14.3.0
 
-      - name: Set environment variables
-        uses: allenevans/set-env@v2.0.0
+      - name: Set Environment Variables
+        uses: ./.github/actions/setvars
         with:
-          NODE_ENV: test
-          DB_TYPE: postgres
-          DB_HOST: 127.0.0.1
-          DB_PORT: ${{ job.services.postgres.ports[5432] }}
-          DB_DATABASE_NAME: truthy_db
-          DB_USERNAME: truthy_user
-          DB_PASSWORD: truthypwd
+          varFilePath: ./.github/variables/myvars.env
 
       - name: Install dependencies
         run: npm install
