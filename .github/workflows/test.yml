@@ -2,6 +2,15 @@ name: test
 
 on: push
 
+# set env variables
+deploy:
+  runs-on: ubuntu-latest
+  steps:
+    - name: Set Environment Variables
+      uses: ./.github/actions/setvars
+      with:
+        varFilePath: ./.github/variables/myvars.env
+
 jobs:
   test:
     runs-on: ubuntu-latest
