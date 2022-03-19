@@ -4,12 +4,12 @@ on: push
 
 jobs:
   deploy:
-  runs-on: ubuntu-latest
-  steps:
-    - name: Set Environment Variables
-      uses: ./.github/actions/setvars
-      with:
-        varFilePath: ./.github/variables/myvars.env
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set Environment Variables
+        uses: ./.github/actions/setvars
+        with:
+          varFilePath: ./.github/variables/myvars.env
         
   test:
     runs-on: ubuntu-latest
