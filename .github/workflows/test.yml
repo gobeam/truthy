@@ -2,17 +2,14 @@ name: test
 
 on: push
 
-jobs:
-  deploy:
+jobs:   
+  test:
     runs-on: ubuntu-latest
     steps:
       - name: Set Environment Variables
         uses: ./.github/actions/setvars
         with:
           varFilePath: ./.github/variables/myvars.env
-        
-  test:
-    runs-on: ubuntu-latest
 
     services:
       postgres:
