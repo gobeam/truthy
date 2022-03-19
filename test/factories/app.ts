@@ -121,6 +121,20 @@ const setupRedis = async () => {
 
 const setupTestDatabase = async () => {
   const database = `test_${uuid4()}`;
+  console.log('🚀 ~ file: app.ts ~ line 124 ~ setupTestDatabase ~ database', {
+    type: dbConfig.type,
+    host: process.env.DB_HOST || dbConfig.host,
+    port: parseInt(process.env.DB_PORT) || dbConfig.port,
+    database: process.env.DB_DATABASE_NAME || dbConfig.database,
+    username: process.env.DB_USERNAME || dbConfig.username,
+    password: process.env.DB_PASSWORD || dbConfig.password,
+    logging: false,
+    synchronize: false,
+    migrationsRun: true,
+    migrationsTableName: 'migrations',
+    migrations: [__dirname + '/../../src/database/migrations/**/*{.ts,.js}'],
+    entities: [__dirname + '/../../src/**/*.entity{.ts,.js}']
+  });
   const manager = new ConnectionManager().create({
     type: dbConfig.type,
     host: process.env.DB_HOST || dbConfig.host,
