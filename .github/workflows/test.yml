@@ -2,7 +2,7 @@ name: test
 
 on: push
 
-jobs:
+jobs:   
   test:
     runs-on: ubuntu-latest
 
@@ -15,6 +15,7 @@ jobs:
           POSTGRES_PASSWORD: truthypwd
         ports:
           - 5432:5432
+
       redis:
         image: redis
         options: >-
@@ -22,6 +23,8 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
+        ports:
+          - 6379:6379
 
     steps:
       - uses: actions/checkout@v2
@@ -31,15 +34,10 @@ jobs:
         with:
           node-version: 14.3.0
 
-      - name: Set environment variables
-        uses: allenevans/set-env@v2.0.0
+      - name: Set Environment Variables
+        uses: ./.github/actions/setvars
         with:
-          NODE_ENV: test
-          DATABASE_HOST: 127.0.0.1
-          DATABASE_PORT: ${{ job.services.postgres.ports[5432] }}
-          DATABASE_NAME: truthy_db
-          DATABASE_USER: truthy_user
-          DATABASE_PASSWORD: truthypwd
+          varFilePath: ./.github/variables/myvars.env
 
       - name: Install dependencies
         run: npm install
@@ -49,3 +47,6 @@ jobs:
 
       - name: Run unit test
         run: npm run test:unit
+
+      - name: Run e2e test
+        run: npm run test:e2e

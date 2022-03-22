@@ -1,7 +1,7 @@
 import { Factory } from 'typeorm-seeding';
 import { Connection } from 'typeorm';
 
-import { templates } from 'src/config/email-template-data';
+import * as templates from 'src/config/email-template';
 import { EmailTemplateEntity } from 'src/email-template/entities/email-template.entity';
 
 export default class CreateEmailTemplateSeed {

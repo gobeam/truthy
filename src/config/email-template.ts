@@ -42,4 +42,4 @@ const templates: Array<EmailTemplateData> = [
   }
 ];
 
-export { templates };
+export = templates;

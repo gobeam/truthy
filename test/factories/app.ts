@@ -114,7 +114,10 @@ export class AppFactory {
 }
 
 const setupRedis = async () => {
-  const redis = new Redis({});
+  const redis = new Redis({
+    host: process.env.REDIS_HOST || 'localhost',
+    port: parseInt(process.env.REDIS_PORT) || 6379
+  });
   await redis.flushall();
   return redis;
 };
