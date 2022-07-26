@@ -212,12 +212,17 @@ export class AuthController {
     @Res()
     response: Response
   ) {
-    const refreshCookie = req.cookies['Refresh'];
-    if (refreshCookie) {
-      await this.authService.revokeRefreshToken(req.cookies['Refresh']);
+    try {
+      const cookie = req.cookies['Refresh'];
+      response.setHeader('Set-Cookie', this.authService.getCookieForLogOut());
+      const refreshCookie = req.cookies['Refresh'];
+      if (refreshCookie) {
+        await this.authService.revokeRefreshToken(cookie);
+      }
+      return response.sendStatus(HttpStatus.NO_CONTENT);
+    } catch (e) {
+      return response.sendStatus(HttpStatus.NO_CONTENT);
     }
-    response.setHeader('Set-Cookie', this.authService.getCookieForLogOut());
-    return response.sendStatus(HttpStatus.NO_CONTENT);
   }
 
   @UseGuards(JwtTwoFactorGuard)

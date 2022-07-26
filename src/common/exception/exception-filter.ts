@@ -3,13 +3,19 @@ import {
   ArgumentsHost,
   Catch,
   ExceptionFilter,
-  HttpException
+  HttpException,
+  Inject
 } from '@nestjs/common';
 import { Response } from 'express';
+import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
+import { Logger } from 'winston';
 
 @Catch(HttpException)
 export class CommonExceptionFilter implements ExceptionFilter {
-  constructor(private readonly i18n: I18nService) {}
+  constructor(
+    @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
+    private readonly i18n: I18nService
+  ) {}
 
   async catch(exception: HttpException, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
@@ -24,6 +30,12 @@ export class CommonExceptionFilter implements ExceptionFilter {
     message = await this.i18n.translate(message.key, {
       lang: ctx.getRequest().i18nLang,
       args: message.args
+    });
+
+    this.logger.error('Error: ', {
+      meta: {
+        error: message
+      }
     });
 
     response.status(statusCode).json({
