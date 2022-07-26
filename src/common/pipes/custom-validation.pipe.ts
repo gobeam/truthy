@@ -15,7 +15,7 @@ export class CustomValidationPipe implements PipeTransform<any> {
     }
     const object = plainToClass(metatype, value);
     const errors = await validate(object);
-    if (errors.length > 0) {
+    if (errors && errors.length > 0) {
       const translatedError = await this.transformError(errors);
       throw new UnprocessableEntityException(translatedError);
     }
