@@ -3,13 +3,13 @@ name: test
 on: push
 
 env:
-  NODE_ENV=test
-  DB_TYPE=postgres
-  DB_HOST=localhost
-  DB_PORT=5432
-  DB_DATABASE_NAME=truthy_db
-  DB_USERNAME=truthy_user
-  DB_PASSWORD=truthypwd
+  NODE_ENV: test
+  DB_TYPE: postgres
+  DB_HOST: localhost
+  DB_PORT: 5432
+  DB_DATABASE_NAME: truthy_db
+  DB_USERNAME: truthy_user
+  DB_PASSWORD: truthypwd
 
 jobs:   
   test:
