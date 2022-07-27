@@ -4,7 +4,6 @@ import { Test } from '@nestjs/testing';
 import { Connection, ConnectionManager, QueryRunner } from 'typeorm';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { useContainer as classValidatorUseContainer } from 'class-validator';
-import { v4 as uuid4 } from 'uuid';
 import { ThrottlerStorageRedisService } from 'nestjs-throttler-storage-redis';
 import * as Redis from 'ioredis';
 import * as config from 'config';
@@ -47,18 +46,6 @@ export class AppFactory {
             };
           }
         })
-        // createMockModule([
-        //   {
-        //     provide: ThrottlerModule,
-        //     useFactory: () => {
-        //       return {
-        //         ttl: jest.fn(),
-        //         limit: jest.fn(),
-        //         storage: jest.fn()
-        //       };
-        //     }
-        //   }
-        // ])
       ]
     })
       .overrideProvider('LOGIN_THROTTLE')
@@ -123,12 +110,12 @@ const setupRedis = async () => {
 };
 
 const setupTestDatabase = async () => {
-  const database = `test_${uuid4()}`;
+  const database = process.env.DB_DATABASE_NAME || dbConfig.database;
   const manager = new ConnectionManager().create({
     type: dbConfig.type,
     host: process.env.DB_HOST || dbConfig.host,
     port: parseInt(process.env.DB_PORT) || dbConfig.port,
-    database: process.env.DB_DATABASE_NAME || dbConfig.database,
+    database,
     username: process.env.DB_USERNAME || dbConfig.username,
     password: process.env.DB_PASSWORD || dbConfig.password,
     logging: false,
