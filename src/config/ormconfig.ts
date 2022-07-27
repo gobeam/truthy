@@ -1,5 +1,13 @@
 import { ConnectionOptions } from 'typeorm';
 import * as config from 'config';
+console.log('🚀 ~ file: ormconfig.ts ~ line 3 ~ config', {
+  type: process.env.DB_TYPE,
+  host: process.env.DB_HOST,
+  port: process.env.DB_PORT,
+  username: process.env.DB_USERNAME,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_DATABASE_NAME
+});
 
 const dbConfig = config.get('db');
 const ormConfig: ConnectionOptions = {
