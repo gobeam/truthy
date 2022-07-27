@@ -94,7 +94,7 @@ export class AppFactory {
 
   async close() {
     await this.appInstance.close();
-    await this.queryRunner.query(`DROP DATABASE "${this.database}"`);
+    // await this.queryRunner.query(`DROP DATABASE "${this.database}"`);
     await this.teardown(this.redis);
     await this.connection.close();
   }
@@ -122,8 +122,8 @@ const setupTestDatabase = async () => {
     synchronize: false,
     migrationsRun: true,
     migrationsTableName: 'migrations',
-    entities: [__dirname + '/../../**/*.entity.{js,ts}'],
-    migrations: [__dirname + '/../../database/migrations/**/*{.ts,.js}']
+    migrations: [__dirname + '/../../src/database/migrations/**/*{.ts,.js}'],
+    entities: [__dirname + '/../../src/**/*.entity{.ts,.js}']
   });
 
   const queryRunner = manager.createQueryRunner();
