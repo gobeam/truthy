@@ -34,7 +34,7 @@ export class AppFactory {
         AppModule,
         TypeOrmModule.forRoot({
           ...connection.options,
-          type: dbConfig.type,
+          type: dbConfig.type || 'postgres',
           database
         }),
         ThrottlerModule.forRootAsync({
@@ -129,7 +129,7 @@ const setupTestDatabase = async () => {
   const queryRunner = manager.createQueryRunner();
   const connection = await manager.connect();
 
-  await queryRunner.createDatabase(database, true);
+  // await queryRunner.createDatabase(database, true);
 
   return { database, connection, queryRunner };
 };
