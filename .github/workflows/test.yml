@@ -6,6 +6,15 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
+    env:
+      NODE_ENV=test
+      DB_TYPE=postgres
+      DB_HOST=localhost
+      DB_PORT=5432
+      DB_DATABASE_NAME=truthy_db
+      DB_USERNAME=truthy_user
+      DB_PASSWORD=truthypwd
+
     services:
       postgres:
         image: postgres:14
