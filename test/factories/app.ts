@@ -122,8 +122,8 @@ const setupTestDatabase = async () => {
     synchronize: false,
     migrationsRun: true,
     migrationsTableName: 'migrations',
-    migrations: [__dirname + '/../../src/database/migrations/**/*{.ts,.js}'],
-    entities: [__dirname + '/../../src/**/*.entity{.ts,.js}']
+    entities: [__dirname + '/../../**/*.entity.{js,ts}'],
+    migrations: [__dirname + '/../../database/migrations/**/*{.ts,.js}']
   });
 
   const queryRunner = manager.createQueryRunner();
