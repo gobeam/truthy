@@ -2,15 +2,6 @@ name: test
 
 on: push
 
-env:
-  NODE_ENV: test
-  DB_TYPE: postgres
-  DB_HOST: localhost
-  DB_PORT: 5432
-  DB_DATABASE_NAME: truthy_db
-  DB_USERNAME: truthy_user
-  DB_PASSWORD: truthypwd
-
 jobs:   
   test:
     runs-on: ubuntu-latest
@@ -53,6 +44,9 @@ jobs:
 
       - name: Run linter
         run: npm run lint
+
+      - name: Run migration
+        run: npm run migrate
 
       - name: Run unit test
         run: npm run test:unit
