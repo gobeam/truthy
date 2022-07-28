@@ -40,9 +40,9 @@ jobs:
           NODE_ENV: test
           DB_HOST: 127.0.0.1
           DB_PORT: ${{ job.services.postgres.ports[5432] }}
-          DB_DATABASE_NAME: folio_db
-          DB_USERNAME: folio_user
-          DB_PASSWORD: folio_password
+          DB_DATABASE_NAME: truthy_db
+          DB_USERNAME: truthy_user
+          DB_PASSWORD: truthy_password
 
       - name: Install dependencies
         run: npm install
