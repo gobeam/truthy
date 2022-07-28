@@ -94,7 +94,7 @@ export class AppFactory {
 
   async close() {
     await this.appInstance.close();
-    // await this.queryRunner.query(`DROP DATABASE "${this.database}"`);
+    // await this.queryRunner.query(`TRUNCATE DATABASE "${this.database}"`);
     await this.teardown(this.redis);
     await this.connection.close();
   }
@@ -111,20 +111,6 @@ const setupRedis = async () => {
 
 const setupTestDatabase = async () => {
   const database = process.env.DB_DATABASE_NAME || dbConfig.database;
-  console.log({
-    type: dbConfig.type,
-    host: process.env.DB_HOST || dbConfig.host,
-    port: parseInt(process.env.DB_PORT) || dbConfig.port,
-    database,
-    username: process.env.DB_USERNAME || dbConfig.username,
-    password: process.env.DB_PASSWORD || dbConfig.password,
-    logging: false,
-    synchronize: false,
-    migrationsRun: true,
-    migrationsTableName: 'migrations',
-    entities: [__dirname + '/../../**/*.entity.{js,ts}'],
-    migrations: [__dirname + '/../../database/migrations/**/*{.ts,.js}']
-  })
   const manager = new ConnectionManager().create({
     type: dbConfig.type,
     host: process.env.DB_HOST || dbConfig.host,
@@ -136,14 +122,12 @@ const setupTestDatabase = async () => {
     synchronize: false,
     migrationsRun: true,
     migrationsTableName: 'migrations',
-    entities: [__dirname + '/../../**/*.entity.{js,ts}'],
-    migrations: [__dirname + '/../../database/migrations/**/*{.ts,.js}']
+    migrations: [__dirname + '/../../src/migrations/**/*{.ts,.js}'],
+    entities: [__dirname + '/../../src/**/*.entity{.ts,.js}']
   });
 
   const queryRunner = manager.createQueryRunner();
   const connection = await manager.connect();
-
-  // await queryRunner.createDatabase(database, true);
 
   return { database, connection, queryRunner };
 };

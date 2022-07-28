@@ -12,7 +12,7 @@ jobs:
         env:
           POSTGRES_DB: truthy_db
           POSTGRES_USER: truthy_user
-          POSTGRES_PASSWORD: truthypwd
+          POSTGRES_PASSWORD: truthy_password
         ports:
           - 5432:5432
 
@@ -34,10 +34,15 @@ jobs:
         with:
           node-version: 14.3.0
 
-      - name: Set Environment Variables
-        uses: ./.github/actions/setvars
+      - name: Set environment variables
+        uses: allenevans/set-env@v2.0.0
         with:
-          varFilePath: ./.github/variables/myvars.env
+          NODE_ENV: test
+          DB_HOST: 127.0.0.1
+          DB_PORT: ${{ job.services.postgres.ports[5432] }}
+          DB_DATABASE_NAME: folio_db
+          DB_USERNAME: folio_user
+          DB_PASSWORD: folio_password
 
       - name: Install dependencies
         run: npm install
