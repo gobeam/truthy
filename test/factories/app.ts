@@ -141,8 +141,6 @@ const setupTestDatabase = async () => {
 
   const queryRunner = manager.createQueryRunner();
   const connection = await manager.connect();
-
   await queryRunner.createDatabase(database, true);
-
   return { database, connection, queryRunner };
 };
