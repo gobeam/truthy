@@ -1,4 +1,4 @@
-import { BaseEntity, Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { BaseEntity, Column, Entity, Index, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity({
   name: 'refresh_token'
@@ -16,10 +16,16 @@ export class RefreshToken extends BaseEntity {
   @Column()
   userAgent: string;
 
-  @Column()
+  @Index()
+  @Column({
+    nullable: true
+  })
   browser: string;
 
-  @Column()
+  @Index()
+  @Column({
+    nullable: true
+  })
   os: string;
 
   @Column()

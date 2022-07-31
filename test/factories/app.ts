@@ -127,9 +127,7 @@ const dbConfiguration = {
   password: process.env.DB_PASSWORD || dbConfig.password,
   logging: false,
   keepConnectionAlive: true,
-  synchronize: false,
-  migrationsRun: false,
-  migrationsTableName: 'migrations',
-  migrations: [__dirname + '/../../src/migrations/**/*{.ts,.js}'],
+  synchronize: process.env.NODE_ENV === 'test',
+  dropSchema: process.env.NODE_ENV === 'test',
   entities: [__dirname + '/../../src/**/*.entity{.ts,.js}']
 } as TypeOrmModuleOptions;
