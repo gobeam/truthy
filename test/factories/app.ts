@@ -5,11 +5,14 @@ import { Connection, ConnectionManager, QueryRunner } from 'typeorm';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { useContainer as classValidatorUseContainer } from 'class-validator';
 import { ThrottlerStorageRedisService } from 'nestjs-throttler-storage-redis';
+import { RateLimiterRedis } from 'rate-limiter-flexible';
 import * as Redis from 'ioredis';
 import * as config from 'config';
 
 import { AppModule } from 'src/app.module';
-import { RateLimiterRedis } from 'rate-limiter-flexible';
+import { PermissionEntity } from 'src/permission/entities/permission.entity';
+import { RoleEntity } from 'src/role/entities/role.entity';
+import { UserEntity } from 'src/auth/entity/user.entity';
 
 const dbConfig = config.get('db');
 
@@ -94,9 +97,9 @@ export class AppFactory {
 
   async close() {
     await this.connection.close();
-    await this.appInstance.close();
     // await this.queryRunner.query(`TRUNCATE DATABASE "${this.database}"`);
     await this.teardown(this.redis);
+    await this.appInstance.close();
   }
 }
 
@@ -123,7 +126,8 @@ const setupTestDatabase = async () => {
     migrationsRun: true,
     migrationsTableName: 'migrations',
     migrations: [__dirname + '/../../src/migrations/**/*{.ts,.js}'],
-    entities: [__dirname + '/../../src/**/*.entity{.ts,.js}']
+    // entities: [__dirname + '/../../src/**/*.entity{.ts,.js}']
+    entities: [UserEntity, RoleEntity, PermissionEntity]
   });
 
   const queryRunner = manager.createQueryRunner();
