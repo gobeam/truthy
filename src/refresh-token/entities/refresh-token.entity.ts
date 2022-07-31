@@ -1,4 +1,10 @@
-import { BaseEntity, Column, Entity, Index, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  BaseEntity,
+  Column,
+  Entity,
+  Index,
+  PrimaryGeneratedColumn
+} from 'typeorm';
 
 @Entity({
   name: 'refresh_token'

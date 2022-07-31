@@ -1,7 +1,7 @@
 import { ThrottlerModule } from '@nestjs/throttler';
 import { INestApplication } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
-import { getConnectionManager } from 'typeorm';
+import { createConnection, getConnection, getConnectionManager } from 'typeorm';
 import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { useContainer as classValidatorUseContainer } from 'class-validator';
 import { ThrottlerStorageRedisService } from 'nestjs-throttler-storage-redis';
@@ -25,12 +25,9 @@ export class AppFactory {
 
   static async new() {
     const redis = await setupRedis();
-    const module = await Test.createTestingModule({
+    const moduleBuilder = Test.createTestingModule({
       imports: [
         AppModule,
-        TypeOrmModule.forRoot({
-          ...dbConfiguration
-        }),
         ThrottlerModule.forRootAsync({
           useFactory: () => {
             return {
@@ -53,13 +50,12 @@ export class AppFactory {
             blockDuration: 3000
           });
         }
-      })
-      .compile();
+      });
 
-    const app = module.createNestApplication();
+    const module = await moduleBuilder.compile();
 
-    classValidatorUseContainer(app.select(AppModule), {
-      fallbackOnErrors: true
+    const app = module.createNestApplication(undefined, {
+      logger: false
     });
 
     await app.init();
@@ -67,17 +63,42 @@ export class AppFactory {
     return new AppFactory(app, redis);
   }
 
-  async refreshDatabase() {
-    const connection = getConnectionManager().get();
-    if (connection.isConnected) {
-      const tables = connection.entityMetadatas
-        .map((entity) => `"${entity.tableName}"`)
-        .join(', ');
+  async close() {
+    await getConnection().dropDatabase();
+    if (this.redis) await this.teardown(this.redis);
+    if (this.appInstance) await this.appInstance.close();
+  }
 
-      await connection.query(
-        `TRUNCATE TABLE ${tables} RESTART IDENTITY CASCADE;`
-      );
+  static async cleanupDB() {
+    const connection = getConnection();
+    const tables = connection.entityMetadatas.map(
+      (entity) => `"${entity.tableName}"`
+    );
+
+    for (const table of tables) {
+      await connection.query(`DELETE FROM ${table};`);
     }
+  }
+
+  static async dropTables() {
+    const connection = await createConnection({
+      type: dbConfig.type || 'postgres',
+      host: process.env.DB_HOST || dbConfig.host,
+      port: parseInt(process.env.DB_PORT) || dbConfig.port,
+      database: process.env.DB_DATABASE_NAME || dbConfig.database,
+      username: process.env.DB_USERNAME || dbConfig.username,
+      password: process.env.DB_PASSWORD || dbConfig.password
+    });
+
+    await connection.query(`SET session_replication_role = 'replica';`);
+    const tables = connection.entityMetadatas.map(
+      (entity) => `"${entity.tableName}"`
+    );
+    for (const tableName of tables) {
+      await connection.query(`DROP TABLE IF EXISTS ${tableName};`);
+    }
+
+    await connection.close();
   }
 
   async teardown(redis: Redis.Redis) {
@@ -87,25 +108,6 @@ export class AppFactory {
         resolve();
       });
     });
-  }
-
-  async close() {
-    await this.appInstance.close();
-    if (this.redis) await this.teardown(this.redis);
-    const connection = getConnectionManager().get();
-
-    if (connection.isConnected) {
-      connection
-        .close()
-        .then(() => {
-          console.log('DB connection closed');
-        })
-        .catch((err: any) => {
-          console.error('Error clossing connection to DB, ', err);
-        });
-    } else {
-      console.log('DB connection already closed.');
-    }
   }
 }
 
@@ -117,17 +119,3 @@ const setupRedis = async () => {
   await redis.flushall();
   return redis;
 };
-
-const dbConfiguration = {
-  type: dbConfig.type || 'postgres',
-  host: process.env.DB_HOST || dbConfig.host,
-  port: parseInt(process.env.DB_PORT) || dbConfig.port,
-  database: process.env.DB_DATABASE_NAME || dbConfig.database,
-  username: process.env.DB_USERNAME || dbConfig.username,
-  password: process.env.DB_PASSWORD || dbConfig.password,
-  logging: false,
-  keepConnectionAlive: true,
-  synchronize: process.env.NODE_ENV === 'test',
-  dropSchema: process.env.NODE_ENV === 'test',
-  entities: [__dirname + '/../../src/**/*.entity{.ts,.js}']
-} as TypeOrmModuleOptions;

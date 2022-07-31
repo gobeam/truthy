@@ -10,11 +10,12 @@ describe('AuthController (e2e)', () => {
   let app: AppFactory;
 
   beforeAll(async () => {
+    await AppFactory.dropTables();
     app = await AppFactory.new();
   });
 
   beforeEach(async () => {
-    await app.refreshDatabase();
+    await AppFactory.cleanupDB();
   });
 
   it('POST /auth/login requires valid username and password', async () => {
@@ -62,6 +63,6 @@ describe('AuthController (e2e)', () => {
   });
 
   afterAll(async () => {
-    if (app) await app.close();
+    await app.close();
   });
 });
