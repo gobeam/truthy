@@ -6,8 +6,8 @@ services:
       - '5432:5432'
     environment:
       - POSTGRES_USER=truthy_user
-      - POSTGRES_PASSWORD=truthy_password
-      - POSTGRES_DB=truthy_test
+      - POSTGRES_PASSWORD=truthypwd
+      - POSTGRES_DB=truthy_db
   redis:
     image: redis
     ports:
