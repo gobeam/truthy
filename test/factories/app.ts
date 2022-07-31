@@ -1,8 +1,8 @@
 import { ThrottlerModule } from '@nestjs/throttler';
 import { INestApplication } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
-import { Connection, ConnectionManager, QueryRunner } from 'typeorm';
-import { TypeOrmModule } from '@nestjs/typeorm';
+import { getConnectionManager } from 'typeorm';
+import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { useContainer as classValidatorUseContainer } from 'class-validator';
 import { ThrottlerStorageRedisService } from 'nestjs-throttler-storage-redis';
 import { RateLimiterRedis } from 'rate-limiter-flexible';
@@ -10,18 +10,12 @@ import * as Redis from 'ioredis';
 import * as config from 'config';
 
 import { AppModule } from 'src/app.module';
-import { PermissionEntity } from 'src/permission/entities/permission.entity';
-import { RoleEntity } from 'src/role/entities/role.entity';
-import { UserEntity } from 'src/auth/entity/user.entity';
 
 const dbConfig = config.get('db');
 
 export class AppFactory {
   private constructor(
     private readonly appInstance: INestApplication,
-    private readonly database: string,
-    private readonly connection: Connection,
-    private readonly queryRunner: QueryRunner,
     private readonly redis: Redis.Redis
   ) {}
 
@@ -30,15 +24,12 @@ export class AppFactory {
   }
 
   static async new() {
-    const { database, connection, queryRunner } = await setupTestDatabase();
     const redis = await setupRedis();
     const module = await Test.createTestingModule({
       imports: [
         AppModule,
         TypeOrmModule.forRoot({
-          ...connection.options,
-          type: dbConfig.type || 'postgres',
-          database
+          ...dbConfiguration
         }),
         ThrottlerModule.forRootAsync({
           useFactory: () => {
@@ -73,17 +64,20 @@ export class AppFactory {
 
     await app.init();
 
-    return new AppFactory(app, database, connection, queryRunner, redis);
+    return new AppFactory(app, redis);
   }
 
   async refreshDatabase() {
-    await Promise.all(
-      this.connection.entityMetadatas.map((entity) => {
-        return this.connection
-          .getRepository(entity.name)
-          .query(`TRUNCATE TABLE "${entity.tableName}" CASCADE`);
-      })
-    );
+    const connection = getConnectionManager().get();
+    if (connection.isConnected) {
+      const tables = connection.entityMetadatas
+        .map((entity) => `"${entity.tableName}"`)
+        .join(', ');
+
+      await connection.query(
+        `TRUNCATE TABLE ${tables} RESTART IDENTITY CASCADE;`
+      );
+    }
   }
 
   async teardown(redis: Redis.Redis) {
@@ -96,10 +90,22 @@ export class AppFactory {
   }
 
   async close() {
-    await this.connection.close();
-    // await this.queryRunner.query(`TRUNCATE DATABASE "${this.database}"`);
-    await this.teardown(this.redis);
     await this.appInstance.close();
+    if (this.redis) await this.teardown(this.redis);
+    const connection = getConnectionManager().get();
+
+    if (connection.isConnected) {
+      connection
+        .close()
+        .then(() => {
+          console.log('DB connection closed');
+        })
+        .catch((err: any) => {
+          console.error('Error clossing connection to DB, ', err);
+        });
+    } else {
+      console.log('DB connection already closed.');
+    }
   }
 }
 
@@ -112,25 +118,18 @@ const setupRedis = async () => {
   return redis;
 };
 
-const setupTestDatabase = async () => {
-  const database = process.env.DB_DATABASE_NAME || dbConfig.database;
-  const manager = new ConnectionManager().create({
-    type: dbConfig.type,
-    host: process.env.DB_HOST || dbConfig.host,
-    port: parseInt(process.env.DB_PORT) || dbConfig.port,
-    database,
-    username: process.env.DB_USERNAME || dbConfig.username,
-    password: process.env.DB_PASSWORD || dbConfig.password,
-    logging: false,
-    synchronize: false,
-    migrationsRun: true,
-    migrationsTableName: 'migrations',
-    migrations: [__dirname + '/../../src/migrations/**/*{.ts,.js}'],
-    // entities: [__dirname + '/../../src/**/*.entity{.ts,.js}']
-    entities: [UserEntity, RoleEntity, PermissionEntity]
-  });
-
-  const queryRunner = manager.createQueryRunner();
-  const connection = await manager.connect();
-  return { database, connection, queryRunner };
-};
+const dbConfiguration = {
+  type: dbConfig.type || 'postgres',
+  host: process.env.DB_HOST || dbConfig.host,
+  port: parseInt(process.env.DB_PORT) || dbConfig.port,
+  database: process.env.DB_DATABASE_NAME || dbConfig.database,
+  username: process.env.DB_USERNAME || dbConfig.username,
+  password: process.env.DB_PASSWORD || dbConfig.password,
+  logging: false,
+  keepConnectionAlive: true,
+  synchronize: false,
+  migrationsRun: false,
+  migrationsTableName: 'migrations',
+  migrations: [__dirname + '/../../src/migrations/**/*{.ts,.js}'],
+  entities: [__dirname + '/../../src/**/*.entity{.ts,.js}']
+} as TypeOrmModuleOptions;
