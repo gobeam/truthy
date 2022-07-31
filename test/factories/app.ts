@@ -93,10 +93,10 @@ export class AppFactory {
   }
 
   async close() {
+    await this.connection.close();
     await this.appInstance.close();
     // await this.queryRunner.query(`TRUNCATE DATABASE "${this.database}"`);
     await this.teardown(this.redis);
-    await this.connection.close();
   }
 }
 
@@ -128,6 +128,5 @@ const setupTestDatabase = async () => {
 
   const queryRunner = manager.createQueryRunner();
   const connection = await manager.connect();
-
   return { database, connection, queryRunner };
 };
