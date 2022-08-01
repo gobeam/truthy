@@ -1,21 +1,24 @@
 import { NestFactory } from '@nestjs/core';
-import { Logger, ValidationPipe } from '@nestjs/common';
+import { ValidationPipe } from '@nestjs/common';
 import { useContainer } from 'class-validator';
 import * as config from 'config';
+import helmet from 'helmet';
 import {
   DocumentBuilder,
   SwaggerCustomOptions,
   SwaggerModule
 } from '@nestjs/swagger';
 import * as cookieParser from 'cookie-parser';
+import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 
 import { AppModule } from 'src/app.module';
 
 async function bootstrap() {
-  const logger = new Logger('bootstrap');
   const serverConfig = config.get('server');
   const port = process.env.PORT || serverConfig.port;
   const app = await NestFactory.create(AppModule);
+  app.use(helmet());
+  app.useLogger(app.get(WINSTON_MODULE_NEST_PROVIDER));
   const apiConfig = config.get('app');
   if (process.env.NODE_ENV === 'development') {
     app.enableCors({
@@ -38,15 +41,17 @@ async function bootstrap() {
     const document = SwaggerModule.createDocument(app, swaggerConfig);
     SwaggerModule.setup('api-docs', app, document, customOptions);
   } else {
+    const whitelist = [apiConfig.get<string>('frontendUrl')];
     app.enableCors({
-      origin: process.env.ORIGIN || serverConfig.origin,
+      origin: function (origin, callback) {
+        if (!origin || whitelist.indexOf(origin) !== -1) {
+          callback(null, true);
+        } else {
+          callback(new Error('Not allowed by CORS'));
+        }
+      },
       credentials: true
     });
-    logger.log(
-      `Accepting request only from: ${
-        process.env.ORIGIN || serverConfig.origin
-      }`
-    );
   }
   useContainer(app.select(AppModule), {
     fallbackOnErrors: true
@@ -61,7 +66,7 @@ async function bootstrap() {
 
   app.use(cookieParser());
   await app.listen(port);
-  logger.log(`Application listening in port: ${port}`);
+  console.log(`Application listening in port: ${port}`);
 }
 
 bootstrap();

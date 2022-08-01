@@ -49,12 +49,16 @@ export class RefreshTokenService {
     const token = await this.repository.createRefreshToken(user, refreshToken);
     const opts: SignOptions = {
       ...BASE_OPTIONS,
-      expiresIn: tokenConfig.refreshExpiresIn,
       subject: String(user.id),
       jwtid: String(token.id)
     };
 
-    return this.jwt.signAsync({ ...opts });
+    return this.jwt.signAsync(
+      { ...opts },
+      {
+        expiresIn: tokenConfig.refreshExpiresIn
+      }
+    );
   }
 
   /**
