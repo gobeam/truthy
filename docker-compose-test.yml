@@ -7,7 +7,7 @@ services:
     environment:
       - POSTGRES_USER=truthy_user
       - POSTGRES_PASSWORD=truthypwd
-      - POSTGRES_DB=
+      - POSTGRES_DB=truthy_db
       
   redis:
     image: redis
