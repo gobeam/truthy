@@ -1,25 +1,19 @@
 import { ThrottlerModule } from '@nestjs/throttler';
 import { INestApplication } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
-import { Connection, ConnectionManager, QueryRunner } from 'typeorm';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { useContainer as classValidatorUseContainer } from 'class-validator';
-import { v4 as uuid4 } from 'uuid';
+import { createConnection, getConnection } from 'typeorm';
 import { ThrottlerStorageRedisService } from 'nestjs-throttler-storage-redis';
+import { RateLimiterRedis } from 'rate-limiter-flexible';
 import * as Redis from 'ioredis';
 import * as config from 'config';
 
 import { AppModule } from 'src/app.module';
-import { RateLimiterRedis } from 'rate-limiter-flexible';
 
 const dbConfig = config.get('db');
 
 export class AppFactory {
   private constructor(
     private readonly appInstance: INestApplication,
-    private readonly database: string,
-    private readonly connection: Connection,
-    private readonly queryRunner: QueryRunner,
     private readonly redis: Redis.Redis
   ) {}
 
@@ -28,16 +22,10 @@ export class AppFactory {
   }
 
   static async new() {
-    const { database, connection, queryRunner } = await setupTestDatabase();
     const redis = await setupRedis();
-    const module = await Test.createTestingModule({
+    const moduleBuilder = Test.createTestingModule({
       imports: [
         AppModule,
-        TypeOrmModule.forRoot({
-          ...connection.options,
-          type: dbConfig.type,
-          database
-        }),
         ThrottlerModule.forRootAsync({
           useFactory: () => {
             return {
@@ -47,18 +35,6 @@ export class AppFactory {
             };
           }
         })
-        // createMockModule([
-        //   {
-        //     provide: ThrottlerModule,
-        //     useFactory: () => {
-        //       return {
-        //         ttl: jest.fn(),
-        //         limit: jest.fn(),
-        //         storage: jest.fn()
-        //       };
-        //     }
-        //   }
-        // ])
       ]
     })
       .overrideProvider('LOGIN_THROTTLE')
@@ -72,28 +48,55 @@ export class AppFactory {
             blockDuration: 3000
           });
         }
-      })
-      .compile();
+      });
 
-    const app = module.createNestApplication();
+    const module = await moduleBuilder.compile();
 
-    classValidatorUseContainer(app.select(AppModule), {
-      fallbackOnErrors: true
+    const app = module.createNestApplication(undefined, {
+      logger: false
     });
 
     await app.init();
 
-    return new AppFactory(app, database, connection, queryRunner, redis);
+    return new AppFactory(app, redis);
   }
 
-  async refreshDatabase() {
-    await Promise.all(
-      this.connection.entityMetadatas.map((entity) => {
-        return this.connection
-          .getRepository(entity.name)
-          .query(`TRUNCATE TABLE "${entity.tableName}" CASCADE`);
-      })
+  async close() {
+    await getConnection().dropDatabase();
+    if (this.redis) await this.teardown(this.redis);
+    if (this.appInstance) await this.appInstance.close();
+  }
+
+  static async cleanupDB() {
+    const connection = getConnection();
+    const tables = connection.entityMetadatas.map(
+      (entity) => `"${entity.tableName}"`
     );
+
+    for (const table of tables) {
+      await connection.query(`DELETE FROM ${table};`);
+    }
+  }
+
+  static async dropTables() {
+    const connection = await createConnection({
+      type: dbConfig.type || 'postgres',
+      host: process.env.DB_HOST || dbConfig.host,
+      port: parseInt(process.env.DB_PORT) || dbConfig.port,
+      database: process.env.DB_DATABASE_NAME || dbConfig.database,
+      username: process.env.DB_USERNAME || dbConfig.username,
+      password: process.env.DB_PASSWORD || dbConfig.password
+    });
+
+    await connection.query(`SET session_replication_role = 'replica';`);
+    const tables = connection.entityMetadatas.map(
+      (entity) => `"${entity.tableName}"`
+    );
+    for (const tableName of tables) {
+      await connection.query(`DROP TABLE IF EXISTS ${tableName};`);
+    }
+
+    await connection.close();
   }
 
   async teardown(redis: Redis.Redis) {
@@ -104,13 +107,6 @@ export class AppFactory {
       });
     });
   }
-
-  async close() {
-    await this.appInstance.close();
-    await this.queryRunner.query(`DROP DATABASE "${this.database}"`);
-    await this.teardown(this.redis);
-    await this.connection.close();
-  }
 }
 
 const setupRedis = async () => {
@@ -120,29 +116,4 @@ const setupRedis = async () => {
   });
   await redis.flushall();
   return redis;
-};
-
-const setupTestDatabase = async () => {
-  const database = `test_${uuid4()}`;
-  const manager = new ConnectionManager().create({
-    type: dbConfig.type,
-    host: process.env.DB_HOST || dbConfig.host,
-    port: parseInt(process.env.DB_PORT) || dbConfig.port,
-    database: process.env.DB_DATABASE_NAME || dbConfig.database,
-    username: process.env.DB_USERNAME || dbConfig.username,
-    password: process.env.DB_PASSWORD || dbConfig.password,
-    logging: false,
-    synchronize: false,
-    migrationsRun: true,
-    migrationsTableName: 'migrations',
-    migrations: [__dirname + '/../../src/database/migrations/**/*{.ts,.js}'],
-    entities: [__dirname + '/../../src/**/*.entity{.ts,.js}']
-  });
-
-  const queryRunner = manager.createQueryRunner();
-  const connection = await manager.connect();
-
-  await queryRunner.createDatabase(database, true);
-
-  return { database, connection, queryRunner };
 };

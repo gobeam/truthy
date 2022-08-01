@@ -1,0 +1,15 @@
+version: '3'
+services:
+  truthy-postgres:
+    image: postgres
+    ports:
+      - '5432:5432'
+    environment:
+      - POSTGRES_USER=truthy_user
+      - POSTGRES_PASSWORD=truthypwd
+      - POSTGRES_DB=truthy_db
+
+  redis:
+    image: redis
+    ports:
+      - '6379:6379'

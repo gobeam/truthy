@@ -1,0 +1,48 @@
+name: Continuous Integration Testing
+
+on: push
+
+jobs:
+  unit-tests:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [16.x]
+        test: [truthy-cms]
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Use NodeJS ${{ matrix.node-version }}
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run unit test
+        run: npm run test:unit
+
+  e2e-test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [16.x]
+    needs: [unit-tests]
+    steps:
+      - uses: actions/checkout@v1
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Set Environment Variables
+        uses: ./.github/actions/setvars
+        with:
+          varFilePath: ./.github/variables/myvars.env
+      - name: Start Docker-Compose
+        run: docker-compose -f docker-compose-test.yml up -d
+      - name: Install dependencies
+        run: npm install
+      - name: Run tests
+        run: npm run test:e2e
+      - name: Stop Docker-Compose
+        run: docker-compose -f docker-compose-test.yml down

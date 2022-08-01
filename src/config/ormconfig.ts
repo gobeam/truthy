@@ -11,7 +11,11 @@ const ormConfig: ConnectionOptions = {
   database: process.env.DB_DATABASE_NAME || dbConfig.database,
   migrationsTransactionMode: 'each',
   entities: [__dirname + '/../**/*.entity.{js,ts}'],
-  synchronize: process.env.TYPE_ORM_SYNC || dbConfig.synchronize,
+  logging: false,
+  synchronize: false,
+  migrationsRun: process.env.NODE_ENV === 'test',
+  dropSchema: process.env.NODE_ENV === 'test',
+  migrationsTableName: 'migrations',
   migrations: [__dirname + '/../database/migrations/**/*{.ts,.js}'],
   cli: {
     migrationsDir: 'src/database/migrations'
