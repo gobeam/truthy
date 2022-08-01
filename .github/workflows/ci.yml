@@ -2,16 +2,13 @@ name: Continuous Integration Testing
 
 on: push
 
-jobs:   
+jobs:
   unit-tests:
     runs-on: ubuntu-latest
     strategy:
       matrix:
         node-version: [16.x]
-        test:
-          [
-            truthy-cms,
-          ]
+        test: [truthy-cms]
 
     steps:
       - uses: actions/checkout@v2
@@ -24,7 +21,7 @@ jobs:
 
       - name: Run unit test
         run: npm run test:unit
-  
+
   e2e-test:
     runs-on: ubuntu-latest
     strategy:
