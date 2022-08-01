@@ -1,9 +1,7 @@
 import { ThrottlerModule } from '@nestjs/throttler';
 import { INestApplication } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
-import { createConnection, getConnection, getConnectionManager } from 'typeorm';
-import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
-import { useContainer as classValidatorUseContainer } from 'class-validator';
+import { createConnection, getConnection } from 'typeorm';
 import { ThrottlerStorageRedisService } from 'nestjs-throttler-storage-redis';
 import { RateLimiterRedis } from 'rate-limiter-flexible';
 import * as Redis from 'ioredis';
