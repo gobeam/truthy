@@ -16,11 +16,21 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: ${{ matrix.node-version }}
+
+      - name: Setup yarn
+        run: npm install -g yarn
+
+      - name: Setup Nodejs with yarn caching
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: yarn
+
       - name: Install dependencies
-        run: npm install
+        run: yarn
 
       - name: Run unit test
-        run: npm run test:unit
+        run: yarn test:unit
 
   e2e-test:
     runs-on: ubuntu-latest
@@ -34,6 +44,14 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: ${{ matrix.node-version }}
+      - name: Setup yarn
+        run: npm install -g yarn
+
+      - name: Setup Nodejs with yarn caching
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: yarn
       - name: Set Environment Variables
         uses: ./.github/actions/setvars
         with:
@@ -41,8 +59,8 @@ jobs:
       - name: Start Docker-Compose
         run: docker-compose -f docker-compose-test.yml up -d
       - name: Install dependencies
-        run: npm install
+        run: yarn
       - name: Run tests
-        run: npm run test:e2e
+        run: yarn test:e2e
       - name: Stop Docker-Compose
         run: docker-compose -f docker-compose-test.yml down
