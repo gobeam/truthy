@@ -3,16 +3,22 @@ import {
   Catch,
   ExceptionFilter,
   HttpException,
-  HttpStatus
+  HttpStatus,
+  Inject
 } from '@nestjs/common';
 import { I18nService } from 'nestjs-i18n';
 
 import { ValidationErrorInterface } from 'src/common/interfaces/validation-error.interface';
 import { StatusCodesList } from 'src/common/constants/status-codes-list.constants';
+import { Logger } from 'winston';
+import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 
 @Catch(HttpException)
 export class I18nExceptionFilterPipe implements ExceptionFilter {
-  constructor(private readonly i18n: I18nService) {}
+  constructor(
+    @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: Logger,
+    private readonly i18n: I18nService
+  ) {}
 
   async catch(exception: HttpException, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
@@ -28,49 +34,57 @@ export class I18nExceptionFilterPipe implements ExceptionFilter {
   }
 
   async getMessage(exception: HttpException, lang: string) {
-    const exceptionResponse = exception.getResponse() as any;
-    if (!exceptionResponse.message && typeof exceptionResponse === 'string') {
-      return await this.i18n.translate(`exception.${exceptionResponse}`, {
-        lang,
-        args: {}
+    try {
+      const exceptionResponse = exception.getResponse() as any;
+      if (!exceptionResponse.message && typeof exceptionResponse === 'string') {
+        return await this.i18n.translate(`exception.${exceptionResponse}`, {
+          lang,
+          args: {}
+        });
+      }
+      if (exceptionResponse.statusCode === HttpStatus.UNPROCESSABLE_ENTITY) {
+        if (
+          exceptionResponse.hasOwnProperty('message') &&
+          exceptionResponse.message instanceof Array
+        ) {
+          exceptionResponse.code = StatusCodesList.ValidationError;
+          exceptionResponse.message = await this.translateArray(
+            exceptionResponse.message,
+            lang
+          );
+        }
+        return exceptionResponse;
+      }
+      let errorMessage = 'internalError';
+      if (exceptionResponse.message instanceof Array) {
+        errorMessage = exceptionResponse.message[0];
+      } else if (typeof exceptionResponse.message === 'string') {
+        errorMessage = exceptionResponse.message;
+      } else if (
+        !exceptionResponse.message &&
+        typeof exceptionResponse === 'string'
+      ) {
+        errorMessage = exceptionResponse;
+      }
+
+      const { title, argument } = this.checkIfConstraintAvailable(errorMessage);
+      exceptionResponse.message = await this.i18n.translate(
+        `exception.${title}`,
+        {
+          lang,
+          args: {
+            ...argument
+          }
+        }
+      );
+      return exceptionResponse;
+    } catch (error) {
+      this.logger.error('Error in I18nExceptionFilterPipe: ', {
+        meta: {
+          error
+        }
       });
     }
-    if (exceptionResponse.statusCode === HttpStatus.UNPROCESSABLE_ENTITY) {
-      if (
-        exceptionResponse.hasOwnProperty('message') &&
-        exceptionResponse.message instanceof Array
-      ) {
-        exceptionResponse.code = StatusCodesList.ValidationError;
-        exceptionResponse.message = await this.translateArray(
-          exceptionResponse.message,
-          lang
-        );
-      }
-      return exceptionResponse;
-    }
-    let errorMessage = 'internalError';
-    if (exceptionResponse.message instanceof Array) {
-      errorMessage = exceptionResponse.message[0];
-    } else if (typeof exceptionResponse.message === 'string') {
-      errorMessage = exceptionResponse.message;
-    } else if (
-      !exceptionResponse.message &&
-      typeof exceptionResponse === 'string'
-    ) {
-      errorMessage = exceptionResponse;
-    }
-
-    const { title, argument } = this.checkIfConstraintAvailable(errorMessage);
-    exceptionResponse.message = await this.i18n.translate(
-      `exception.${title}`,
-      {
-        lang,
-        args: {
-          ...argument
-        }
-      }
-    );
-    return exceptionResponse;
   }
 
   checkIfConstraintAvailable(message: string): {
@@ -106,7 +120,8 @@ export class I18nExceptionFilterPipe implements ExceptionFilter {
         'isIn',
         'matches',
         'maxLength',
-        'minLength'
+        'minLength',
+        'isLength'
       ];
       const item = errors[i];
       let message = [];
@@ -122,13 +137,22 @@ export class I18nExceptionFilterPipe implements ExceptionFilter {
               validationKey = title;
               validationArgument = argument;
             }
-            return this.i18n.translate(`validation.${validationKey}`, {
+            const args: Record<string, any> = {
               lang,
               args: {
-                ...validationArgument,
                 property: item.property
               }
-            });
+            };
+            if (
+              validationArgument &&
+              Object.keys(validationArgument).length > 0
+            ) {
+              args.args = {
+                ...validationArgument,
+                property: item.property
+              };
+            }
+            return this.i18n.translate(`validation.${validationKey}`, args);
           })
         );
       }
