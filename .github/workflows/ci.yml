@@ -48,4 +48,4 @@ jobs:
       - name: Run tests
         run: npm run test:e2e
       - name: Stop Docker-Compose
-        run: docker-compose down
+        run: docker-compose -f docker-compose-test.yml down
