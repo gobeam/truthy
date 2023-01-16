@@ -14,7 +14,7 @@ const mockRefreshToken = {
 };
 
 describe('Refresh token repository', () => {
-  let repository, user;
+  let repository, user, dataSource;
   beforeEach(async () => {
     const module = await Test.createTestingModule({
       providers: [
@@ -26,16 +26,19 @@ describe('Refresh token repository', () => {
       ]
     }).compile();
     repository = module.get<RefreshTokenRepository>(RefreshTokenRepository);
+    dataSource = module.get<DataSource>(DataSource);
     user = new UserSerializer();
     user.id = 1;
     user.email = 'test@mail.com';
   });
 
   it('create new refresh token', async () => {
-    jest.spyOn(repository, 'create').mockReturnValue(mockRefreshToken);
+    jest.spyOn(dataSource, 'getRepository').mockReturnValue({
+      save: jest.fn().mockReturnValue(mockRefreshToken)
+    });
     await repository.createRefreshToken(user, 60 * 60);
-    expect(repository.create).toHaveBeenCalledTimes(1);
-    expect(repository.create().save).toHaveBeenCalledTimes(1);
+    expect(dataSource.getRepository).toHaveBeenCalledTimes(1);
+    expect(dataSource.getRepository().save).toHaveBeenCalledTimes(1);
   });
 
   it('findTokenById', async () => {

@@ -50,7 +50,7 @@ describe('User Repository', () => {
   describe('login', () => {
     let user, userLoginDto: UserLoginDto;
     beforeEach(async () => {
-      userRepository.findOne = jest.fn();
+      userRepository.findOneBy = jest.fn();
       user = new UserEntity();
       user.status = UserStatusEnum.ACTIVE;
       user.username = mockUser.username;
@@ -62,24 +62,22 @@ describe('User Repository', () => {
       };
     });
     it('check if username and password matches and return user', async () => {
-      userRepository.findOne.mockResolvedValue(user);
+      userRepository.findOneBy.mockResolvedValue(user);
       user.validatePassword.mockResolvedValue(true);
       const result = await userRepository.login(userLoginDto);
-      expect(userRepository.findOne).toHaveBeenCalledWith({
-        where: [
-          {
-            username: userLoginDto.username
-          },
-          {
-            email: userLoginDto.username
-          }
-        ]
-      });
+      expect(userRepository.findOneBy).toHaveBeenCalledWith([
+        {
+          username: userLoginDto.username
+        },
+        {
+          email: userLoginDto.username
+        }
+      ]);
       expect(result).toEqual([user, null, null]);
     });
 
     it('throw error if username and password does not matches', async () => {
-      userRepository.findOne.mockResolvedValue(user);
+      userRepository.findOneBy.mockResolvedValue(user);
       user.validatePassword.mockResolvedValue(false);
       const result = await userRepository.login(userLoginDto);
       expect(result).toEqual([
@@ -90,7 +88,7 @@ describe('User Repository', () => {
     });
 
     it('check if user is null', async () => {
-      userRepository.findOne.mockResolvedValue(null);
+      userRepository.findOneBy.mockResolvedValue(null);
       const result = await userRepository.login(userLoginDto);
       expect(result).toEqual([
         null,
