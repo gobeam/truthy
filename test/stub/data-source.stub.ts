@@ -26,5 +26,13 @@ export const dataSourceStubs = {
       innerJoinAndMapOne: jest.fn().mockReturnThis(),
       orWhere: jest.fn().mockReturnThis()
     })
+  }),
+  getRepository: jest.fn().mockReturnValue({
+    find: jest.fn().mockResolvedValue([]),
+    findOne: jest.fn().mockResolvedValue(undefined),
+    save: jest.fn().mockResolvedValue(undefined),
+    create: jest.fn().mockReturnValue({}),
+    update: jest.fn().mockResolvedValue(undefined),
+    delete: jest.fn().mockResolvedValue(undefined)
   })
 };
