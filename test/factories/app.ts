@@ -3,7 +3,6 @@ import { INestApplication } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { DataSource } from 'typeorm';
 import { ThrottlerStorageRedisService } from 'nestjs-throttler-storage-redis';
-import { RateLimiterRedis } from 'rate-limiter-flexible';
 import Redis from 'ioredis';
 
 import { AppModule } from 'src/app.module';
