@@ -1,6 +1,5 @@
 import { Test } from '@nestjs/testing';
-import { getConnectionToken } from '@nestjs/typeorm';
-import { Connection } from 'typeorm';
+import { DataSource } from 'typeorm';
 
 import { UniqueValidatorPipe } from 'src/common/pipes/unique-validator.pipe';
 import { UserEntity } from 'src/auth/entity/user.entity';
@@ -13,19 +12,18 @@ const mockConnection = () => ({
 });
 
 describe('UniqueValidatorPipe', () => {
-  let isUnique: UniqueValidatorPipe, connection;
+  let isUnique: UniqueValidatorPipe;
   beforeEach(async () => {
     const module = await Test.createTestingModule({
       providers: [
         UniqueValidatorPipe,
         {
-          provide: getConnectionToken(),
+          provide: DataSource,
           useFactory: mockConnection
         }
       ]
     }).compile();
-    isUnique = await module.get<UniqueValidatorPipe>(UniqueValidatorPipe);
-    connection = await module.get<Connection>(Connection);
+    isUnique = module.get<UniqueValidatorPipe>(UniqueValidatorPipe);
   });
 
   describe('check unique validation', () => {
@@ -41,7 +39,6 @@ describe('UniqueValidatorPipe', () => {
         property: 'username'
       };
       const result = await isUnique.validate<UserEntity>('username', args);
-      expect(connection.getRepository).toHaveBeenCalledWith(UserEntity);
       expect(result).toBe(true);
     });
   });

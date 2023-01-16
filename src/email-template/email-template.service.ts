@@ -1,5 +1,4 @@
 import { Injectable, UnprocessableEntityException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
 import { Not, ObjectLiteral } from 'typeorm';
 
 import { CreateEmailTemplateDto } from 'src/email-template/dto/create-email-template.dto';
@@ -17,10 +16,7 @@ import { Pagination } from 'src/paginate';
 export class EmailTemplateService
   implements CommonServiceInterface<EmailTemplate>
 {
-  constructor(
-    @InjectRepository(EmailTemplateRepository)
-    private readonly repository: EmailTemplateRepository
-  ) {}
+  constructor(private readonly repository: EmailTemplateRepository) {}
 
   /**
    * convert string to slug

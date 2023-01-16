@@ -1,25 +1,21 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
-import { InjectRepository } from '@nestjs/typeorm';
-import * as config from 'config';
+import config from 'config';
 import { Request } from 'express';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 
 import { StatusCodesList } from 'src/common/constants/status-codes-list.constants';
 import { CustomHttpException } from 'src/exception/custom-http.exception';
 import { JwtPayloadDto } from 'src/auth/dto/jwt-payload.dto';
-import { UserEntity } from 'src/auth/entity/user.entity';
-import { UserRepository } from 'src/auth/user.repository';
+import { AuthService } from 'src/auth/auth.service';
+import { UserSerializer } from 'src/auth/serializer/user.serializer';
 
 @Injectable()
 export class JwtTwoFactorStrategy extends PassportStrategy(
   Strategy,
   'jwt-two-factor'
 ) {
-  constructor(
-    @InjectRepository(UserRepository)
-    private userRepository: UserRepository
-  ) {
+  constructor(private readonly service: AuthService) {
     super({
       jwtFromRequest: ExtractJwt.fromExtractors([
         (request: Request) => {
@@ -30,11 +26,12 @@ export class JwtTwoFactorStrategy extends PassportStrategy(
     });
   }
 
-  async validate(payload: JwtPayloadDto): Promise<UserEntity> {
+  async validate(payload: JwtPayloadDto): Promise<UserSerializer> {
     const { isTwoFAAuthenticated, subject } = payload;
-    const user = await this.userRepository.findOne(Number(subject), {
-      relations: ['role', 'role.permission']
-    });
+    const user = await this.service.findOne(Number(subject), [
+      'role',
+      'role.permission'
+    ]);
     if (!user.isTwoFAEnabled) {
       return user;
     }

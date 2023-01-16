@@ -1,5 +1,5 @@
 import { Logger } from '@nestjs/common';
-import * as config from 'config';
+import config from 'config';
 import { MailerService } from '@nestjs-modules/mailer';
 import {
   OnQueueActive,

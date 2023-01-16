@@ -4,12 +4,12 @@ describe('Example Test (e2e)', () => {
   let app: AppFactory;
 
   beforeAll(async () => {
-    await AppFactory.dropTables();
     app = await AppFactory.new();
+    await app.cleanupDbTable();
   });
 
   beforeEach(async () => {
-    await AppFactory.cleanupDB();
+    await app.cleanupDbTable();
   });
 
   it('it passes', async () => {
@@ -17,6 +17,6 @@ describe('Example Test (e2e)', () => {
   });
 
   afterAll(async () => {
-    await app.close();
+    if (app) await app.close();
   });
 });

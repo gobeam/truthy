@@ -1,7 +1,9 @@
 import { Test } from '@nestjs/testing';
+import { DataSource } from 'typeorm';
 
 import { RefreshTokenRepository } from 'src/refresh-token/refresh-token.repository';
 import { UserSerializer } from 'src/auth/serializer/user.serializer';
+import { dataSourceStubs } from 'test/stub/data-source.stub';
 
 const mockRefreshToken = {
   id: 1,
@@ -15,11 +17,15 @@ describe('Refresh token repository', () => {
   let repository, user;
   beforeEach(async () => {
     const module = await Test.createTestingModule({
-      providers: [RefreshTokenRepository]
+      providers: [
+        RefreshTokenRepository,
+        {
+          provide: DataSource,
+          useValue: dataSourceStubs
+        }
+      ]
     }).compile();
-    repository = await module.get<RefreshTokenRepository>(
-      RefreshTokenRepository
-    );
+    repository = module.get<RefreshTokenRepository>(RefreshTokenRepository);
     user = new UserSerializer();
     user.id = 1;
     user.email = 'test@mail.com';

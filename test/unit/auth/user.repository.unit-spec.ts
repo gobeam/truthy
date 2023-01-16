@@ -7,6 +7,8 @@ import { UserEntity } from 'src/auth/entity/user.entity';
 import { UserStatusEnum } from 'src/auth/user-status.enum';
 import { StatusCodesList } from 'src/common/constants/status-codes-list.constants';
 import { ExceptionTitleList } from 'src/common/constants/exception-title-list.constants';
+import { DataSource } from 'typeorm';
+import { dataSourceStubs } from 'test/stub/data-source.stub';
 
 const mockUser = {
   roleId: 1,
@@ -20,9 +22,15 @@ describe('User Repository', () => {
   let userRepository;
   beforeEach(async () => {
     const module = await Test.createTestingModule({
-      providers: [UserRepository]
+      providers: [
+        UserRepository,
+        {
+          provide: DataSource,
+          useValue: dataSourceStubs
+        }
+      ]
     }).compile();
-    userRepository = await module.get<UserRepository>(UserRepository);
+    userRepository = module.get<UserRepository>(UserRepository);
   });
 
   describe('store', () => {

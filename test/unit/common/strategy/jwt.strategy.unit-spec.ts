@@ -1,17 +1,17 @@
 import { Test } from '@nestjs/testing';
 
 import { JwtStrategy } from 'src/common/strategy/jwt.strategy';
-import { UserRepository } from 'src/auth/user.repository';
 import { UserEntity } from 'src/auth/entity/user.entity';
 import { JwtPayloadDto } from 'src/auth/dto/jwt-payload.dto';
 import { UnauthorizedException } from 'src/exception/unauthorized.exception';
+import { AuthService } from 'src/auth/auth.service';
 
-const mockUserRepository = () => ({
+const authServiceMock = () => ({
   findOne: jest.fn()
 });
 
 describe('Test JWT strategy', () => {
-  let userRepository, jwtStrategy: JwtStrategy;
+  let authService, jwtStrategy: JwtStrategy;
   beforeEach(async () => {
     jest.mock('config', () => ({
       default: {
@@ -22,13 +22,13 @@ describe('Test JWT strategy', () => {
       providers: [
         JwtStrategy,
         {
-          provide: UserRepository,
-          useFactory: mockUserRepository
+          provide: AuthService,
+          useFactory: authServiceMock
         }
       ]
     }).compile();
-    jwtStrategy = await module.get<JwtStrategy>(JwtStrategy);
-    userRepository = await module.get<UserRepository>(UserRepository);
+    jwtStrategy = module.get<JwtStrategy>(JwtStrategy);
+    authService = module.get<AuthService>(AuthService);
   });
 
   describe('validate user', () => {
@@ -39,13 +39,11 @@ describe('Test JWT strategy', () => {
       const payload: JwtPayloadDto = {
         subject: '1'
       };
-      userRepository.findOne.mockResolvedValue(user);
+      authService.findOne.mockResolvedValue(user);
       const result = await jwtStrategy.validate(payload);
-      expect(userRepository.findOne).toHaveBeenCalledWith(
+      expect(authService.findOne).toHaveBeenCalledWith(
         Number(payload.subject),
-        {
-          relations: ['role', 'role.permission']
-        }
+        ['role', 'role.permission']
       );
       expect(result).toEqual(user);
     });
@@ -54,7 +52,7 @@ describe('Test JWT strategy', () => {
       const payload: JwtPayloadDto = {
         subject: '1'
       };
-      userRepository.findOne.mockResolvedValue(null);
+      authService.findOne.mockResolvedValue(null);
       await expect(jwtStrategy.validate(payload)).rejects.toThrow(
         UnauthorizedException
       );

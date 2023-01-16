@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { JwtService } from '@nestjs/jwt';
-import * as bcrypt from 'bcrypt';
+import bcrypt from 'bcrypt';
 import { UnprocessableEntityException } from '@nestjs/common';
 
 import { AuthService } from 'src/auth/auth.service';
@@ -27,7 +27,7 @@ const mockUserRepository = () => ({
   store: jest.fn(),
   login: jest.fn(),
   transform: jest.fn(),
-  findBy: jest.fn(),
+  findByCondition: jest.fn(),
   updateEntity: jest.fn(),
   getUserForResetPassword: jest.fn(),
   countEntityByCondition: jest.fn()
@@ -99,14 +99,12 @@ describe('AuthService', () => {
       ]
     }).compile();
 
-    service = await module.get<AuthService>(AuthService);
-    userRepository = await module.get<UserRepository>(UserRepository);
-    refreshTokenService = await module.get<RefreshTokenService>(
-      RefreshTokenService
-    );
-    mailService = await module.get<MailService>(MailService);
-    throttleService = await module.get<'LOGIN_THROTTLE'>('LOGIN_THROTTLE');
-    jwtService = await module.get<JwtService>(JwtService);
+    service = module.get<AuthService>(AuthService);
+    userRepository = module.get<UserRepository>(UserRepository);
+    refreshTokenService = module.get<RefreshTokenService>(RefreshTokenService);
+    mailService = module.get<MailService>(MailService);
+    throttleService = module.get<'LOGIN_THROTTLE'>('LOGIN_THROTTLE');
+    jwtService = module.get<JwtService>(JwtService);
   });
 
   afterEach(() => {
@@ -228,7 +226,11 @@ describe('AuthService', () => {
       mockUser.status = UserStatusEnum.INACTIVE; // initially user will have inactive status
       const token = 'Adf2vBnVV';
       await service.activateAccount(token);
-      expect(userRepository.findOne).toHaveBeenCalledWith({ token });
+      expect(userRepository.findOne).toHaveBeenCalledWith({
+        where: {
+          token
+        }
+      });
       expect(service.generateUniqueToken).toHaveBeenCalled();
       expect(mockUser.save).toHaveBeenCalled();
     });
@@ -246,9 +248,12 @@ describe('AuthService', () => {
 
   describe('findBy', () => {
     it('find user by id', async () => {
-      userRepository.findBy.mockResolvedValue(mockUser);
-      const result = await service.findBy('username', 'tester');
-      expect(userRepository.findBy).toHaveBeenCalledWith('username', 'tester');
+      userRepository.findByCondition.mockResolvedValue(mockUser);
+      const result = await service.findByCondition('username', 'tester');
+      expect(userRepository.findByCondition).toHaveBeenCalledWith(
+        'username',
+        'tester'
+      );
       expect(result).toBe(mockUser);
     });
   });

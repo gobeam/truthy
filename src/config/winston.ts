@@ -1,8 +1,8 @@
-import * as winston from 'winston';
+import winston from 'winston';
 import { utilities as nestWinstonModuleUtilities } from 'nest-winston';
 import { WinstonModuleOptions } from 'nest-winston';
-import * as WinstonCloudWatch from 'winston-cloudwatch';
-import * as config from 'config';
+import WinstonCloudWatch from 'winston-cloudwatch';
+import config from 'config';
 
 const isProduction = process.env.NODE_ENV === 'production';
 const winstonConfig = config.get('winston');

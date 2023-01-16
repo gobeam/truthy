@@ -16,7 +16,7 @@ export class IsUsernameAlreadyExist implements ValidatorConstraintInterface {
    * @param text
    */
   async validate(text: string) {
-    const user = await this.authService.findBy('username', text);
+    const user = await this.authService.findByCondition('username', text);
     return !user;
   }
 }

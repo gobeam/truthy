@@ -1,4 +1,4 @@
-import { plainToClass } from 'class-transformer';
+import { plainToInstance } from 'class-transformer';
 import {
   DeepPartial,
   FindManyOptions,
@@ -37,7 +37,7 @@ export class BaseRepository<
         id
       },
       relations
-    })
+    } as any)
       .then((entity) => {
         if (!entity) {
           return Promise.reject(new NotFoundException());
@@ -56,7 +56,7 @@ export class BaseRepository<
    * @param relations
    * @param transformOptions
    */
-  async findBy(
+  async findByCondition(
     fieldName: string,
     value: any,
     relations: string[] = [],
@@ -67,7 +67,7 @@ export class BaseRepository<
         [fieldName]: value
       },
       relations
-    })
+    } as any)
       .then((entity) => {
         if (!entity) {
           return Promise.reject(new NotFoundException());
@@ -88,7 +88,7 @@ export class BaseRepository<
   ): Promise<number> {
     return this.count({
       where: conditions
-    })
+    } as any)
       .then((count) => {
         return Promise.resolve(count);
       })
@@ -223,7 +223,7 @@ export class BaseRepository<
    * @param transformOptions
    */
   transform(model: T, transformOptions = {}): K {
-    return plainToClass(ModelSerializer, model, transformOptions) as K;
+    return plainToInstance(ModelSerializer, model, transformOptions) as K;
   }
 
   /**

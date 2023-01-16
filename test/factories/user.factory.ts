@@ -1,6 +1,6 @@
-import { getRepository } from 'typeorm';
+import { DataSource } from 'typeorm';
 import { faker } from '@faker-js/faker';
-import * as bcrypt from 'bcrypt';
+import bcrypt from 'bcrypt';
 
 import { UserEntity } from 'src/auth/entity/user.entity';
 import { UserStatusEnum } from 'src/auth/user-status.enum';
@@ -8,9 +8,14 @@ import { RoleEntity } from 'src/role/entities/role.entity';
 
 export class UserFactory {
   private role: RoleEntity;
+  private connection: DataSource;
 
-  static new() {
-    return new UserFactory();
+  static new(connection: DataSource) {
+    return new UserFactory(connection);
+  }
+
+  constructor(connection: DataSource) {
+    this.connection = connection;
   }
 
   withRole(role: RoleEntity) {
@@ -19,7 +24,6 @@ export class UserFactory {
   }
 
   async create(user: Partial<UserEntity> = {}) {
-    const userRepository = getRepository(UserEntity);
     const salt = await bcrypt.genSalt();
     const password = await this.hashPassword(
       user.password || faker.internet.password(),
@@ -30,7 +34,7 @@ export class UserFactory {
       email: faker.internet.email().toLowerCase(),
       name: `${faker.name.firstName()} ${faker.name.lastName()}`,
       address: faker.address.streetAddress(),
-      contact: faker.phone.phoneNumber(),
+      contact: faker.phone.number(),
       avatar: faker.image.avatar(),
       salt,
       token: faker.datatype.uuid(),
@@ -41,7 +45,13 @@ export class UserFactory {
     };
 
     if (this.role) payload.role = this.role;
-    return userRepository.save(payload);
+    return this.connection.manager.save(UserEntity, payload);
+  }
+
+  getById(id: number) {
+    return this.connection.manager.getRepository(RoleEntity).findOneBy({
+      id
+    });
   }
 
   async createMany(users: Partial<UserEntity>[]) {

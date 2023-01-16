@@ -4,7 +4,7 @@ import { AuthService } from 'src/auth/auth.service';
 import { IsUsernameAlreadyExist } from 'src/auth/pipes/username-unique-validation.pipes';
 
 const mockAuthService = () => ({
-  findBy: jest.fn()
+  findByCondition: jest.fn()
 });
 describe('IsUsernameAlreadyExist', () => {
   let authService: AuthService, isUsernameAlreadyExist: IsUsernameAlreadyExist;
@@ -18,17 +18,20 @@ describe('IsUsernameAlreadyExist', () => {
         }
       ]
     }).compile();
-    isUsernameAlreadyExist = await module.get<IsUsernameAlreadyExist>(
+    isUsernameAlreadyExist = module.get<IsUsernameAlreadyExist>(
       IsUsernameAlreadyExist
     );
-    authService = await module.get<AuthService>(AuthService);
+    authService = module.get<AuthService>(AuthService);
   });
 
   describe('username unique validation', () => {
     it('check for same username', async () => {
-      expect(authService.findBy).not.toHaveBeenCalled();
+      expect(authService.findByCondition).not.toHaveBeenCalled();
       const result = await isUsernameAlreadyExist.validate('tester');
-      expect(authService.findBy).toHaveBeenCalledWith('username', 'tester');
+      expect(authService.findByCondition).toHaveBeenCalledWith(
+        'username',
+        'tester'
+      );
       expect(result).toBe(true);
     });
   });

@@ -2,24 +2,23 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { APP_FILTER, APP_GUARD, APP_PIPE } from '@nestjs/core';
-import * as path from 'path';
-import * as config from 'config';
+import path, { join } from 'path';
+import config from 'config';
 import { ServeStaticModule } from '@nestjs/serve-static';
-import { join } from 'path';
 import {
   CookieResolver,
   HeaderResolver,
-  I18nJsonParser,
   I18nModule,
-  QueryResolver
+  QueryResolver,
+  AcceptLanguageResolver
 } from 'nestjs-i18n';
 import { WinstonModule } from 'nest-winston';
 
 import { AuthModule } from 'src/auth/auth.module';
 import { RolesModule } from 'src/role/roles.module';
 import { PermissionsModule } from 'src/permission/permissions.module';
-import * as ormConfig from 'src/config/ormconfig';
-import * as throttleConfig from 'src/config/throttle-config';
+import { AppDataSource } from 'src/config/ormconfig';
+import { throttleConfig } from 'src/config/throttle-config';
 import { MailModule } from 'src/mail/mail.module';
 import { EmailTemplateModule } from 'src/email-template/email-template.module';
 import { RefreshTokenModule } from 'src/refresh-token/refresh-token.module';
@@ -40,22 +39,17 @@ const appConfig = config.get('app');
       useFactory: () => throttleConfig
     }),
     TypeOrmModule.forRootAsync({
-      useFactory: () => ormConfig
+      useFactory: () => AppDataSource.options
     }),
-    I18nModule.forRootAsync({
-      useFactory: () => ({
-        fallbackLanguage: appConfig.fallbackLanguage,
-        parserOptions: {
-          path: path.join(__dirname, '/i18n/'),
-          watch: true
-        }
-      }),
-      parser: I18nJsonParser,
+    I18nModule.forRoot({
+      fallbackLanguage: appConfig.fallbackLanguage,
+      loaderOptions: {
+        path: path.join(__dirname, '/i18n/'),
+        watch: true
+      },
       resolvers: [
-        {
-          use: QueryResolver,
-          options: ['lang', 'locale', 'l']
-        },
+        { use: QueryResolver, options: ['lang'] },
+        AcceptLanguageResolver,
         new HeaderResolver(['x-custom-lang']),
         new CookieResolver(['lang', 'locale', 'l'])
       ]

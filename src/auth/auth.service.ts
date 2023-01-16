@@ -5,8 +5,7 @@ import {
   UnprocessableEntityException
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { InjectRepository } from '@nestjs/typeorm';
-import * as config from 'config';
+import config from 'config';
 import { existsSync, unlinkSync } from 'fs';
 import { SignOptions } from 'jsonwebtoken';
 import { DeepPartial, Not, ObjectLiteral } from 'typeorm';
@@ -61,7 +60,6 @@ const BASE_OPTIONS: SignOptions = {
 @Injectable()
 export class AuthService {
   constructor(
-    @InjectRepository(UserRepository)
     private readonly userRepository: UserRepository,
     private readonly jwt: JwtService,
     private readonly mailService: MailService,
@@ -124,13 +122,17 @@ export class AuthService {
     return user;
   }
 
+  async findOne(id: number, relations: string[] = []): Promise<UserSerializer> {
+    return this.userRepository.get(id, relations);
+  }
+
   /**
    * find user entity by condition
    * @param field
    * @param value
    */
-  async findBy(field: string, value: string): Promise<UserSerializer> {
-    return this.userRepository.findBy(field, value);
+  async findByCondition(field: string, value: string): Promise<UserSerializer> {
+    return this.userRepository.findByCondition(field, value);
   }
 
   /**
@@ -322,7 +324,7 @@ export class AuthService {
    * @param token
    */
   async activateAccount(token: string): Promise<void> {
-    const user = await this.userRepository.findOne({ token });
+    const user = await this.userRepository.findOne({ where: { token } });
     if (!user) {
       throw new NotFoundException();
     }

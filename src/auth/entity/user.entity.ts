@@ -8,7 +8,7 @@ import {
   JoinColumn,
   OneToOne
 } from 'typeorm';
-import * as bcrypt from 'bcrypt';
+import bcrypt from 'bcrypt';
 import { Exclude } from 'class-transformer';
 
 import { UserStatusEnum } from 'src/auth/user-status.enum';

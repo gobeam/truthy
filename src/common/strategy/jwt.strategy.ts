@@ -1,13 +1,12 @@
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import * as config from 'config';
+import config from 'config';
 
-import { UserRepository } from 'src/auth/user.repository';
-import { UserEntity } from 'src/auth/entity/user.entity';
 import { JwtPayloadDto } from 'src/auth/dto/jwt-payload.dto';
 import { UnauthorizedException } from 'src/exception/unauthorized.exception';
+import { AuthService } from 'src/auth/auth.service';
+import { UserSerializer } from 'src/auth/serializer/user.serializer';
 
 const cookieExtractor = (req) => {
   return req?.cookies?.Authentication;
@@ -15,10 +14,7 @@ const cookieExtractor = (req) => {
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy, 'jwt-strategy') {
-  constructor(
-    @InjectRepository(UserRepository)
-    private userRepository: UserRepository
-  ) {
+  constructor(private readonly service: AuthService) {
     super({
       jwtFromRequest: ExtractJwt.fromExtractors([cookieExtractor]),
       secretOrKey: process.env.JWT_SECRET || config.get('jwt.secret')
@@ -29,11 +25,12 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt-strategy') {
    * Validate if user exists and return user entity
    * @param payload
    */
-  async validate(payload: JwtPayloadDto): Promise<UserEntity> {
+  async validate(payload: JwtPayloadDto): Promise<UserSerializer> {
     const { subject } = payload;
-    const user = await this.userRepository.findOne(Number(subject), {
-      relations: ['role', 'role.permission']
-    });
+    const user = await this.service.findOne(Number(subject), [
+      'role',
+      'role.permission'
+    ]);
     if (!user) {
       throw new UnauthorizedException();
     }

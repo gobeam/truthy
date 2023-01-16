@@ -7,15 +7,16 @@ import { RoleRepository } from 'src/role/role.repository';
 import { UniqueValidatorPipe } from 'src/common/pipes/unique-validator.pipe';
 import { AuthModule } from 'src/auth/auth.module';
 import { PermissionsModule } from 'src/permission/permissions.module';
+import { RoleEntity } from './entities/role.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([RoleRepository]),
+    TypeOrmModule.forFeature([RoleEntity]),
     AuthModule,
     PermissionsModule
   ],
   exports: [],
   controllers: [RolesController],
-  providers: [RolesService, UniqueValidatorPipe]
+  providers: [RoleRepository, RolesService, UniqueValidatorPipe]
 })
 export class RolesModule {}

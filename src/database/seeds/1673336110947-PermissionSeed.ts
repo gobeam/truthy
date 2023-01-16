@@ -1,5 +1,4 @@
-import { Factory } from 'typeorm-seeding';
-import { Connection } from 'typeorm';
+import { MigrationInterface, QueryRunner } from 'typeorm';
 
 import {
   ModulesPayloadInterface,
@@ -10,10 +9,10 @@ import {
 } from 'src/config/permission-config';
 import { PermissionEntity } from 'src/permission/entities/permission.entity';
 
-export default class CreatePermissionSeed {
+export class PermissionSeed1673336110947 implements MigrationInterface {
   permissions: RoutePayloadInterface[] = [];
 
-  public async run(factory: Factory, connection: Connection): Promise<any> {
+  public async up(queryRunner: QueryRunner): Promise<void> {
     const modules = PermissionConfiguration.modules;
     for (const moduleData of modules) {
       let resource = moduleData.resource;
@@ -28,7 +27,7 @@ export default class CreatePermissionSeed {
     }
 
     if (this.permissions && this.permissions.length > 0) {
-      await connection
+      await queryRunner.manager
         .createQueryBuilder()
         .insert()
         .into(PermissionEntity)
@@ -38,7 +37,11 @@ export default class CreatePermissionSeed {
     }
   }
 
-  assignResourceAndConcatPermission(
+  public async down(queryRunner: QueryRunner): Promise<void> {
+    await queryRunner.manager.getRepository(PermissionEntity).delete({});
+  }
+
+  private assignResourceAndConcatPermission(
     modules: ModulesPayloadInterface | SubModulePayloadInterface,
     resource: string,
     isDefault?: false
@@ -50,7 +53,7 @@ export default class CreatePermissionSeed {
     }
   }
 
-  concatPermissions(
+  private concatPermissions(
     permission: PermissionPayload,
     resource: string,
     isDefault: boolean

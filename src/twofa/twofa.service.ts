@@ -1,5 +1,5 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
-import * as config from 'config';
+import config from 'config';
 import { Response } from 'express';
 import { authenticator } from 'otplib';
 import { toFileStream, toDataURL } from 'qrcode';

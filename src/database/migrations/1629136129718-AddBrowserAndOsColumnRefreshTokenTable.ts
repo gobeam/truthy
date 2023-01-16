@@ -41,7 +41,7 @@ export class AddBrowserAndOsColumnRefreshTokenTable1629136129718
     const table = await queryRunner.getTable(this.tableName);
     for (const field of this.indexFields) {
       const index = `IDX_REFRESH_TOKEN_${field.toUpperCase()}`;
-      const keyIndex = await table.indices.find(
+      const keyIndex = table.indices.find(
         (fk) => fk.name.indexOf(index) !== -1
       );
       await queryRunner.dropIndex(this.tableName, keyIndex);

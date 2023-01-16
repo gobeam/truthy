@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { BullModule } from '@nestjs/bull';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { PugAdapter } from '@nestjs-modules/mailer/dist/adapters/pug.adapter';
-import * as config from 'config';
+import config from 'config';
 
 import { MailService } from 'src/mail/mail.service';
 import { MailProcessor } from 'src/mail/mail.processor';

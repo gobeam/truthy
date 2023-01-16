@@ -1,13 +1,12 @@
-import { Factory } from 'typeorm-seeding';
-import { Connection } from 'typeorm';
+import { MigrationInterface, QueryRunner } from 'typeorm';
 
 import { UserEntity } from 'src/auth/entity/user.entity';
 import { UserStatusEnum } from 'src/auth/user-status.enum';
 import { RoleEntity } from 'src/role/entities/role.entity';
 
-export default class CreateUserSeed {
-  public async run(factory: Factory, connection: Connection): Promise<any> {
-    const role = await connection
+export class UserSeeder1673336356834 implements MigrationInterface {
+  public async up(queryRunner: QueryRunner): Promise<void> {
+    const role = await queryRunner.manager
       .getRepository(RoleEntity)
       .createQueryBuilder('role')
       .where('role.name = :name', {
@@ -18,7 +17,7 @@ export default class CreateUserSeed {
     if (!role) {
       return;
     }
-    await connection
+    await queryRunner.manager
       .createQueryBuilder()
       .insert()
       .into(UserEntity)
@@ -36,5 +35,9 @@ export default class CreateUserSeed {
       ])
       .orIgnore()
       .execute();
+  }
+
+  public async down(queryRunner: QueryRunner): Promise<void> {
+    await queryRunner.manager.getRepository(UserEntity).delete({});
   }
 }

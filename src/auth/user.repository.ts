@@ -1,6 +1,7 @@
-import { DeepPartial, EntityRepository } from 'typeorm';
-import * as bcrypt from 'bcrypt';
-import { classToPlain, plainToClass } from 'class-transformer';
+import { DataSource, DeepPartial } from 'typeorm';
+import { Injectable } from '@nestjs/common';
+import bcrypt from 'bcrypt';
+import { instanceToPlain, plainToInstance } from 'class-transformer';
 
 import { UserEntity } from 'src/auth/entity/user.entity';
 import { UserLoginDto } from 'src/auth/dto/user-login.dto';
@@ -11,8 +12,12 @@ import { UserStatusEnum } from 'src/auth/user-status.enum';
 import { ExceptionTitleList } from 'src/common/constants/exception-title-list.constants';
 import { StatusCodesList } from 'src/common/constants/status-codes-list.constants';
 
-@EntityRepository(UserEntity)
+@Injectable()
 export class UserRepository extends BaseRepository<UserEntity, UserSerializer> {
+  constructor(private dataSource: DataSource) {
+    super(UserEntity, dataSource.createEntityManager());
+  }
+
   /**
    * store new user
    * @param createUserDto
@@ -40,16 +45,14 @@ export class UserRepository extends BaseRepository<UserEntity, UserSerializer> {
     userLoginDto: UserLoginDto
   ): Promise<[user: UserEntity, error: string, code: number]> {
     const { username, password } = userLoginDto;
-    const user = await this.findOne({
-      where: [
-        {
-          username: username
-        },
-        {
-          email: username
-        }
-      ]
-    });
+    const user = await this.findOneBy([
+      {
+        username: username
+      },
+      {
+        email: username
+      }
+    ]);
     if (user && (await user.validatePassword(password))) {
       if (user.status !== UserStatusEnum.ACTIVE) {
         return [
@@ -89,9 +92,9 @@ export class UserRepository extends BaseRepository<UserEntity, UserSerializer> {
    * @param transformOption
    */
   transform(model: UserEntity, transformOption = {}): UserSerializer {
-    return plainToClass(
+    return plainToInstance(
       UserSerializer,
-      classToPlain(model, transformOption),
+      instanceToPlain(model, transformOption),
       transformOption
     );
   }

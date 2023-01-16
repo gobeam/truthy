@@ -1,5 +1,5 @@
 import { HttpStatus } from '@nestjs/common';
-import * as request from 'supertest';
+import request from 'supertest';
 
 import { AppFactory } from 'test/factories/app';
 import { RoleFactory } from 'test/factories/role.factory';
@@ -10,12 +10,12 @@ describe('AuthController (e2e)', () => {
   let app: AppFactory;
 
   beforeAll(async () => {
-    await AppFactory.dropTables();
     app = await AppFactory.new();
+    await app.cleanupDbTable();
   });
 
   beforeEach(async () => {
-    await AppFactory.cleanupDB();
+    await app.cleanupDbTable();
   });
 
   it('POST /auth/login requires valid username and password', async () => {
@@ -40,15 +40,15 @@ describe('AuthController (e2e)', () => {
 
   it('POST /auth/login should login if provided with valid username and password', async () => {
     let cookie;
-    const role = await RoleFactory.new().create();
-    const user = await UserFactory.new()
+    const role = await RoleFactory.new(app.dbConnection).create();
+    const user = await UserFactory.new(app.dbConnection)
       .withRole(role)
       .create({ password: 'password' });
 
     await request(app.instance.getHttpServer())
       .post(`/auth/login`)
       .send({
-        username: user.email,
+        username: user.username,
         password: 'password',
         remember: true
       })
@@ -63,6 +63,6 @@ describe('AuthController (e2e)', () => {
   });
 
   afterAll(async () => {
-    await app.close();
+    if (app) await app.close();
   });
 });

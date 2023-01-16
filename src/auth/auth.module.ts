@@ -2,8 +2,8 @@ import { Module } from '@nestjs/common';
 import { PassportModule } from '@nestjs/passport';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { JwtModule } from '@nestjs/jwt';
-import * as Redis from 'ioredis';
-import * as config from 'config';
+import Redis from 'ioredis';
+import config from 'config';
 
 import { AuthController } from 'src/auth/auth.controller';
 import { AuthService } from 'src/auth/auth.service';
@@ -14,6 +14,7 @@ import { RateLimiterRedis } from 'rate-limiter-flexible';
 import { RefreshTokenModule } from 'src/refresh-token/refresh-token.module';
 import { JwtTwoFactorStrategy } from 'src/common/strategy/jwt-two-factor.strategy';
 import { JwtStrategy } from 'src/common/strategy/jwt.strategy';
+import { UserEntity } from './entity/user.entity';
 
 const throttleConfig = config.get('throttle.login');
 const redisConfig = config.get('queue');
@@ -51,12 +52,13 @@ const LoginThrottleFactory = {
     PassportModule.register({
       defaultStrategy: 'jwt'
     }),
-    TypeOrmModule.forFeature([UserRepository]),
+    TypeOrmModule.forFeature([UserEntity]),
     MailModule,
     RefreshTokenModule
   ],
   controllers: [AuthController],
   providers: [
+    UserRepository,
     AuthService,
     JwtTwoFactorStrategy,
     JwtStrategy,

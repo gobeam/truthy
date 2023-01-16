@@ -33,7 +33,10 @@ describe('test base repository', () => {
   });
 
   beforeEach(async () => {
-    baseRepository = new BaseRepository<MockEntity, MockSerializer>();
+    baseRepository = new BaseRepository<MockEntity, MockSerializer>(
+      MockEntity,
+      null
+    );
     entity = new MockEntity();
     entity.id = 1;
     entity.test = 'testing';
@@ -74,9 +77,6 @@ describe('test base repository', () => {
 
   describe('test get all entity', () => {
     it('get all entity', async () => {
-      // const createQueryBuilderSpy = jest
-      //   .spyOn(Repository.prototype, 'createQueryBuilder')
-      //   .mockImplementation(() => createQueryBuilder);
       const findSpy = jest
         .spyOn(Repository.prototype, 'find')
         .mockResolvedValue([entity]);

@@ -1,16 +1,21 @@
-import { EntityRepository } from 'typeorm';
-import { classToPlain, plainToClass } from 'class-transformer';
+import { DataSource } from 'typeorm';
+import { instanceToPlain, plainToInstance } from 'class-transformer';
 
 import { PermissionEntity } from 'src/permission/entities/permission.entity';
 import { BaseRepository } from 'src/common/repository/base.repository';
 import { Permission } from 'src/permission/serializer/permission.serializer';
 import { RoutePayloadInterface } from 'src/config/permission-config';
+import { Injectable } from '@nestjs/common';
+import { UserEntity } from 'src/auth/entity/user.entity';
 
-@EntityRepository(PermissionEntity)
+@Injectable()
 export class PermissionRepository extends BaseRepository<
   PermissionEntity,
   Permission
 > {
+  constructor(private dataSource: DataSource) {
+    super(UserEntity, dataSource.createEntityManager());
+  }
   async syncPermission(
     permissionsList: RoutePayloadInterface[]
   ): Promise<void> {
@@ -23,9 +28,9 @@ export class PermissionRepository extends BaseRepository<
   }
 
   transform(model: PermissionEntity, transformOption = {}): Permission {
-    return plainToClass(
+    return plainToInstance(
       Permission,
-      classToPlain(model, transformOption),
+      instanceToPlain(model, transformOption),
       transformOption
     );
   }

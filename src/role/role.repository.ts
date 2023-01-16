@@ -1,5 +1,5 @@
-import { EntityRepository } from 'typeorm';
-import { classToPlain, plainToClass } from 'class-transformer';
+import { DataSource } from 'typeorm';
+import { instanceToPlain, plainToInstance } from 'class-transformer';
 
 import { RoleEntity } from 'src/role/entities/role.entity';
 import { RoleSerializer } from 'src/role/serializer/role.serializer';
@@ -7,9 +7,15 @@ import { BaseRepository } from 'src/common/repository/base.repository';
 import { CreateRoleDto } from 'src/role/dto/create-role.dto';
 import { PermissionEntity } from 'src/permission/entities/permission.entity';
 import { UpdateRoleDto } from 'src/role/dto/update-role.dto';
+import { Injectable } from '@nestjs/common';
+import { UserEntity } from 'src/auth/entity/user.entity';
 
-@EntityRepository(RoleEntity)
+@Injectable()
 export class RoleRepository extends BaseRepository<RoleEntity, RoleSerializer> {
+  constructor(private dataSource: DataSource) {
+    super(UserEntity, dataSource.createEntityManager());
+  }
+
   async store(
     createRoleDto: CreateRoleDto,
     permissions: PermissionEntity[]
@@ -47,9 +53,9 @@ export class RoleRepository extends BaseRepository<RoleEntity, RoleSerializer> {
    * @param transformOption
    */
   transform(model: RoleEntity, transformOption = {}): RoleSerializer {
-    return plainToClass(
+    return plainToInstance(
       RoleSerializer,
-      classToPlain(model, transformOption),
+      instanceToPlain(model, transformOption),
       transformOption
     );
   }

@@ -119,7 +119,7 @@ export class UserTable1614275816426 implements MigrationInterface {
   public async down(queryRunner: QueryRunner): Promise<void> {
     const table = await queryRunner.getTable(this.tableName);
 
-    const foreignKey = await table.foreignKeys.find(
+    const foreignKey = table.foreignKeys.find(
       (fk) => fk.columnNames.indexOf('roleId') !== -1
     );
     await queryRunner.dropForeignKey(this.tableName, foreignKey);
@@ -127,7 +127,7 @@ export class UserTable1614275816426 implements MigrationInterface {
 
     for (const field of this.indexFields) {
       const index = `IDX_USER_${field.toUpperCase()}`;
-      const keyIndex = await table.indices.find(
+      const keyIndex = table.indices.find(
         (fk) => fk.name.indexOf(index) !== -1
       );
       await queryRunner.dropIndex(this.tableName, keyIndex);

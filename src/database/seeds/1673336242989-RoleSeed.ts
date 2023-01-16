@@ -1,14 +1,13 @@
-import { Factory } from 'typeorm-seeding';
-import { Connection } from 'typeorm';
+import { MigrationInterface, QueryRunner } from 'typeorm';
 
 import { RoleEntity } from 'src/role/entities/role.entity';
 import { PermissionConfiguration } from 'src/config/permission-config';
 import { PermissionEntity } from 'src/permission/entities/permission.entity';
 
-export default class CreateRoleSeed {
-  public async run(factory: Factory, connection: Connection): Promise<any> {
+export class RoleSeed1673336242989 implements MigrationInterface {
+  public async up(queryRunner: QueryRunner): Promise<void> {
     const roles = PermissionConfiguration.roles;
-    await connection
+    await queryRunner.manager
       .createQueryBuilder()
       .insert()
       .into(RoleEntity)
@@ -17,7 +16,7 @@ export default class CreateRoleSeed {
       .execute();
 
     // Assign all permission to superUser
-    const role = await connection
+    const role = await queryRunner.manager
       .getRepository(RoleEntity)
       .createQueryBuilder('role')
       .where('role.name = :name', {
@@ -26,11 +25,15 @@ export default class CreateRoleSeed {
       .getOne();
 
     if (role) {
-      role.permission = await connection
+      role.permission = await queryRunner.manager
         .getRepository(PermissionEntity)
         .createQueryBuilder('permission')
         .getMany();
-      await role.save();
+      await queryRunner.manager.save(RoleEntity, role);
     }
+  }
+
+  public async down(queryRunner: QueryRunner): Promise<void> {
+    await queryRunner.manager.getRepository(RoleEntity).delete({});
   }
 }

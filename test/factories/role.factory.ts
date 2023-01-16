@@ -1,16 +1,20 @@
-import { getRepository } from 'typeorm';
+import { DataSource } from 'typeorm';
 import { faker } from '@faker-js/faker';
 
 import { RoleEntity } from 'src/role/entities/role.entity';
 
 export class RoleFactory {
-  static new() {
-    return new RoleFactory();
+  private connection: DataSource;
+  static new(connection: DataSource) {
+    return new RoleFactory(connection);
   }
 
-  async create(role: Partial<RoleEntity> = {}) {
-    const roleRepository = getRepository(RoleEntity);
-    return roleRepository.save({
+  constructor(connection: DataSource) {
+    this.connection = connection;
+  }
+
+  create(role: Partial<RoleEntity> = {}) {
+    return this.connection.manager.save(RoleEntity, {
       name: faker.name.jobTitle(),
       description: faker.lorem.sentence(),
       ...role

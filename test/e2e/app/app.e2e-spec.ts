@@ -1,4 +1,4 @@
-import * as request from 'supertest';
+import request from 'supertest';
 
 import { AppFactory } from 'test/factories/app';
 
@@ -6,12 +6,12 @@ describe('AppController (e2e)', () => {
   let app: AppFactory;
 
   beforeAll(async () => {
-    await AppFactory.dropTables();
     app = await AppFactory.new();
+    await app.cleanupDbTable();
   });
 
   beforeEach(async () => {
-    await AppFactory.cleanupDB();
+    await app.cleanupDbTable();
   });
 
   it('/ (GET)', () => {
@@ -22,6 +22,6 @@ describe('AppController (e2e)', () => {
   });
 
   afterAll(async () => {
-    await app.close();
+    if (app) await app.close();
   });
 });

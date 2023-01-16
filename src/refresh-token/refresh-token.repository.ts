@@ -1,17 +1,23 @@
-import { EntityRepository } from 'typeorm';
-import * as config from 'config';
+import { DataSource } from 'typeorm';
+import config from 'config';
+import { Injectable } from '@nestjs/common';
 
 import { RefreshToken } from 'src/refresh-token/entities/refresh-token.entity';
 import { UserSerializer } from 'src/auth/serializer/user.serializer';
 import { BaseRepository } from 'src/common/repository/base.repository';
 import { RefreshTokenSerializer } from 'src/refresh-token/serializer/refresh-token.serializer';
+import { UserEntity } from 'src/auth/entity/user.entity';
 
 const tokenConfig = config.get('jwt');
-@EntityRepository(RefreshToken)
+@Injectable()
 export class RefreshTokenRepository extends BaseRepository<
   RefreshToken,
   RefreshTokenSerializer
 > {
+  constructor(private dataSource: DataSource) {
+    super(UserEntity, dataSource.createEntityManager());
+  }
+
   /**
    * Create refresh token
    * @param user
@@ -21,19 +27,20 @@ export class RefreshTokenRepository extends BaseRepository<
     user: UserSerializer,
     tokenPayload: Partial<RefreshToken>
   ): Promise<RefreshToken> {
-    const token = this.create();
-    token.userId = user.id;
-    token.isRevoked = false;
-    token.ip = tokenPayload.ip;
-    token.userAgent = tokenPayload.userAgent;
-    token.browser = tokenPayload.browser;
-    token.os = tokenPayload.os;
+    const token = this.dataSource.getRepository(RefreshToken);
     const expiration = new Date();
     expiration.setSeconds(
       expiration.getSeconds() + tokenConfig.refreshExpiresIn
     );
-    token.expires = expiration;
-    return token.save();
+    return token.save({
+      userId: user.id,
+      isRevoked: false,
+      ip: tokenPayload.ip,
+      userAgent: tokenPayload.userAgent,
+      browser: tokenPayload.browser,
+      os: tokenPayload.os,
+      expires: expiration
+    });
   }
 
   /**

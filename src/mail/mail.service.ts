@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Queue } from 'bull';
-import * as config from 'config';
+import config from 'config';
 import { InjectQueue } from '@nestjs/bull';
 
 import { MailJobInterface } from 'src/mail/interface/mail-job.interface';

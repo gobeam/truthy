@@ -1,2 +1,11 @@
+db:
+  host: 'localhost'
+  type: 'postgres'
+  port: 5432
+  username: ''
+  password: ''
+  database: 'truthy-test'
+  synchronize: false
+
 jwt:
   secret: 'example@123'
