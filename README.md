@@ -96,10 +96,6 @@ Lints all the files inside src,apps,libs,test folders and shows the results.
 
 Formats all the files inside src using prettier with config provided in .prettierrc
 
-### `yarn format`
-
-Formats all the files inside src using prettier with config provided in .prettierrc
-
 ### `yarn coverage`
 
 Runs coverage test command and creates coverage folder with detail report which can be checked with:
