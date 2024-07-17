@@ -1,5 +1,5 @@
 import { ThrottlerModule } from '@nestjs/throttler';
-import { INestApplication } from '@nestjs/common';
+import { ExecutionContext, INestApplication } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { DataSource } from 'typeorm';
 import { ThrottlerStorageRedisService } from 'nestjs-throttler-storage-redis';
@@ -7,6 +7,7 @@ import Redis from 'ioredis';
 
 import { AppModule } from 'src/app.module';
 import { AppDataSource } from 'src/config/ormconfig';
+import assert from 'assert';
 
 export class AppFactory {
   private constructor(
@@ -33,7 +34,14 @@ export class AppFactory {
             return {
               ttl: 60,
               limit: 60,
-              storage: new ThrottlerStorageRedisService(redis)
+              storage: new ThrottlerStorageRedisService(redis),
+              throttlers: [
+                {
+                  name: 'test',
+                  ttl: 60,
+                  limit: 60
+                }
+              ]
             };
           }
         })
@@ -72,7 +80,9 @@ export class AppFactory {
         );
       }
     }
-    await this.redis.flushall();
+    if ((await this.redis.ping()) === 'PONG') {
+      await this.redis.flushall();
+    }
   }
 }
 

@@ -103,9 +103,8 @@ export class PermissionsService
       description: updatePermissionDto.description
     };
     condition.id = Not(id);
-    const countSameDescription = await this.repository.countEntityByCondition(
-      condition
-    );
+    const countSameDescription =
+      await this.repository.countEntityByCondition(condition);
     if (countSameDescription > 0) {
       throw new UnprocessableEntityException({
         property: 'name',

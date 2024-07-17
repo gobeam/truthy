@@ -164,9 +164,8 @@ export class AuthService {
 
     const [user, error, code] = await this.userRepository.login(userLoginDto);
     if (!user) {
-      const [result, throttleError] = await this.limitConsumerPromiseHandler(
-        usernameIPkey
-      );
+      const [result, throttleError] =
+        await this.limitConsumerPromiseHandler(usernameIPkey);
       if (!result) {
         throw new CustomHttpException(
           `tooManyRequest-{"second":${String(
@@ -295,9 +294,8 @@ export class AuthService {
         [field]: updateUserDto[field]
       };
       condition.id = Not(id);
-      const checkUnique = await this.userRepository.countEntityByCondition(
-        condition
-      );
+      const checkUnique =
+        await this.userRepository.countEntityByCondition(condition);
       if (checkUnique > 0) {
         errorPayload.push({
           property: field,
@@ -377,9 +375,8 @@ export class AuthService {
    */
   async resetPassword(resetPasswordDto: ResetPasswordDto): Promise<void> {
     const { password } = resetPasswordDto;
-    const user = await this.userRepository.getUserForResetPassword(
-      resetPasswordDto
-    );
+    const user =
+      await this.userRepository.getUserForResetPassword(resetPasswordDto);
     if (!user) {
       throw new NotFoundException();
     }
@@ -453,9 +450,8 @@ export class AuthService {
     const condition: ObjectLiteral = {
       token
     };
-    const tokenCount = await this.userRepository.countEntityByCondition(
-      condition
-    );
+    const tokenCount =
+      await this.userRepository.countEntityByCondition(condition);
     if (tokenCount > 0) {
       await this.generateUniqueToken(length);
     }
@@ -524,9 +520,8 @@ export class AuthService {
   async revokeRefreshToken(encoded: string): Promise<void> {
     // ignore exception because anyway we are going invalidate cookies
     try {
-      const { token } = await this.refreshTokenService.resolveRefreshToken(
-        encoded
-      );
+      const { token } =
+        await this.refreshTokenService.resolveRefreshToken(encoded);
       if (token) {
         token.isRevoked = true;
         await token.save();

@@ -107,9 +107,8 @@ export class RolesService implements CommonServiceInterface<RoleSerializer> {
       name: updateRoleDto.name
     };
     condition.id = Not(id);
-    const checkUniqueTitle = await this.repository.countEntityByCondition(
-      condition
-    );
+    const checkUniqueTitle =
+      await this.repository.countEntityByCondition(condition);
     if (checkUniqueTitle > 0) {
       throw new UnprocessableEntityException({
         property: 'name',
