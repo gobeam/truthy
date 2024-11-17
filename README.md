@@ -272,11 +272,6 @@ Please make sure to update tests as appropriate. - see `CONTRIBUTING.md` for det
 
 ---
 
-## Sponsors
-- [Ekbana Solutions Pvt. Ltd](https://ekbana.com/)
-
----
-
 ## License
 
 Released under the MIT License - see `LICENSE.md` for details.
