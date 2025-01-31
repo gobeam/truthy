@@ -214,19 +214,14 @@ export class AuthService {
    */
   async limitConsumerPromiseHandler(
     usernameIPkey: string
-  ): Promise<[RateLimiterRes, RateLimiterRes]> {
-    return new Promise((resolve) => {
-      this.rateLimiter
-        .consume(usernameIPkey)
-        .then((rateLimiterRes) => {
-          resolve([rateLimiterRes, null]);
-        })
-        .catch((rateLimiterError) => {
-          resolve([null, rateLimiterError]);
-        });
-    });
+  ): Promise<[RateLimiterRes | null, RateLimiterRes | null]> {
+    try {
+      const rateLimiterRes = await this.rateLimiter.consume(usernameIPkey);
+      return [rateLimiterRes, null];
+    } catch (rateLimiterError) {
+      return [null, rateLimiterError];
+    }
   }
-
   /**
    * get user profile
    * @param user
